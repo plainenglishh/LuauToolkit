@@ -1,9 +1,9 @@
 # luauc-toolkit
 
-Pure-luau library providing utilities for assembling, dissecting and executing
-luau bytecode.
+Pure-luau library for assembling, processing, dissecting and executing luau bytecode.
 
-This library is work in progress and most features aren't implemented properly.
+> [!WARNING]  
+> This library is work in progress and most features aren't implemented.
 
 ## Todo
 
