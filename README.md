@@ -19,6 +19,7 @@ Pure-luau library for assembling, processing, dissecting and executing luau byte
     - [ ] `??` a very basic LSP
 - [ ] `P` Disassembler (emits LASM source from a given bytecode chunk/ir)
 - [ ] `?` A bytecode interpeter?
+- [ ] BytecodeBuilder class (emits IR)
 - [ ] Optimisations
     - [ ] `P` Strip debug info
     - [ ] `?` Inlining
@@ -32,7 +33,7 @@ Pure-luau library for assembling, processing, dissecting and executing luau byte
 |`?`|most likely|
 |`??`|maybe|
 |`???`|probably not|
-|`P`|prototype already completed|
+|`P`|prototype completed|
 
 ## Notes
 
