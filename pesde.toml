@@ -1,0 +1,18 @@
+name = "plainenglish/luauc_toolkit"
+version = "0.1.0"
+description = "Pure-luau library for (dis)assembling, processing and executing luau bytecode"
+authors = ["plainenglish <plainenglish@spearhead.industries>"]
+repository = "https://github.com/plainenglishh/luauc-toolkit"
+license = "MIT"
+
+[target]
+environment = "luau"
+lib = "lib/init.luau"
+
+[indices]
+default = "https://github.com/pesde-pkg/index"
+
+[scripts]
+update_opcodes = "scripts/update_opcodes.luau"
+test = "scripts/test.luau"
+bench = "scripts/bench.luau"
