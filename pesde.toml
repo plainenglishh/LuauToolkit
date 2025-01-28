@@ -4,6 +4,7 @@ description = "Pure-luau library for (dis)assembling, processing and executing l
 authors = ["plainenglish <plainenglish@spearhead.industries>"]
 repository = "https://github.com/plainenglishh/luauc-toolkit"
 license = "MIT"
+private = true
 
 [target]
 environment = "luau"
