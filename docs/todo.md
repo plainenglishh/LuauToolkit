@@ -1,10 +1,10 @@
 # Todo
 
-- [ ] Bytecode Toolkit (Toolkit for working with bytecode)
-    - [X] An intermediate table format ("IR")
+- [ ] Bytecode Toolkit -- Toolkit for working with bytecode
+    - [X] Intermediate Representation ("IR") -- Luau table representation of bytecode chunks
         - [X] Encoder
         - [X] Decoder
-    - [ ] Assembler for Luau Bytecode Assembly\* ("LASM") for creating custom bytecode chunks
+    - [ ] Luau Bytecode Assembly\* ("LASM") Assembler -- Creating custom bytecode chunks with a library DSL
         - [X] Formal Grammar
         - [X] Tokeniser
         - [X] Parser (not fully tested)
