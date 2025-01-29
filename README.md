@@ -1,4 +1,4 @@
-# luauc-toolkit
+# luau-toolkit
 
 Pure-luau library for assembling, processing, dissecting and executing luau bytecode.
 

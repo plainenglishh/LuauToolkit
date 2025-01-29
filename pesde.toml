@@ -1,4 +1,4 @@
-name = "plainenglish/luauc_toolkit"
+name = "plainenglish/luau_toolkit"
 version = "0.1.0"
 description = "Pure-luau library for (dis)assembling, processing and executing luau bytecode"
 authors = ["plainenglish <plainenglish@spearhead.industries>"]
