@@ -11,11 +11,11 @@ Pure-luau library for assembling, processing, dissecting and executing luau byte
     - [X] Encoder
     - [X] Decoder
 - [ ] A Luau Bytecode Assembler ("LASM") for creating custom bytecode chunks
-    - [ ] `P` Formal Grammar
-    - [ ] `P` VSC Textmate Grammar
+    - [X] Formal Grammar
     - [ ] `P` Lexer
     - [ ] `P` Parser
     - [ ] Analyser (to convert AST to IR)
+    - [ ] `P` VSC Textmate Grammar
     - [ ] `??` a very basic LSP
 - [ ] `P` Disassembler (emits LASM source from a given bytecode chunk/ir)
 - [ ] `?` A bytecode interpeter?
