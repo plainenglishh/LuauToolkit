@@ -22,8 +22,8 @@ Pure-luau library for assembling, processing, dissecting and executing luau byte
 - [ ] BytecodeBuilder class (emits IR)
 - [ ] Optimisations
     - [ ] `P` Strip debug info
-    - [ ] `?` Inlining
-    - [ ] `?` Unrolling
+    - [ ] `??` Inlining
+    - [ ] `???` Unrolling
 - [ ] `??` Decompiler
 - [ ] `???` Basic compiler
 - [ ] Come up with a decent name
