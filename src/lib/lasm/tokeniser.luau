@@ -3,7 +3,7 @@ export type TokenType =
     | "OPEN_PAREN"      | "CLOSE_PAREN"     | "OPEN_SBRACKET"   
     | "CLOSE_SBRACKET"  | "AT"              | "EXCLAIM"         
     | "EQ"              | "SEMICOLON"       | "DOT"
-    | "COLON"
+    | "COLON"           | "COMMA"
     -- Misc --
     | "IDENTIFIER"
     -- Keywords --
@@ -384,11 +384,23 @@ function tokeniser.tokenise(src: string|buffer): TokeniseResult
         return path;
     end
 
-    while not at_eof() do
+    match_whitespace();
+    while true do
         match_whitespace();
+        if at_eof() then
+            break;
+        end
 
         lexeme_start = cursor;
-        if match("(") then -- OPEN_PAREN
+        if match("-") and lookahead() == "-" then -- COMMENT
+            while not at_eof() do
+                if lookahead() == "\n" then
+                    break;
+                else
+                    advance();
+                end
+            end
+        elseif match("(") then -- OPEN_PAREN
             emit_token("OPEN_PAREN");
         elseif match(")") then -- CLOSE_PAREN
             emit_token("CLOSE_PAREN");
@@ -408,6 +420,8 @@ function tokeniser.tokenise(src: string|buffer): TokeniseResult
             emit_token("COLON");
         elseif match(".") then -- DOT
             emit_token("DOT");
+        elseif match(",") then -- COMMA
+            emit_token("COMMA");
         elseif lookahead() == "\"" then -- STRING_LITERAL
             local string_literal = match_string_literal();
             if string_literal then

@@ -1,24 +1,29 @@
-chunk = {chunk_statement};
-chunk_statement = chunk_attribute | string_def | proto_def;
+(* non-terminals, grouped by AST node *)
+
+chunk = {chunk_attribute | string_def | proto_def | alias_def};
+
 string_def = STRING_KEYWORD IDENTIFIER EQ STRING_LITERAL SEMICOLON;
 
-proto_def = {proto_attribute} proto_header {proto_statement} END_KEYWORD;
-proto_header = PROTO_KEYWORD IDENTIFIER OPEN_PAREN [any_literal] {COMMA any_literal} CLOSE_PAREN;
-
-proto_statement = instruction | alias_def | const_def;
+proto_def = proto_header {proto_body} END_KEYWORD;
+proto_header = {proto_attribute} PROTO_KEYWORD IDENTIFIER OPEN_PAREN [literal] {COMMA literal} CLOSE_PAREN;
+proto_body = {instruction | alias_def | const_def};
 
 instruction = [label] IDENTIFIER [value] {COMMA value} SEMICOLON;
 label = IDENTIFIER COLON;
 
 alias_def = ALIAS_KEYWORD IDENTIFIER EQ value SEMICOLON;
+
 const_def = CONST_KEYWORD IDENTIFIER EQ value SEMICOLON;
 
 proto_attribute = AT attribute_body;
 chunk_attribute = AT EXCLAIM attribute_body;
-attribute_body = IDENTIFIER | OPEN_SBRACKET IDENTIFIER [EQ any_literal] CLOSE_SBRACKET;
+attribute_body = IDENTIFIER | OPEN_SBRACKET IDENTIFIER [EQ literal] CLOSE_SBRACKET;
 
-value = IDENTIFIER | any_literal;
-any_literal = NIL_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL | NUMBER_LITERAL | VECTOR_LITERAL | IMPORT_LITERAL;
+value = identifier | literal;
+
+literal = NIL_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL | NUMBER_LITERAL | VECTOR_LITERAL | IMPORT_LITERAL;
+
+identifier = IDENTIFIER; (* For when identifier should be emitted as an AST node instead of a string literal *)
 
 
 (* Tokens *)
@@ -49,3 +54,6 @@ EQ = '=';
 SEMICOLON = ';';
 COLON = ':';
 DOT = '.';
+COMMA = ',';
+
+COMMENT = '--' ? any character except newline ? NEWLINE; (* Should NOT be emitted*)

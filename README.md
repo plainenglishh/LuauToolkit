@@ -13,7 +13,7 @@ Pure-luau library for assembling, processing, dissecting and executing luau byte
 - [ ] A Luau Bytecode Assembler ("LASM") for creating custom bytecode chunks
     - [X] Formal Grammar
     - [X] Tokeniser
-    - [ ] `P` Parser
+    - [X] Parser (not fully tested)
     - [ ] Analyser (to convert AST to IR)
     - [ ] `P` VSC Textmate Grammar
     - [ ] `??` a very basic LSP
