@@ -25,6 +25,7 @@ Pure-luau library for assembling, processing, dissecting and executing luau byte
     - [ ] `?` Inlining
     - [ ] `?` Unrolling
 - [ ] `??` Decompiler
+- [ ] `???` Basic compiler
 - [ ] Come up with a decent name
 
 ||Meaning|

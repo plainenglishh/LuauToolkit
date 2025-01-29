@@ -1,5 +1,7 @@
+--!nocheck
+
 --[[
-    plainenglishh/byteparse v1.1.0
+    plainenglishh/byteparse v1.2.0
    
     Pure-luau library for serialising and deserialising binary formats.
 ]]
@@ -33,7 +35,7 @@
 --!strict
 --!nolint LocalShadow
 
-local _BYTEPARSE_VERSION = "v1.1.0";
+local _BYTEPARSE_VERSION = "v1.2.0";
 
 export type u8 = number;
 export type u16 = number;
@@ -51,8 +53,12 @@ export type Serialisable = boolean | number | string | buffer | vector | nil | S
 export type SerialisableArray = {Serialisable};
 export type SerialisableTable = {[Serialisable]: Serialisable};
 
+export type DataType = "u8" | "i8" | "u16" | "i16" | "u32" | "i32" | "f32" | "f64";
+
+local warned = false;
 local function warn_vector_lib()
-    if not _G.BYTEPARSE_SUPPRESS_WARNINGS and type(vector) ~= "table" then
+    if not (_G.BYTEPARSE_SUPPRESS_WARNINGS or warned) and type(vector) ~= "table" then
+        warned = true;
         print(`[byteparse WARN]: expected global 'vector' to be a table, got {type(vector)}`);
         if type(vector) == "function" then
             print(`[byteparse WARN]: this is likely caused by mlua, which sets 'vector' to a function instead of the builtin vector library. either switch runtimes or polyfill 'vector'`);
@@ -60,7 +66,6 @@ local function warn_vector_lib()
     end
 end
 
--- NIL terminates zarrays.
 local TYPE_IDS = {
     NIL = 0,
     BOOLEAN = 1,
@@ -93,6 +98,16 @@ type TableParts = {
     array_size: number,
     hash_size: number,
 };
+
+local error_mt = {
+    __tostring = function(self)
+        return `[byteparse ERROR]: {self.reason}: {self.message}`;
+    end,
+};
+
+local function BPError(reason: string, message: string)
+    return setmetatable({ reason = reason, message = message, }, error_mt);
+end
 
 --[=[
     Library root.
@@ -188,6 +203,42 @@ function byteparse.zterm_buffer(buf: buffer): buffer
 end
 
 --[=[
+    Creates a new buffer from a hexadecimal string, ignoring any characters that
+    aren't [0-9A-Fa-f].
+]=]
+function byteparse.buffer_from_hex(hex: string)
+    local hex = string.gsub(hex, "%W", "");
+    local writer = byteparse.writer(0);
+    
+    for i = 1, #hex, 2  do
+        local byte = tonumber(string.sub(hex, i, i + 1), 16) :: number;
+        writer.write_u8(byte);
+    end
+
+    return writer.to_buffer();
+end
+
+--[=[
+    Reverses a range of values in a buffer in place.
+]=]
+function byteparse.buffer_reverse(b: buffer, offset: number?, count: number?)
+    local offset = offset or 0;
+    local count = (count or buffer.len(b));
+
+    if count % 2 ~= 0 then
+        count += 1;
+    end
+
+    local temp;
+
+    for i = offset, offset + count//2 - 1 do
+        temp = buffer.readu8(b, offset + (count - 1 - i));
+        buffer.writeu8(b, offset + (count - 1 - i), buffer.readu8(b, i));
+        buffer.writeu8(b, i, temp);
+    end
+end
+
+--[=[
     The library version as a semver string. E.g `v1.0.0`
 
     @within byteparse
@@ -209,8 +260,8 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
     local b = buffer.create(start_size);
     local cursor = 0;
     local written_size = 0;
-    local vector_size = 3;
-    
+    local default_vector_size = 3;
+
     --[=[
         Writer instance used to serialise to binary formats.
         @class writer
@@ -305,14 +356,14 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
         Sets the vector size. The given vector size cannot exceed the VMs
         'LUA_VECTOR_SIZE' size.
 
-        @param vec_size number -- The vector size, must be either 3 or 4.
+        @error InvalidVecSize -- Errors when passed a vector size that isn't 3 or 4.
     ]=]
-    function writer.set_vector_size(vec_size: number)
+    function writer.set_default_vector_size(vec_size: number)
         if vec_size ~= 3 and vec_size ~= 4 then
-            error("vector size must be either 3 or 4", 2);
+            error(BPError("InvalidVecSize", `expected either 3 or 4, got {vec_size}`), 2);
         end
 
-        vector_size = vec_size;
+        default_vector_size = vec_size;
     end
 
     --[=[
@@ -544,54 +595,54 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
     --[=[
         Writes a array without a prefixed length.
 
-        Assumes the encoder function advances the cursor.
+        Assumes the writer_callback function advances the cursor.
 
         Note: You should ensure the binary format has a way of encoding the
         arrays size, as this function doesn't write any data a reader can use
         to determine the size.
 
-        @param ... B... -- Additional parameters to pass to the encoder.
+        @param ... B... -- Additional parameters to pass to the writer_callback.
     ]=]
-    function writer.write_array<T, B...>(value: {T}, encoder: (T) -> (), ...: B...)
+    function writer.write_array<T, B...>(value: {T}, writer_callback: (T) -> (), ...: B...)
         for _, v in value do
-            encoder(v, ...);
+            writer_callback(v, ...);
         end
     end
 
     --[=[
         Writes a length prefixed array.
 
-        Assumes the encoder function advances the cursor.
+        Assumes the writer_callback function advances the cursor.
 
-        @param ... B... -- Additional parameters to pass to the encoder.
+        @param ... B... -- Additional parameters to pass to the writer_callback.
     ]=]
-    function writer.write_larray<T, B...>(value: {T}, encoder: (T) -> (), ...: B...)
+    function writer.write_larray<T, B...>(value: {T}, writer_callback: (T) -> (), ...: B...)
         writer.write_varint(#value);
-        writer.write_array(value, encoder, ...);
+        writer.write_array(value, writer_callback, ...);
     end
 
     --[=[
         Writes a null terminated array.
 
-        Assumes the encoder function advances the cursor. The encoder function
+        Assumes the writer_callback function advances the cursor. The writer_callback function
         can freely emit null bytes **after** the first byte, provided it advances the cursor properly.
 
-        @param ... B... -- Additional parameters to pass to the encoder.
+        @param ... B... -- Additional parameters to pass to the writer_callback.
     ]=]
-    function writer.write_zarray<T, B...>(value: {T}, encoder: (T) -> (), ...: B...)
-        writer.write_array(value, encoder, ...);
+    function writer.write_zarray<T, B...>(value: {T}, writer_callback: (T) -> (), ...: B...)
+        writer.write_array(value, writer_callback, ...);
         writer.write_null();
     end
 
     --[=[
         Writes a vector.
     ]=]
-    function writer.write_vector(value: vector)
+    function writer.write_vector(value: vector, vector_size: number?)
         writer.write_f32(value.x);
         writer.write_f32(value.y);
         writer.write_f32(value.z);
         
-        if vector_size == 4 then
+        if (vector_size or default_vector_size) == 4 then
             writer.write_f32((value :: any).w);
         end
     end
@@ -655,6 +706,25 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
         end
     end
 
+    --[=[
+        Writes an optional value.
+
+        This function writes a boolean indicating whether the value is present,
+        followed by the data itself (if present) using `writer_callback`.
+
+        #### Example Use
+        ```lua
+        writer.write_optional(1, writer.write_u8); -- Writes `0101`
+        writer.write_optional(nil, writer.write_u8); -- Writes `00`
+        ```
+    ]=]
+    function writer.write_optional<T, B...>(value: T?, writer_callback: (T) -> (), ...: B...)
+        writer.write_bool(value ~= nil);
+        if value ~= nil then
+            writer_callback(value, ...);
+        end
+    end
+
     return writer;
 end
 
@@ -667,7 +737,7 @@ function byteparse.reader(b: buffer)
     warn_vector_lib();
 
     local cursor = 0;
-    local vector_size = 3;
+    local default_vector_size = 3;
 
     --[=[
         Advances the read cursor by a set amount following a read.
@@ -711,14 +781,14 @@ function byteparse.reader(b: buffer)
         Sets the vector size. The given vector size cannot exceed the VMs
         'LUA_VECTOR_SIZE' size.
 
-        @param vec_size number -- The vector size, must be either 3 or 4.
+        @error InvalidVecSize -- Errors when passed a vector size that isn't 3 or 4.
     ]=]
-    function reader.set_vector_size(vec_size: number)
+    function reader.set_default_vector_size(vec_size: number)
         if vec_size ~= 3 and vec_size ~= 4 then
-            error("vector size must be either 3 or 4", 2);
+            error(BPError("InvalidVecSize", `expected either 3 or 4, got {vec_size}`), 2);
         end
 
-        vector_size = vec_size;
+        default_vector_size = vec_size;
     end
 
     --[=[
@@ -900,16 +970,16 @@ function byteparse.reader(b: buffer)
     --[=[
         Reads an array of values.
 
-        Assumes `decoder` advances the cursor.
-        Stops reading if the decoder returns nil.
+        Assumes `reader_callback` advances the cursor.
+        Stops reading if the reader_callback returns nil.
 
-        @param ... B... -- Additional parameters to pass to the decoder.
+        @param ... B... -- Additional parameters to pass to the reader_callback.
     ]=]
-    function reader.read_array<T, B...>(size: number, decoder: (B...) -> T?, ...: B...): {T}
+    function reader.read_array<T, B...>(size: number, reader_callback: (B...) -> T?, ...: B...): {T}
         local values = {};
         if size == -1 then
             while true do
-                local next_value = decoder(...);
+                local next_value = reader_callback(...);
                 if next_value then
                     table.insert(values, next_value);
                 else
@@ -918,7 +988,7 @@ function byteparse.reader(b: buffer)
             end
         else
             for i = 1, size do
-                local next_value = decoder(...);
+                local next_value = reader_callback(...);
                 if next_value then
                     table.insert(values, next_value);
                 else
@@ -933,25 +1003,25 @@ function byteparse.reader(b: buffer)
     --[=[
         Reads a length prefixed array of values.
 
-        Assumes `decoder` advances the cursor.
-        Stops reading if the decoder returns nil.
+        Assumes `reader_callback` advances the cursor.
+        Stops reading if the reader_callback returns nil.
 
-        @param ... B... -- Additional parameters to pass to the decoder.
+        @param ... B... -- Additional parameters to pass to the reader_callback.
     ]=]
-    function reader.read_larray<T, B...>(decoder: (B...) -> T?, ...: B...): {T}
+    function reader.read_larray<T, B...>(reader_callback: (B...) -> T?, ...: B...): {T}
         local size = reader.read_varint();
-        return reader.read_array(size, decoder, ...);
+        return reader.read_array(size, reader_callback, ...);
     end
 
     --[=[
         Reads a null terminated array of values.
 
-        Assumes `decoder` advances the cursor.
-        Stops reading if the next byte is `0`, or if the decoder returns nil.
+        Assumes `reader_callback` advances the cursor.
+        Stops reading if the next byte is `0`, or if the reader_callback returns nil.
 
-        @param ... B... -- Additional parameters to pass to the decoder.
+        @param ... B... -- Additional parameters to pass to the reader_callback.
     ]=]
-    function reader.read_zarray<T, B...>(decoder: (B...) -> T?, ...: B...): {T}
+    function reader.read_zarray<T, B...>(reader_callback: (B...) -> T?, ...: B...): {T}
         local values = {};
         while true do
             if buffer.readu8(b, cursor) == 0 then
@@ -959,7 +1029,7 @@ function byteparse.reader(b: buffer)
                 return values;
             end
 
-            local next_value = decoder(...);
+            local next_value = reader_callback(...);
             if next_value then
                 table.insert(values, next_value);
             else
@@ -970,13 +1040,15 @@ function byteparse.reader(b: buffer)
 
     --[=[
         Reads a vector.
+
+        This function reads either three or four (depending on vector_size)
     ]=]
-    function reader.read_vector(): vector
+    function reader.read_vector(vector_size: number?): vector
         local x = reader.read_f32();
         local y = reader.read_f32();
         local z = reader.read_f32();
         
-        if vector_size == 4 then
+        if (vector_size or default_vector_size) == 4 then
             local w = reader.read_f32();
             return (vector.create :: any)(x, y, z, w);
         end
@@ -1016,6 +1088,8 @@ function byteparse.reader(b: buffer)
 
     --[=[
         Reads a type-prefixed value.
+
+        @error InvalidTypeID -- Errors when an unknown type id is read.
     ]=]
     function reader.read_any(): Serialisable
         local type_id = reader.read_u8();
@@ -1036,7 +1110,29 @@ function byteparse.reader(b: buffer)
             return reader.read_table();
         end
 
-        error(`[byteparse ERROR]: unknown type id {type_id} at cursor {cursor}`);
+        error(BPError("InvalidTypeID", `got invalid type id {type_id}`));
+    end
+
+    --[=[
+        Reads an optional value.
+
+        This function reads a potentially absent value by reading a boolean to
+        determine whether the value is present, and reading the value with
+        `reader_callback` if it is.
+
+        #### Example
+        ```lua
+        local reader = byteparse.reader(byteparse.buffer_from_hex("0101 00"));
+        reader.read_optional(reader.read_u8); -- Returns `1`
+        reader.read_optional(reader.read_u8); -- Returns `nil`
+        ```
+    ]=]
+    function reader.read_optional<T, B...>(reader_callback: (B...) -> T, ...: B...): T?
+        if reader.read_bool() then
+            return reader_callback(...);
+        end
+
+        return;
     end
 
     return reader;
