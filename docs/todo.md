@@ -29,6 +29,7 @@
 - [ ] Virtual Machine
     - [ ] `??` 'partial' VM (interprets bytecode instructions and runs them on the VM running the library, similar to fiu),
     - [ ] `???` 'full' VM (interprets bytecode instructions in an isolated pure-luau implemented VM)\*\*
+- [ ] Come up with a proper API design, maybe with external typedefs so the library can be distributed in a typeless format (i.e bytecode or heavily minified source code);
 - [ ] Come up with a decent name
 
 \* assembly language for luau bytecode, created for this library.
