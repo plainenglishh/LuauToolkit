@@ -3,6 +3,7 @@
 _G.BYTEPARSE_SUPPRESS_WARNINGS = true;
 
 local stdio = require("@lune/stdio");
+local serde = require("@lune/serde");
 local luau = require("@lune/luau");
 local luauc_toolkit = require("../src/lib");
 
@@ -18,9 +19,32 @@ local function test(name: string, fn: () -> ())
     });
 end
 
+local function eq(a: any, b: any): boolean
+    local ok, is_eq = pcall(function()
+        return serde.encode("json", a) == serde.encode("json", b)
+    end);
+    return (a == b) or (ok and is_eq);
+end
+
+local function assert_token(result, n: number, token: string, literal: any?)
+    if not result.tokens[n] or result.tokens[n].type ~= token then
+        if not result.tokens[n] then
+            error(`expected {token} at #{n}, got nothing`, 2);
+        else
+            error(`expected {token} at #{n}, got {result.tokens[n].type}`, 2);
+        end
+    end
+
+    if literal then
+        if not eq(result.tokens[n].literal, literal) then
+            error(`expected #{n}'s literal to be {stdio.format(literal)}, got {stdio.format(result.tokens[n].literal)}`, 2);
+        end
+    end
+end
+
 --------------------------------------------------------------------------------
 
-test("library::ir::{encode,decode}", function()
+test("ir::{encode,decode}", function()
     local bc = luau.compile([[
         local HELLO_WORLD = "Hello, World!";
 
@@ -36,6 +60,106 @@ test("library::ir::{encode,decode}", function()
 
     local ir_chunk = luauc_toolkit.ir.decode(bc);
     luauc_toolkit.ir.decode(luauc_toolkit.ir.encode(ir_chunk)); -- Assume the fact it didn't panic means it worked for now.
+end);
+
+test("lasm::tokeniser::punctuation", function()
+    local src = "()[]@!=;:.";
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+    
+    assert(res.ok);
+    assert_token(res, 1, "OPEN_PAREN");
+    assert_token(res, 2, "CLOSE_PAREN");
+    assert_token(res, 3, "OPEN_SBRACKET");
+    assert_token(res, 4, "CLOSE_SBRACKET");
+    assert_token(res, 5, "AT");
+    assert_token(res, 6, "EXCLAIM");
+    assert_token(res, 7, "EQ");
+    assert_token(res, 8, "SEMICOLON");
+    assert_token(res, 9, "COLON");
+    assert_token(res, 10, "DOT");
+end);
+
+test("lasm::tokeniser::number_literals", function()
+    local src = "100 2_0_0 0.123 10_10.10_10 0b11111111 0b1000_0000 0xFFFF 0xFF_00";
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "NUMBER_LITERAL", 100);
+    assert_token(res, 2, "NUMBER_LITERAL", 200);
+    assert_token(res, 3, "NUMBER_LITERAL", 0.123);
+    assert_token(res, 4, "NUMBER_LITERAL", 10_10.10_10);
+    assert_token(res, 5, "NUMBER_LITERAL", 0b11111111);
+    assert_token(res, 6, "NUMBER_LITERAL", 0b1000_0000);
+    assert_token(res, 7, "NUMBER_LITERAL", 0xFFFF);
+    assert_token(res, 8, "NUMBER_LITERAL", 0xFF_00);
+end);
+
+test("lasm::tokeniser::string_literals", function()
+    local src = [["Hello, World!" "he said \"hi\"!" "\x00\xFF" "hello\z   world"]];
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "STRING_LITERAL", "Hello, World!");
+    assert_token(res, 2, "STRING_LITERAL", "he said \"hi\"!");
+    assert_token(res, 3, "STRING_LITERAL", "\x00\xFF");
+    assert_token(res, 4, "STRING_LITERAL", "helloworld");
+end);
+
+test("lasm::tokeniser::vector_literals", function()
+    local src = [[<1, 2, 3><1,>]];
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "VECTOR_LITERAL", {1, 2, 3});
+    assert_token(res, 2, "VECTOR_LITERAL", {1});
+end);
+
+test("lasm::tokeniser::import_literals", function()
+    local src = [[env.print env.string.byte]];
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "IMPORT_LITERAL", {"print"});
+    assert_token(res, 2, "IMPORT_LITERAL", {"string", "byte"});
+end);
+
+test("lasm::tokeniser::boolean_literals", function()
+    local src = [[true false]];
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "BOOLEAN_LITERAL", true);
+    assert_token(res, 2, "BOOLEAN_LITERAL", false);
+end);
+
+test("lasm::tokeniser::nil_literal", function()
+    local src = [[nil]];
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "NIL_LITERAL");
+end);
+
+test("lasm::tokeniser::keywords", function()
+    local src = [[end string const alias proto env]];
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "END_KEYWORD");
+    assert_token(res, 2, "STRING_KEYWORD");
+    assert_token(res, 3, "CONST_KEYWORD");
+    assert_token(res, 4, "ALIAS_KEYWORD");
+    assert_token(res, 5, "PROTO_KEYWORD");
+    assert_token(res, 6, "ENV_KEYWORD");
+end);
+
+test("lasm::tokeniser::identifiers", function()
+    local src = [[hello world]];
+    local res = luauc_toolkit.lasm.tokeniser.tokenise(src);
+
+    assert(res.ok);
+    assert_token(res, 1, "IDENTIFIER", "hello");
+    assert_token(res, 2, "IDENTIFIER", "world");
 end);
 
 --------------------------------------------------------------------------------
@@ -58,7 +182,7 @@ local function run_tests()
         else
             tests_passing = false;
             stdio.write(`{stdio.color("red")}fail{stdio.color("reset")}\n`);
-            print(tostring(err):split("\n")[1]);
+            print(tostring(err));
         end
     end
     

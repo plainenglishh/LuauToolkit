@@ -4,8 +4,12 @@ string_def = STRING_KEYWORD IDENTIFIER EQ STRING_LITERAL SEMICOLON;
 
 proto_def = {proto_attribute} proto_header {proto_statement} END_KEYWORD;
 proto_header = PROTO_KEYWORD IDENTIFIER OPEN_PAREN [any_literal] {COMMA any_literal} CLOSE_PAREN;
+
 proto_statement = instruction | alias_def | const_def;
-instruction = IDENTIFIER [value] {COMMA value} SEMICOLON;
+
+instruction = [label] IDENTIFIER [value] {COMMA value} SEMICOLON;
+label = IDENTIFIER COLON;
+
 alias_def = ALIAS_KEYWORD IDENTIFIER EQ value SEMICOLON;
 const_def = CONST_KEYWORD IDENTIFIER EQ value SEMICOLON;
 
@@ -19,19 +23,22 @@ any_literal = NIL_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL | NUMBER_LITERAL | 
 
 (* Tokens *)
 
-IMPORT_LITERAL = IDENTIFIER ['.' IDENTIFIER];
-VECTOR_LITERAL = '<' [NUMBER_LITERAL] {COMMA NUMBER_LITERAL} '>';
+IMPORT_LITERAL = ENV_KEYWORD '.' IDENTIFIER ['.' IDENTIFIER];
+VECTOR_LITERAL = '<' [NUMBER_LITERAL] [COMMA NUMBER_LITERAL] [COMMA NUMBER_LITERAL] [COMMA NUMBER_LITERAL]'>';
 NUMBER_LITERAL = (('0x'|'0X') ? any digit or underscore ?) | (('0b'|'0B') ? any digit or underscore ?) | (? any digit or underscore ? '.' ? any digit or underscore ?);
-STRING_LITERAL = '"' ? any character excluding new lines ? '"' | '[' {'='} '[' ? any character ? ']' {'='} ']';
+STRING_LITERAL = '"' ? any character ? '"';
 BOOLEAN_LITERAL = 'true' | 'false';
 NIL_LITERAL = 'nil';
 
-IDENTIFIER = ? any letter, or '_' ? {? any letter, digit or '_' ?};
 PROTO_KEYWORD = 'proto';
 ALIAS_KEYWORD = 'alias';
 CONST_KEYWORD = 'const';
 STRING_KEYWORD = 'string';
 END_KEYWORD = 'end';
+ENV_KEYWORD = 'env';
+
+IDENTIFIER = ? any letter, or '_' ? {? any letter, digit or '_' ?};
+
 OPEN_PAREN = '(';
 CLOSE_PAREN = ')';
 OPEN_SBRACKET = '[';
@@ -40,4 +47,5 @@ AT = '@';
 EXCLAIM = '!';
 EQ = '=';
 SEMICOLON = ';';
+COLON = ':';
 DOT = '.';
