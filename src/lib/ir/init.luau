@@ -180,12 +180,8 @@ function ir.decode(bc: buffer|string)
     local function read_line_info(instructions_count: number): buffer
         --- Borrowed from fiu's implementation
         local cursor_start = reader.get_cursor();
-        local function dump<T>(fn: () -> T): T
-            local value = fn();
-            return value;
-        end
 
-        local linegaplog2 = dump(reader.read_u8);
+        local linegaplog2 = reader.read_u8();
 
         local intervals = bit32.rshift((instructions_count - 1), linegaplog2) + 1
 
@@ -194,13 +190,13 @@ function ir.decode(bc: buffer|string)
 
         local lastoffset = 0
         for j = 1, instructions_count do
-            lastoffset += dump(reader.read_u8);
+            lastoffset += reader.read_u8();
             lineinfo[j] = lastoffset
         end
 
         local lastline = 0
         for j = 1, intervals do
-            lastline += dump(reader.read_u32);
+            lastline += reader.read_u32();
             abslineinfo[j] = lastline % (2 ^ 32)
         end
 
@@ -286,21 +282,8 @@ function ir.decode(bc: buffer|string)
         proto.protos = reader.read_larray(reader.read_varint);
         proto.line_defined = reader.read_varint();
         proto.debug_name = reader.read_varint();
-        
-        local line_info_enabled = reader.read_bool();
-        if line_info_enabled then
-            proto.line_info = read_line_info(instruction_count);
-        else
-            proto.line_info = nil :: any;
-        end
-        
-
-        local debug_info_enabled = reader.read_bool();
-        if debug_info_enabled then
-            proto.debug_info = read_debug_info();
-        else
-            proto.debug_info = nil :: any;
-        end
+        proto.line_info = reader.read_optional(read_line_info, instruction_count);
+        proto.debug_info = reader.read_optional(read_debug_info);
 
         return proto;
     end
@@ -462,22 +445,14 @@ function ir.encode(ir_chunk: IRChunk): buffer
             write_instruction(inst);
         end
 
-
         writer.write_larray(proto.constants, write_constant);
         writer.write_larray(proto.protos, writer.write_varint);
 
         writer.write_varint(proto.line_defined);
         writer.write_varint(proto.debug_name);
         
-        writer.write_bool(proto.line_info ~= nil);
-        if proto.line_info then
-            write_line_info(proto.line_info);
-        end
-
-        writer.write_bool(proto.debug_info ~= nil);
-        if proto.debug_info then
-            write_debug_info(proto.debug_info);
-        end
+        writer.write_optional(proto.line_info, write_line_info);
+        writer.write_optional(proto.debug_info, write_debug_info);
     end
 
     --[=[

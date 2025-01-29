@@ -35,7 +35,7 @@ test("library::ir::{encode,decode}", function()
     });
 
     local ir_chunk = luauc_toolkit.ir.decode(bc);
-    luauc_toolkit.ir.encode(ir_chunk); -- Assume the fact it didn't panic means it worked for now.
+    luauc_toolkit.ir.decode(luauc_toolkit.ir.encode(ir_chunk)); -- Assume the fact it didn't panic means it worked for now.
 end);
 
 --------------------------------------------------------------------------------
