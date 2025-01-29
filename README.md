@@ -5,37 +5,6 @@ Pure-luau library for assembling, processing, dissecting and executing luau byte
 > [!WARNING]  
 > This library is work in progress and most features aren't implemented.
 
-## Todo
-
-- [x] An intermediate table format ("IR")
-    - [X] Encoder
-    - [X] Decoder
-- [ ] A Luau Bytecode Assembler ("LASM") for creating custom bytecode chunks
-    - [X] Formal Grammar
-    - [X] Tokeniser
-    - [X] Parser (not fully tested)
-    - [ ] Analyser (to convert AST to IR)
-    - [ ] `P` VSC Textmate Grammar
-    - [ ] `??` a very basic LSP
-- [ ] `P` Disassembler (emits LASM source from a given bytecode chunk/ir)
-- [ ] `?` A bytecode interpeter?
-- [ ] BytecodeBuilder class (emits IR)
-- [ ] Optimisations
-    - [ ] `P` Strip debug info
-    - [ ] `??` Inlining
-    - [ ] `???` Unrolling
-- [ ] `??` Decompiler
-- [ ] `???` Basic compiler
-- [ ] Come up with a decent name
-
-||Meaning|
-|-|-|
-||planned|
-|`?`|most likely|
-|`??`|maybe|
-|`???`|probably not|
-|`P`|prototype completed|
-
 ## Notes
 
 - For performance reasons, the IR encoder will not attempt to validate the
