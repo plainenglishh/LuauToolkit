@@ -181,7 +181,7 @@ return function(tokens: {tokeniser.Token}): ParseResult
     local errors: {ParseError} = {};
 
     local function at_eof(): boolean
-        return cursor > #tokens;
+        return (tokens[cursor] and tokens[cursor].type == "EOF") or cursor > #tokens;
     end
 
     --[=[
@@ -202,7 +202,7 @@ return function(tokens: {tokeniser.Token}): ParseResult
         return function(): Span
             local stop = cursor;
 
-            return { start = tokens[start].span.start, stop = (tokens[stop] or tokens[#tokens]).span.stop };
+            return { start = (tokens[start] or tokens[#tokens]).span.start, stop = (tokens[stop] or tokens[#tokens]).span.stop };
         end
     end
 

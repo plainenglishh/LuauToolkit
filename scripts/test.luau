@@ -79,8 +79,9 @@ test("lasm::tokeniser::punctuation", function()
     assert_token(res, 9, "COLON");
     assert_token(res, 10, "DOT");
     assert_token(res, 11, "COMMA");
+    assert_token(res, 12, "EOF");
 
-    assert(#res.tokens == 11);
+    assert(#res.tokens == 12);
 end);
 
 test("lasm::tokeniser::number_literals", function()
@@ -97,8 +98,9 @@ test("lasm::tokeniser::number_literals", function()
     assert_token(res, 6, "NUMBER_LITERAL", 0b1000_0000);
     assert_token(res, 7, "NUMBER_LITERAL", 0xFFFF);
     assert_token(res, 8, "NUMBER_LITERAL", 0xFF_00);
+    assert_token(res, 9, "EOF");
     
-    assert(#res.tokens == 8);
+    assert(#res.tokens == 9);
 end);
 
 test("lasm::tokeniser::string_literals", function()
@@ -111,8 +113,9 @@ test("lasm::tokeniser::string_literals", function()
     assert_token(res, 2, "STRING_LITERAL", "he said \"hi\"!");
     assert_token(res, 3, "STRING_LITERAL", "\x00\xFF");
     assert_token(res, 4, "STRING_LITERAL", "helloworld");
+    assert_token(res, 5, "EOF");
 
-    assert(#res.tokens == 4);
+    assert(#res.tokens == 5);
 end);
 
 test("lasm::tokeniser::vector_literals", function()
@@ -123,8 +126,9 @@ test("lasm::tokeniser::vector_literals", function()
 
     assert_token(res, 1, "VECTOR_LITERAL", {1, 2, 3});
     assert_token(res, 2, "VECTOR_LITERAL", {1});
+    assert_token(res, 3, "EOF");
     
-    assert(#res.tokens == 2);
+    assert(#res.tokens == 3);
 end);
 
 test("lasm::tokeniser::import_literals", function()
@@ -135,8 +139,9 @@ test("lasm::tokeniser::import_literals", function()
 
     assert_token(res, 1, "IMPORT_LITERAL", {"print"});
     assert_token(res, 2, "IMPORT_LITERAL", {"string", "byte"});
+    assert_token(res, 3, "EOF");
 
-    assert(#res.tokens == 2);
+    assert(#res.tokens == 3);
 end);
 
 test("lasm::tokeniser::boolean_literals", function()
@@ -147,8 +152,9 @@ test("lasm::tokeniser::boolean_literals", function()
 
     assert_token(res, 1, "BOOLEAN_LITERAL", true);
     assert_token(res, 2, "BOOLEAN_LITERAL", false);
+    assert_token(res, 3, "EOF");
 
-    assert(#res.tokens == 2);
+    assert(#res.tokens == 3);
 end);
 
 test("lasm::tokeniser::nil_literal", function()
@@ -158,8 +164,9 @@ test("lasm::tokeniser::nil_literal", function()
     assert(res.ok);
 
     assert_token(res, 1, "NIL_LITERAL");
+    assert_token(res, 2, "EOF");
     
-    assert(#res.tokens == 1);
+    assert(#res.tokens == 2);
 end);
 
 test("lasm::tokeniser::keywords", function()
@@ -174,8 +181,9 @@ test("lasm::tokeniser::keywords", function()
     assert_token(res, 4, "ALIAS_KEYWORD");
     assert_token(res, 5, "PROTO_KEYWORD");
     assert_token(res, 6, "ENV_KEYWORD");
+    assert_token(res, 7, "EOF");
 
-    assert(#res.tokens == 6);
+    assert(#res.tokens == 7);
 end);
 
 test("lasm::tokeniser::identifiers", function()
@@ -186,8 +194,9 @@ test("lasm::tokeniser::identifiers", function()
 
     assert_token(res, 1, "IDENTIFIER", "hello");
     assert_token(res, 2, "IDENTIFIER", "world");
+    assert_token(res, 3, "EOF");
 
-    assert(#res.tokens == 2);
+    assert(#res.tokens == 3);
 end);
 
 test("lasm::tokeniser::comments", function()
@@ -197,16 +206,19 @@ test("lasm::tokeniser::comments", function()
     assert(res.ok);
     
     assert_token(res, 1, "END_KEYWORD");
+    assert_token(res, 2, "EOF");
 
-    assert(#res.tokens == 1);
+    assert(#res.tokens == 2);
 end);
 
 test("lasm::tokeniser::nothing", function()
     local src = "    ";
     local res = luau_toolkit.lasm.tokenise(src);
+    
+    assert_token(res, 1, "EOF");
 
     assert(res.ok);
-    assert(#res.tokens == 0);
+    assert(#res.tokens == 1);
 end);
 
 test("lasm::tokeniser::doesnt_explode", function()

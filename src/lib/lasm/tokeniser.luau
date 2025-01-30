@@ -5,7 +5,7 @@ export type TokenType =
     | "EQ"              | "SEMICOLON"       | "DOT"
     | "COLON"           | "COMMA"
     -- Misc --
-    | "IDENTIFIER"
+    | "IDENTIFIER"      | "EOF"
     -- Keywords --
     | "END_KEYWORD"     | "STRING_KEYWORD"  | "CONST_KEYWORD"   
     | "ALIAS_KEYWORD"   | "PROTO_KEYWORD"   | "ENV_KEYWORD"
@@ -477,6 +477,8 @@ return function(src: string|buffer): TokeniseResult
             emit_token("IDENTIFIER", ident);
         end
     end
+
+    emit_token("EOF");
 
     return {
         ok = #errors == 0,
