@@ -15,6 +15,7 @@
         - [ ] Analyser (to convert AST to IR using BytecodeGenerator)
         - [ ] `P` VSC Textmate Grammar
         - [ ] `??` a very basic LSP (using lspsdk)
+        - [ ] Automatically determine which opcodes are used (i.e A & C so an empty B doesn't have to be specified.)
     - [X] Disassembler (emits LASM source from a given bytecode chunk/ir)
     - [ ] `?` A bytecode interpeter?
     - [ ] BytecodeBuilder class (emits IR)
