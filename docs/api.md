@@ -1,0 +1,17 @@
+
+- `root` luau-toolkit
+    - `module` bytecode
+        - `function` encode             - encodes IR to bytecode
+        - `function` decode             - decodes bytecode to IR
+        - `table` opcodes               - table of bytecode data
+        - `function` get_opcode_info    - searches `opcodes`
+        - `function` encode_import_id   - encodes an import id from up to 3 strings
+        - `function` get_jump_offset    - gets the jump offset between two instuctions in an IR proto
+    - `module` lasm
+        - `function` assemble           - Combination of `steps`
+        - `function` codegen            - Builder class for generating lasm source code
+        - `namespace` steps
+            - `function` tokenise       - Tokenises
+            - `function` parse          - Parses tokens
+            - `function` analyse        - Generates an analyser result from a parse result
+            - `function` assemble       - Assembles an 'analyse' result into IR
