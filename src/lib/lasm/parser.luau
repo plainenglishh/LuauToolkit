@@ -224,7 +224,6 @@ function parser.parse(tokens: {tokeniser.Token}): ParseResult
         return tok or error("end reached");
     end
 
-
     local function backtrack()
         cursor -= 1;
     end

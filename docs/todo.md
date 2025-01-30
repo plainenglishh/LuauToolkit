@@ -4,13 +4,14 @@
     - [X] Intermediate Representation ("IR") -- Luau table representation of bytecode chunks
         - [X] Encoder
         - [X] Decoder
-    - [ ] Luau Bytecode Assembly\* ("LASM") Assembler -- Creating custom bytecode chunks with a library DSL
+    - [X] Luau Bytecode Assembly\* ("LASM") Assembler -- Creating custom bytecode chunks with a library DSL
         - [X] Formal Grammar
         - [X] Tokeniser
         - [X] Parser (not fully tested)
         - [ ] Analyser (to convert AST to IR using BytecodeGenerator)
         - [ ] `P` VSC Textmate Grammar
         - [ ] `??` a very basic LSP (using lspsdk)
+    - [ ] CodeGenerator class (emits LASM)
     - [ ] `P` Disassembler (emits LASM source from a given bytecode chunk/ir)
     - [ ] `?` A bytecode interpeter?
     - [ ] BytecodeBuilder class (emits IR)
