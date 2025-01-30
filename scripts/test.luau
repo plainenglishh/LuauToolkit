@@ -216,6 +216,23 @@ test("lasm::tokeniser::doesnt_explode", function()
     assert(not res.ok);
 end);
 
+test("lasm::nothing", function()
+    local src = [[]];
+    local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src));
+    assert(res.ok);
+end);
+
+test("lasm::basic", function()
+    local src = [[
+    string S_hello_world = "Hello, World!";
+    
+    @main
+    proto P_main()
+        
+    end
+    ]]; 
+end);
+
 --------------------------------------------------------------------------------
 
 local function run_tests()
