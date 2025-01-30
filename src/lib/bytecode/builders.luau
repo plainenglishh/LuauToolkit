@@ -1,7 +1,8 @@
 local common = require("../common");
-local opcodes = require("../opcodes");
-
+local opcodes = require("./opcodes");
+local other = require("./other");
 local t = require("../types");
+
 
 local FLAG_POSITION = {
     native_module = 0,
@@ -9,9 +10,9 @@ local FLAG_POSITION = {
     native_function = 2,
 };
 
-local bytecode_builder = {};
+local builders = {};
 
-function bytecode_builder.chunk(from: t.IRChunk?)
+function builders.chunk(from: t.IRChunk?)
     local self: t.IRChunk = from or {
         luau_version = 6,
         types_version = 1,
@@ -103,7 +104,7 @@ function bytecode_builder.chunk(from: t.IRChunk?)
     return builder;
 end
 
-function bytecode_builder.proto(from: t.IRProto?)
+function builders.proto(from: t.IRProto?)
     local last_inst_position = 0;
     local self: t.IRProto = from or {
         max_stack_size = 0,
@@ -165,7 +166,7 @@ function bytecode_builder.proto(from: t.IRProto?)
         Adds a new instruction, returning its position.
     ]=]
     function builder.add_instruction(name_or_id: opcodes.OpcodeName|number, operands: {number}?, aux: number?): number
-        local info = common.get_opcode_info(name_or_id) or error(`unknown instruction '{name_or_id}'`);
+        local info = other.get_opcode_info(name_or_id) or error(`unknown instruction '{name_or_id}'`);
         local operands = operands or {};
 
         if #operands > #info.operands then
@@ -263,4 +264,4 @@ function bytecode_builder.proto(from: t.IRProto?)
     return builder;
 end
 
-return bytecode_builder;
+return builders;

@@ -1,6 +1,6 @@
 local lasm = {};
 
-lasm.tokeniser = require("./tokeniser");
-lasm.parser = require("./parser");
+lasm.tokenise = require("./tokeniser");
+lasm.parse = require("./parser");
 
 return lasm;

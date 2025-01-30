@@ -1,7 +1,5 @@
 --!nolint ForRange
 
-local opcodes = require("./opcodes");
-
 local common = {};
 
 --[=[
@@ -35,23 +33,6 @@ function common.deep_clone(tbl: {[any]: any}): {[any]: any}
     end
 
     return new;
-end
-
---[=[
-    Returns opcode info from an opcode name or id.
-]=]
-function common.get_opcode_info(opcode: number|opcodes.OpcodeName): opcodes.OpcodeInfo?
-    if type(opcode) == "string" then
-        for _, v in opcodes do
-            if v.name == opcode then
-                return v;
-            end
-        end
-    else
-        return opcodes[opcode];
-    end
-
-    return;
 end
 
 --[=[

@@ -1,11 +1,14 @@
 local byteparse = require("@vendor/byteparse");
-local opcodes = require("../opcodes");
-local constants = require("../constants");
+local opcodes = require("./opcodes");
+local constants = require("./constants");
 local common = require("../common");
 local t = require("../types");
 
 local ir = {};
 
+--[=[
+    Decode a bytecode chunk into it's internal table representation.
+]=]
 function ir.decode(bc: buffer|string)
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bc);
@@ -247,6 +250,9 @@ function ir.decode(bc: buffer|string)
     return read_chunk();
 end
 
+--[=[
+    Encode a bytecode table representation object into a bytecode chunk.
+]=]
 function ir.encode(ir_chunk: t.IRChunk): buffer
     local writer = byteparse.writer(100);
 

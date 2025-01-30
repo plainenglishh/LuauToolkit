@@ -40,9 +40,7 @@ export type TokeniseResult = {
     errors: {TokeniseError},
 };
 
-local tokeniser = {};
-
-function tokeniser.tokenise(src: string|buffer): TokeniseResult
+return function(src: string|buffer): TokeniseResult
     local src = if type(src) == "string" then buffer.fromstring(src) else src;
     local lexeme_start = 0;
     local cursor = 0;
@@ -486,5 +484,3 @@ function tokeniser.tokenise(src: string|buffer): TokeniseResult
         errors = errors,
     };
 end
-
-return tokeniser;

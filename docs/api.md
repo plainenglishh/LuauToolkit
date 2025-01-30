@@ -8,10 +8,8 @@
         - `function` encode_import_id   - encodes an import id from up to 3 strings
         - `function` get_jump_offset    - gets the jump offset between two instuctions in an IR proto
     - `module` lasm
-        - `function` assemble           - Combination of `steps`
+        - `function` assemble           - Combination of all steps
+        - `function` tokenise           - Creates a string of tokens from an input
+        - `function` parse              - Parses tokens and generates an AST
+        - `function` analyse            - Generates an analyser result from a source buffer
         - `function` codegen            - Builder class for generating lasm source code
-        - `namespace` steps
-            - `function` tokenise       - Tokenises
-            - `function` parse          - Parses tokens
-            - `function` analyse        - Generates an analyser result from a parse result
-            - `function` assemble       - Assembles an 'analyse' result into IR

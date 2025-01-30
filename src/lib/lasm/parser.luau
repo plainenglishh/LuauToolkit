@@ -173,12 +173,11 @@ export type ParseResult = {
     errors: {ParseError},
 };
 
-local parser = {};
 
 --[=[
     A recursive descent parser for a LASM token stream.
 ]=]
-function parser.parse(tokens: {tokeniser.Token}): ParseResult
+return function(tokens: {tokeniser.Token}): ParseResult
     local cursor = 1;
     local errors: {ParseError} = {};
 
@@ -579,5 +578,3 @@ function parser.parse(tokens: {tokeniser.Token}): ParseResult
         errors = errors,
     };
 end
-
-return parser;

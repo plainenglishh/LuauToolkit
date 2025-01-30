@@ -58,13 +58,13 @@ test("ir::{encode,decode}", function()
         debugLevel = 2,
     });
 
-    local ir_chunk = luau_toolkit.ir.decode(bc);
-    luau_toolkit.ir.decode(luau_toolkit.ir.encode(ir_chunk)); -- Assume the fact it didn't panic means it worked for now.
+    local ir_chunk = luau_toolkit.bytecode.decode(bc);
+    luau_toolkit.bytecode.decode(luau_toolkit.bytecode.encode(ir_chunk)); -- Assume the fact it didn't panic means it worked for now.
 end);
 
 test("lasm::tokeniser::punctuation", function()
     local src = "()[]@!=;:.,";
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
     
     assert(res.ok);
 
@@ -85,7 +85,7 @@ end);
 
 test("lasm::tokeniser::number_literals", function()
     local src = "100 2_0_0 0.123 10_10.10_10 0b11111111 0b1000_0000 0xFFFF 0xFF_00";
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -103,7 +103,7 @@ end);
 
 test("lasm::tokeniser::string_literals", function()
     local src = [["Hello, World!" "he said \"hi\"!" "\x00\xFF" "hello\z   world"]];
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -117,7 +117,7 @@ end);
 
 test("lasm::tokeniser::vector_literals", function()
     local src = [[<1, 2, 3><1,>]];
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -129,7 +129,7 @@ end);
 
 test("lasm::tokeniser::import_literals", function()
     local src = [[env.print env.string.byte]];
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -141,7 +141,7 @@ end);
 
 test("lasm::tokeniser::boolean_literals", function()
     local src = [[true false]];
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -153,7 +153,7 @@ end);
 
 test("lasm::tokeniser::nil_literal", function()
     local src = [[nil]];
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -164,7 +164,7 @@ end);
 
 test("lasm::tokeniser::keywords", function()
     local src = [[end string const alias proto env]];
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -180,7 +180,7 @@ end);
 
 test("lasm::tokeniser::identifiers", function()
     local src = [[hello world]];
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
 
@@ -192,7 +192,7 @@ end);
 
 test("lasm::tokeniser::comments", function()
     local src = "-- hello world\n--ahhhh\nend -- AHH!!!!";
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
     
@@ -203,7 +203,7 @@ end);
 
 test("lasm::tokeniser::nothing", function()
     local src = "    ";
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(res.ok);
     assert(#res.tokens == 0);
@@ -211,7 +211,7 @@ end);
 
 test("lasm::tokeniser::doesnt_explode", function()
     local src = "- 0nXM Asshsdg23885234uv247htgrenhgoywg 1--=afasd fg;asd'; k end end end end const !!! AHHHHH!!!!!!!!!!";
-    local res = luau_toolkit.lasm.tokeniser.tokenise(src);
+    local res = luau_toolkit.lasm.tokenise(src);
 
     assert(not res.ok);
 end);
