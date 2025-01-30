@@ -1,25 +1,28 @@
 # Todo
 
+- [ ] Come up with a proper API design;
+     - [ ] Split into modules;
+     - [ ] Create external typedefs;
 - [ ] Bytecode Toolkit -- Toolkit for working with bytecode
     - [X] Intermediate Representation ("IR") -- Luau table representation of bytecode chunks
         - [X] Encoder
         - [X] Decoder
     - [X] Luau Bytecode Assembly\* ("LASM") Assembler -- Creating custom bytecode chunks with a library DSL
         - [X] Formal Grammar
+        - [X] CodeGenerator class
         - [X] Tokeniser
         - [X] Parser (not fully tested)
         - [ ] Analyser (to convert AST to IR using BytecodeGenerator)
         - [ ] `P` VSC Textmate Grammar
         - [ ] `??` a very basic LSP (using lspsdk)
-    - [ ] CodeGenerator class (emits LASM)
-    - [ ] `P` Disassembler (emits LASM source from a given bytecode chunk/ir)
+    - [X] Disassembler (emits LASM source from a given bytecode chunk/ir)
     - [ ] `?` A bytecode interpeter?
     - [ ] BytecodeBuilder class (emits IR)
     - [ ] Optimiser
         - [ ] `P` Strip debug info
         - [ ] `??` Inlining
         - [ ] `???` Unrolling
-    - [ ] `??` Decompiler (using CodeGenerator)
+    - [ ] `??` Decompiler (using luau CodeGenerator)
 - [ ] Source Code Toolkit (Toolkit for working with source code)
     - [ ] `??` Tokeniser
     - [ ] `??` Parser
@@ -30,7 +33,6 @@
 - [ ] Virtual Machine
     - [ ] `??` 'partial' VM (interprets bytecode instructions and runs them on the VM running the library, similar to fiu),
     - [ ] `???` 'full' VM (interprets bytecode instructions in an isolated pure-luau implemented VM)\*\*
-- [ ] Come up with a proper API design, maybe with external typedefs so the library can be distributed in a typeless format (i.e bytecode or heavily minified source code);
 - [ ] Come up with a decent name
 
 \* assembly language for luau bytecode, created for this library.

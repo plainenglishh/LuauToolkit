@@ -54,4 +54,34 @@ function common.get_opcode_info(opcode: number|opcodes.OpcodeName): opcodes.Opco
     return;
 end
 
+--[=[
+    Builds a string
+]=]
+function common.string_builder()
+    local strings = {};
+
+    local builder = {};
+
+    function builder.write(str: string)
+        table.insert(strings, str);
+    end
+
+    function builder.writeln(str: string)
+        builder.write(str);
+        builder.write("\n");
+    end
+
+    function builder.write_to(other)
+        for _, v in strings do
+            other.write(v);
+        end
+    end
+
+    function builder.build(): string
+        return table.concat(strings, "");
+    end
+
+    return builder;
+end
+
 return common;
