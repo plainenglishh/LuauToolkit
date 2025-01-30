@@ -125,7 +125,15 @@ return function(tokens: {tokeniser.Token}): ParseResult
             return;
         end
 
-        return t.AstLiteral(tok.span, tok.literal);
+        local lit_type;
+
+        if tok.type == "VECTOR_LITERAL" then
+            lit_type = "vector";
+        elseif tok.type == "IMPORT_LITERAL" then
+            lit_type = "import";
+        end
+
+        return t.AstLiteral(tok.span, tok.literal, lit_type);
     end
 
     local function match_value(): t.AstValue?
@@ -280,7 +288,7 @@ return function(tokens: {tokeniser.Token}): ParseResult
             expecting_comma = true;
         end
 
-        return t.AstInstruction(span(), opcode.lexeme, operands);
+        return t.AstInstruction(span(), opcode.lexeme, operands, if label then label.lexeme else nil);
     end
 
     local function match_proto_def(): t.AstProtoDef?

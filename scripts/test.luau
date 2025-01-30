@@ -255,24 +255,89 @@ test("lasm::parse::nothing", function()
     assert_ast_eq(res.root, t.AstChunk(_nil, {}));
 end);
 
-test("lasm::parse::basic", function()
+test("lasm::parse::strings", function()
     local src = [[
-        proto P0() -- Returns 0
-            PREPVARARGS 0;
-            LOADN 0;
-        end
+        string S1 = "Hello, World!";
     ]]; 
 
     local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
     assert(res.ok);
 
     assert_ast_eq(res.root, t.AstChunk(_nil, {
+        t.AstStringDef(_nil, "S1", "Hello, World!");
+    }));
+end);
+
+test("lasm::parse::proto", function()
+    local src = [[
+        proto P0() end
+    ]]; 
+
+    local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
+    assert(res.ok);
+
+    assert_ast_eq(res.root, t.AstChunk(_nil, {
+        t.AstProtoDef(_nil, "P0", {}, {}, {});
+    }));
+end);
+
+test("lasm::parse::instructions", function()
+    local src = [[
+        proto P0()
+            LOADB 0, true;
+            LOADN 1, 0;
+            L1: RETURN 0, 3;
+        end
+    ]]; 
+
+    local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
+    
+    assert(res.ok);
+
+    assert_ast_eq(res.root, t.AstChunk(_nil, {
         t.AstProtoDef(_nil, "P0", {}, {}, {
-            t.AstInstruction(_nil, "PREPVARARGS", {t.AstValue(_nil, t.AstLiteral(_nil, 0))}),
-            t.AstInstruction(_nil, "LOADN", {t.AstValue(_nil, t.AstLiteral(_nil, 0))}),
+            t.AstInstruction(_nil, "LOADB", {t.AstValue(_nil, t.AstLiteral(_nil, 0)), t.AstValue(_nil, t.AstLiteral(_nil, true))}),
+            t.AstInstruction(_nil, "LOADN", {t.AstValue(_nil, t.AstLiteral(_nil, 1)), t.AstValue(_nil, t.AstLiteral(_nil, 0))}),
+            t.AstInstruction(_nil, "RETURN", {t.AstValue(_nil, t.AstLiteral(_nil, 0)), t.AstValue(_nil, t.AstLiteral(_nil, 3))}, "L1"),
         });
     }));
 end);
+
+
+test("lasm::parse::constants", function()
+    local src = [[
+        string S1 = "Hello, World!";
+
+        proto P0()
+            const K0 = nil;
+            const K1 = true;
+            const K2 = 123;
+            const K3 = S1;
+            const K4 = env.print;
+            const K5 = nil; -- Replace with tbl lit
+            const K6 = P0;
+            const K7 = <0, 1, 2>;
+        end
+    ]]; 
+
+    local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
+    assert(res.ok);
+    
+    assert_ast_eq(res.root, t.AstChunk(_nil, {
+        t.AstStringDef(_nil, "S1", "Hello, World!"),
+        t.AstProtoDef(_nil, "P0", {}, {}, {
+            t.AstConstDef(_nil, "K0", t.AstValue(_nil, t.AstLiteral(_nil, nil))),
+            t.AstConstDef(_nil, "K1", t.AstValue(_nil, t.AstLiteral(_nil, true))),
+            t.AstConstDef(_nil, "K2", t.AstValue(_nil, t.AstLiteral(_nil, 123))),
+            t.AstConstDef(_nil, "K3", t.AstValue(_nil, t.AstIdentifier(_nil, "S1"))),
+            t.AstConstDef(_nil, "K4", t.AstValue(_nil, t.AstLiteral(_nil, {"print"}, "import"))),
+            t.AstConstDef(_nil, "K5", t.AstValue(_nil, t.AstLiteral(_nil, nil))),
+            t.AstConstDef(_nil, "K6", t.AstValue(_nil, t.AstIdentifier(_nil, "P0"))),
+            t.AstConstDef(_nil, "K7", t.AstValue(_nil, t.AstLiteral(_nil, {0, 1, 2}, "vector"))),
+        }),
+    }));
+end);
+
 
 --------------------------------------------------------------------------------
 
