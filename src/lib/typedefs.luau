@@ -113,7 +113,6 @@ export type OpcodeName =
     | "JUMPXEQKB"            | "JUMPXEQKN"            | "JUMPXEQKS"           
     | "IDIV"                 | "IDIVK"                ;
 
-
 export type ConstantType = "nil" | "boolean" | "number" | "string" | "import" | "table" | "closure" | "vector";
 
 

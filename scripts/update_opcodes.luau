@@ -7,7 +7,7 @@
 
 local net = require("@lune/net");
 local fs = require("@lune/fs");
-
+ 
 local HEADER = [=[
 local t = require("../typedefs");
 ]=];
@@ -211,8 +211,8 @@ local function generate(bytecode_h: string): string
                 if v.name == "AUX" then
                     has_aux = true;
                 end
-        
-                if v.name == "A" or v.name == "B" or  v.name == "C" then -- AD uses A, but D always falls A in documentation so it gets corrected later.
+                
+                if v.name == "A" or v.name == "B" or  v.name == "C" then -- AD uses A, but D always falls after A in documentation so it gets corrected later.
                     mode = "abc";
                 elseif v.name == "D" then
                     mode = "ad";

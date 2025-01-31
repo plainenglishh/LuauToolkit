@@ -1,8 +1,8 @@
 # Todo
 
-- [ ] Come up with a proper API design;
-     - [ ] Split into modules;
-     - [ ] Create external typedefs;
+- [X] Come up with a proper API design;
+     - [X] Split into modules;
+     - [X] Create external typedefs;
 - [ ] Bytecode Toolkit -- Toolkit for working with bytecode
     - [X] Intermediate Representation ("IR") -- Luau table representation of bytecode chunks
         - [X] Encoder
@@ -15,7 +15,6 @@
         - [ ] Analyser (to convert AST to IR using BytecodeGenerator)
         - [ ] `P` VSC Textmate Grammar
         - [ ] `??` a very basic LSP (using lspsdk)
-        - [ ] Automatically determine which opcodes are used (i.e A & C so an empty B doesn't have to be specified.)
     - [X] Disassembler (emits LASM source from a given bytecode chunk/ir)
     - [ ] `?` A bytecode interpeter?
     - [ ] BytecodeBuilder class (emits IR)
@@ -34,7 +33,7 @@
 - [ ] Virtual Machine
     - [ ] `??` 'partial' VM (interprets bytecode instructions and runs them on the VM running the library, similar to fiu),
     - [ ] `???` 'full' VM (interprets bytecode instructions in an isolated pure-luau implemented VM)\*\*
-- [ ] Come up with a decent name
+
 
 \* assembly language for luau bytecode, created for this library.
 \*\* just for fun; 'partial' VM would likely be more performant and 'full' vm would be overblown for practically all use cases. this wouldnt be a 1-1 recreation of the luau VM for obvious reasons, just hopefully similar enough for most code to work.
