@@ -1,19 +1,6 @@
-export type TokenType = 
-    -- Punctuation --
-    | "OPEN_PAREN"      | "CLOSE_PAREN"     | "OPEN_SBRACKET"   
-    | "CLOSE_SBRACKET"  | "AT"              | "EXCLAIM"         
-    | "EQ"              | "SEMICOLON"       | "DOT"
-    | "COLON"           | "COMMA"
-    -- Misc --
-    | "IDENTIFIER"      | "EOF"
-    -- Keywords --
-    | "END_KEYWORD"     | "STRING_KEYWORD"  | "CONST_KEYWORD"   
-    | "ALIAS_KEYWORD"   | "PROTO_KEYWORD"   | "ENV_KEYWORD"
-    -- Literals --
-    | "NIL_LITERAL"     | "BOOLEAN_LITERAL" | "STRING_LITERAL"
-    | "NUMBER_LITERAL"  | "VECTOR_LITERAL"  | "IMPORT_LITERAL" ;
+local t = require("../typedefs");
 
-local KEYWORDS: {[string]: TokenType} = {
+local KEYWORDS: {[string]: t.LASM_TokenType} = {
     ["end"] = "END_KEYWORD",
     ["string"] = "STRING_KEYWORD",
     ["const"] = "CONST_KEYWORD",
@@ -22,32 +9,14 @@ local KEYWORDS: {[string]: TokenType} = {
     ["env"] = "ENV_KEYWORD",
 };
 
-export type Token = {
-    type: TokenType,
-    lexeme: string,
-    literal: any?,
-    span: {start: number, stop: number},
-};
-
-export type TokeniseError = {
-    message: string,
-    span: {start: number, stop: number},
-};
-
-export type TokeniseResult = {
-    ok: boolean,
-    tokens: {Token},
-    errors: {TokeniseError},
-};
-
-return function(src: string|buffer): TokeniseResult
+return function(src: string|buffer): t.LASM_TokeniseResult
     local src = if type(src) == "string" then buffer.fromstring(src) else src;
     local lexeme_start = 0;
     local cursor = 0;
-    local tokens: {Token} = {};
-    local errors: {TokeniseError} = {};
+    local tokens: {t.LASM_Token} = {};
+    local errors: {t.LASM_TokeniseError} = {};
 
-    local function emit_token(type: TokenType, literal: any?)
+    local function emit_token(type: t.LASM_TokenType, literal: any?)
         table.insert(tokens, {
             type = type,
             lexeme = buffer.readstring(src, lexeme_start, cursor - lexeme_start),
@@ -459,7 +428,7 @@ return function(src: string|buffer): TokeniseResult
                 continue;
             end
 
-            local keyword_tok: TokenType = KEYWORDS[ident];
+            local keyword_tok: t.LASM_TokenType = KEYWORDS[ident];
             if keyword_tok then
                 if keyword_tok == "ENV_KEYWORD" then
                     local import_literal = match_import_literal();

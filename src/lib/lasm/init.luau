@@ -1,6 +1,9 @@
-local lasm = {};
+local t = require("../typedefs");
 
-lasm.tokenise = require("./tokeniser");
-lasm.parse = require("./parser");
+local lasm: t.API_Lasm = {
+    parse = require("./parser");
+    tokenise = require("./tokeniser");
+};
+
 
 return lasm;

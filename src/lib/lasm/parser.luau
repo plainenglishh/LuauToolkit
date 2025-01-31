@@ -1,23 +1,8 @@
-local tokeniser = require("./tokeniser");
-local t = require("../types");
+local t = require("../typedefs");
 
-export type ParseError = {
-    message: string,
-    span: t.Span?,
-};
-
-export type ParseResult = {
-    root: t.AstChunk,
-    ok: boolean,
-    errors: {ParseError},
-};
-
---[=[
-    A recursive descent parser for a LASM token stream.
-]=]
-return function(tokens: {tokeniser.Token}): ParseResult
+return function(tokens: {t.LASM_Token}): t.LASM_ParseResult
     local cursor = 1;
-    local errors: {ParseError} = {};
+    local errors: {t.LASM_ParseError} = {};
 
     local function at_eof(): boolean
         return (tokens[cursor] and tokens[cursor].type == "EOF") or cursor > #tokens;
@@ -60,7 +45,7 @@ return function(tokens: {tokeniser.Token}): ParseResult
     --[=[
         Returns the next token and advances the cursor.
     ]=]
-    local function advance(): tokeniser.Token
+    local function advance(): t.LASM_Token
         local tok = tokens[cursor];
         cursor += 1;
         return tok or error("end reached");
@@ -73,20 +58,20 @@ return function(tokens: {tokeniser.Token}): ParseResult
     --[=[
         Returns the next token without advancing the cursor.
     ]=]
-    local function lookahead(): tokeniser.Token?
+    local function lookahead(): t.LASM_Token?
         return tokens[cursor];
     end
 
     --[=[
         Returns the next token and advances the cursor if it matches.
     ]=]
-    local function match(...: tokeniser.TokenType): tokeniser.Token?
+    local function match(...: t.LASM_TokenType): t.LASM_Token?
         local next_tok = lookahead();
         if not next_tok then
             return;
         end
 
-        for _, tok: tokeniser.TokenType in {...} do
+        for _, tok: t.LASM_TokenType in {...} do
             if next_tok.type == tok then
                 advance();
                 return next_tok;
@@ -99,7 +84,7 @@ return function(tokens: {tokeniser.Token}): ParseResult
     --[=[
         Returns the next token and reports an error if it doesn't match.
     ]=]
-    local function expect(...: tokeniser.TokenType): tokeniser.Token?
+    local function expect(...: t.LASM_TokenType): t.LASM_Token?
         local tok = match(...);
         if tok then
             return tok;
@@ -110,16 +95,16 @@ return function(tokens: {tokeniser.Token}): ParseResult
         return;
     end
 
-    local function match_identifier(): t.AstIdentifier?
+    local function match_identifier(): t.LASM_AstIdentifier?
         local tok = match("IDENTIFIER");
         if not tok then
             return;
         end
 
-        return t.AstIdentifier(tok.span, tok.lexeme);
+        return t.LASM_AstIdentifier(tok.span, tok.lexeme);
     end
 
-    local function match_literal(): t.AstLiteral?
+    local function match_literal(): t.LASM_AstLiteral?
         local tok = match("NIL_LITERAL", "BOOLEAN_LITERAL", "STRING_LITERAL", "NUMBER_LITERAL", "VECTOR_LITERAL", "IMPORT_LITERAL");
         if not tok then
             return;
@@ -133,19 +118,19 @@ return function(tokens: {tokeniser.Token}): ParseResult
             lit_type = "import";
         end
 
-        return t.AstLiteral(tok.span, tok.literal, lit_type);
+        return t.LASM_AstLiteral(tok.span, tok.literal, lit_type);
     end
 
-    local function match_value(): t.AstValue?
+    local function match_value(): t.LASM_AstValue?
         local inner = match_identifier() or match_literal();
         if not inner then
             return;
         end
 
-        return t.AstValue(inner.span, inner);
+        return t.LASM_AstValue(inner.span, inner);
     end
     
-    local function match_attribute(kind: "proto"|"chunk"): t.AstAttribute?
+    local function match_attribute(kind: "proto"|"chunk"): t.LASM_AstAttribute?
         local span = measure();
         if not match("AT") then
             return;
@@ -180,10 +165,10 @@ return function(tokens: {tokeniser.Token}): ParseResult
             end
         end
 
-        return t.AstAttribute(span(), name.lexeme, value);
+        return t.LASM_AstAttribute(span(), name.lexeme, value);
     end
     
-    local function match_const_def(): t.AstConstDef?
+    local function match_const_def(): t.LASM_AstConstDef?
         local span = measure();
         if not match("CONST_KEYWORD") then
             return;
@@ -208,10 +193,10 @@ return function(tokens: {tokeniser.Token}): ParseResult
             return;
         end
 
-        return t.AstConstDef(span(), name.lexeme, value);
+        return t.LASM_AstConstDef(span(), name.lexeme, value);
     end
 
-    local function match_alias_def(): t.AstAliasDef?
+    local function match_alias_def(): t.LASM_AstAliasDef?
         local span = measure();
         if not match("ALIAS_KEYWORD") then
             return;
@@ -236,10 +221,10 @@ return function(tokens: {tokeniser.Token}): ParseResult
             return;
         end
 
-        return t.AstAliasDef(span(), name.lexeme, value);
+        return t.LASM_AstAliasDef(span(), name.lexeme, value);
     end
 
-    local function match_instruction(): t.AstInstruction?
+    local function match_instruction(): t.LASM_AstInstruction?
         local span = measure();
         local label = match("IDENTIFIER");
         if not label then
@@ -288,10 +273,10 @@ return function(tokens: {tokeniser.Token}): ParseResult
             expecting_comma = true;
         end
 
-        return t.AstInstruction(span(), opcode.lexeme, operands, if label then label.lexeme else nil);
+        return t.LASM_AstInstruction(span(), opcode.lexeme, operands, if label then label.lexeme else nil);
     end
 
-    local function match_proto_def(): t.AstProtoDef?
+    local function match_proto_def(): t.LASM_AstProtoDef?
         local span = measure();
         local attributes = {};
         while true do
@@ -375,10 +360,10 @@ return function(tokens: {tokeniser.Token}): ParseResult
             table.insert(body, stat);
         end
 
-        return t.AstProtoDef(span(), name.lexeme, attributes, metadata, body);
+        return t.LASM_AstProtoDef(span(), name.lexeme, attributes, metadata, body);
     end
 
-    local function match_string_def(): t.AstStringDef?
+    local function match_string_def(): t.LASM_AstStringDef?
         local span = measure();
         if not match("STRING_KEYWORD") then
             return;
@@ -403,10 +388,10 @@ return function(tokens: {tokeniser.Token}): ParseResult
             return;
         end
 
-        return t.AstStringDef(span(), name.lexeme, value.literal :: string);
+        return t.LASM_AstStringDef(span(), name.lexeme, value.literal :: string);
     end
     
-    local function match_chunk(): t.AstChunk?
+    local function match_chunk(): t.LASM_AstChunk?
         local span = measure();
         local body = {};
 
@@ -420,7 +405,7 @@ return function(tokens: {tokeniser.Token}): ParseResult
             table.insert(body, stat);
         end
     
-        return t.AstChunk(span(), body);
+        return t.LASM_AstChunk(span(), body);
     end
 
     return {

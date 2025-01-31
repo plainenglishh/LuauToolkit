@@ -2,18 +2,15 @@ local byteparse = require("@vendor/byteparse");
 local opcodes = require("./opcodes");
 local constants = require("./constants");
 local common = require("../common");
-local t = require("../types");
+local t = require("../typedefs");
 
 local ir = {};
 
---[=[
-    Decode a bytecode chunk into it's internal table representation.
-]=]
-function ir.decode(bc: buffer|string)
+function ir.decode(bc: buffer|string): t.IR_Chunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bc);
 
-    local function read_instruction(): t.IRInstruction
+    local function read_instruction(): t.IR_Instruction
         local raw = reader.read_u32();
         local instruction = {};
 
@@ -41,11 +38,11 @@ function ir.decode(bc: buffer|string)
         return instruction;
     end
 
-    local function read_constant(): t.IRConstant
+    local function read_constant(): t.IR_Constant
         local ktype_id = reader.read_u8();
         local ktype = constants.constant_types[ktype_id];
 
-        local constant: t.IRConstant = {
+        local constant: t.IR_Constant = {
             type = ktype :: any,
             value = nil,
         };
@@ -78,7 +75,7 @@ function ir.decode(bc: buffer|string)
         return constant;
     end
 
-    local function read_debug_info(): t.IRProtoDebugInfo
+    local function read_debug_info(): t.IR_ProtoDebugInfo
         local debug_info = {};
 
         debug_info.locals = {};
@@ -143,7 +140,7 @@ function ir.decode(bc: buffer|string)
     --[=[
         Reads a bytecode proto and returns the internal table representation.
     ]=]
-    local function read_proto(): t.IRProto
+    local function read_proto(): t.IR_Proto
         local proto = {};
 
         proto.max_stack_size = reader.read_u8();
@@ -154,7 +151,7 @@ function ir.decode(bc: buffer|string)
 
         local types_size = reader.read_varint();
         if types_size > 0 then
-            local types = {} :: t.IRProtoTypeInfo;
+            local types = {} :: t.IR_ProtoTypeInfo;
 
             local func_type_size = reader.read_varint();
             local upvals_type_size = reader.read_varint();
@@ -217,7 +214,7 @@ function ir.decode(bc: buffer|string)
     --[=[
         Reads a bytecode chuck and returns the internal table representation.
     ]=]
-    local function read_chunk(): t.IRChunk
+    local function read_chunk(): t.IR_Chunk
         local chunk = {};
 
         chunk.luau_version = reader.read_u8();
@@ -250,13 +247,10 @@ function ir.decode(bc: buffer|string)
     return read_chunk();
 end
 
---[=[
-    Encode a bytecode table representation object into a bytecode chunk.
-]=]
-function ir.encode(ir_chunk: t.IRChunk): buffer
+function ir.encode(ir_chunk: t.IR_Chunk): buffer
     local writer = byteparse.writer(100);
 
-    local function write_instruction(inst: t.IRInstruction)
+    local function write_instruction(inst: t.IR_Instruction)
         local raw = 0;
         local data = opcodes[inst.opcode];
 
@@ -280,7 +274,7 @@ function ir.encode(ir_chunk: t.IRChunk): buffer
         end
     end
 
-    local function write_constant(const: t.IRConstant)
+    local function write_constant(const: t.IR_Constant)
         writer.write_u8(common.find_from_0(constants.constant_types, const.type) or error("unknown constant type"));
 
         if const.type == "nil" then
@@ -306,7 +300,7 @@ function ir.encode(ir_chunk: t.IRChunk): buffer
         end
     end
 
-    local function write_debug_info(dbg: t.IRProtoDebugInfo)
+    local function write_debug_info(dbg: t.IR_ProtoDebugInfo)
         writer.write_varint(#dbg.locals);
         for _, l in dbg.locals do
             writer.write_varint(l.name);
@@ -325,7 +319,7 @@ function ir.encode(ir_chunk: t.IRChunk): buffer
         writer.write_buffer(lineinfo);
     end
 
-    local function write_type_info(type_info: t.IRProtoTypeInfo)
+    local function write_type_info(type_info: t.IR_ProtoTypeInfo)
         local temp_line_info = byteparse.writer(10);    
         temp_line_info.write_varint(#type_info.func);
         temp_line_info.write_varint(#type_info.upvalues);
@@ -351,7 +345,7 @@ function ir.encode(ir_chunk: t.IRChunk): buffer
     --[=[
         writes a bytecode proto and returns the internal table representation.
     ]=]
-    local function write_proto(proto: t.IRProto)
+    local function write_proto(proto: t.IR_Proto)
         writer.write_u8(proto.max_stack_size);
         writer.write_u8(proto.num_params);
         writer.write_u8(proto.num_upvalues);
@@ -390,7 +384,7 @@ function ir.encode(ir_chunk: t.IRChunk): buffer
     --[=[
         writes a bytecode chuck and returns the internal table representation.
     ]=]
-    local function write_chunk(chunk: t.IRChunk)
+    local function write_chunk(chunk: t.IR_Chunk)
         writer.write_u8(chunk.luau_version);
         writer.write_u8(chunk.types_version);
         writer.write_larray(chunk.strings, writer.write_lstring);

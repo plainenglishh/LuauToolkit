@@ -9,7 +9,7 @@
         - [X] Decoder
     - [X] Luau Bytecode Assembly\* ("LASM") Assembler -- Creating custom bytecode chunks with a library DSL
         - [X] Formal Grammar
-        - [X] CodeGenerator class
+        - [ ] CodeGenerator class
         - [X] Tokeniser
         - [X] Parser (not fully tested)
         - [ ] Analyser (to convert AST to IR using BytecodeGenerator)

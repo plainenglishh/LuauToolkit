@@ -9,25 +9,7 @@ local net = require("@lune/net");
 local fs = require("@lune/fs");
 
 local HEADER = [=[
-export type OperandName = "a" | "b" | "c" | "d" | "e" | "aux";
-export type OperandMode = "abc" | "ad" | "e" | "none";
-export type OperandType = "register" | "jump_offset" | "constant" | "proto" | "number"; 
-
-export type OperandInfo = {
-    name: string,
-    type: {OperandType},
-    description: string,
-};
-
-export type OpcodeInfo = {
-    name: string,
-    opcode: number,
-    mode: OperandMode,
-    aux: boolean,
-    description: string,
-    operands: {OperandInfo},
-    size: number,
-};
+local t = require("../typedefs");
 ]=];
 
 local BYTECODE_H_URL = "https://raw.githubusercontent.com/luau-lang/luau/refs/heads/master/Common/include/Luau/Bytecode.h";
@@ -205,21 +187,21 @@ local function generate(bytecode_h: string): string
         Writes the OpcodeName type from an array of opcodes.
     ]=]
     local function write_opcode_name_type(opcodes: {Opcode})
-        write("export type OpcodeName =\n   ");
+        write("--[[\nuse for types.luau:\n\nexport type OpcodeName =\n   ");
         for i,  opcode in opcodes do
             write(" | %-22s", '"'..opcode.name..'"');
             if i % 3 == 0 then
                 write("\n   ");
             end
         end
-        write(" ;\n\n");
+        write(" ;\n]]\n\n");
     end
 
     --[=[
         Writes a table containing opcode information.
     ]=]
     local function write_opcodes(opcodes: {Opcode})
-        write("local opcodes: {[number]: OpcodeInfo} = {\n");
+        write("local opcodes: {[number]: t.OpcodeInfo} = {\n");
         for i, opcode in opcodes do
             local has_aux = false;
             local operands = "";
@@ -299,4 +281,4 @@ end
 
 local bytecode_h =  bytecode_h_res.body;
 
-fs.writeFile("./src/lib/opcodes.luau", generate(bytecode_h));
+fs.writeFile("./src/lib/bytecode/opcodes.luau", generate(bytecode_h));

@@ -6,7 +6,7 @@ local stdio = require("@lune/stdio");
 local serde = require("@lune/serde");
 local luau = require("@lune/luau");
 local luau_toolkit = require("../src/lib");
-local t = require("../src/lib/types");
+local t = require("../src/lib/typedefs");
 
 
 local _nil = nil :: any;
@@ -42,7 +42,7 @@ local function strip_spans(tbl: any)
     return new;
 end
 
-local function assert_ast_eq(a: t.AstChunk, b: t.AstChunk)
+local function assert_ast_eq(a: t.LASM_AstChunk, b: t.LASM_AstChunk)
     a = strip_spans(a);
     b = strip_spans(b);
     assert(eq(a, b))
@@ -252,7 +252,7 @@ test("lasm::parse::nothing", function()
     local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
     assert(res.ok);
 
-    assert_ast_eq(res.root, t.AstChunk(_nil, {}));
+    assert_ast_eq(res.root, t.LASM_AstChunk(_nil, {}));
 end);
 
 test("lasm::parse::strings", function()
@@ -263,8 +263,8 @@ test("lasm::parse::strings", function()
     local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
     assert(res.ok);
 
-    assert_ast_eq(res.root, t.AstChunk(_nil, {
-        t.AstStringDef(_nil, "S1", "Hello, World!");
+    assert_ast_eq(res.root, t.LASM_AstChunk(_nil, {
+        t.LASM_AstStringDef(_nil, "S1", "Hello, World!");
     }));
 end);
 
@@ -276,8 +276,8 @@ test("lasm::parse::proto", function()
     local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
     assert(res.ok);
 
-    assert_ast_eq(res.root, t.AstChunk(_nil, {
-        t.AstProtoDef(_nil, "P0", {}, {}, {});
+    assert_ast_eq(res.root, t.LASM_AstChunk(_nil, {
+        t.LASM_AstProtoDef(_nil, "P0", {}, {}, {});
     }));
 end);
 
@@ -294,11 +294,11 @@ test("lasm::parse::instructions", function()
     
     assert(res.ok);
 
-    assert_ast_eq(res.root, t.AstChunk(_nil, {
-        t.AstProtoDef(_nil, "P0", {}, {}, {
-            t.AstInstruction(_nil, "LOADB", {t.AstValue(_nil, t.AstLiteral(_nil, 0)), t.AstValue(_nil, t.AstLiteral(_nil, true))}),
-            t.AstInstruction(_nil, "LOADN", {t.AstValue(_nil, t.AstLiteral(_nil, 1)), t.AstValue(_nil, t.AstLiteral(_nil, 0))}),
-            t.AstInstruction(_nil, "RETURN", {t.AstValue(_nil, t.AstLiteral(_nil, 0)), t.AstValue(_nil, t.AstLiteral(_nil, 3))}, "L1"),
+    assert_ast_eq(res.root, t.LASM_AstChunk(_nil, {
+        t.LASM_AstProtoDef(_nil, "P0", {}, {}, {
+            t.LASM_AstInstruction(_nil, "LOADB", {t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, 0)), t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, true))}),
+            t.LASM_AstInstruction(_nil, "LOADN", {t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, 1)), t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, 0))}),
+            t.LASM_AstInstruction(_nil, "RETURN", {t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, 0)), t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, 3))}, "L1"),
         });
     }));
 end);
@@ -323,17 +323,17 @@ test("lasm::parse::constants", function()
     local res = luau_toolkit.lasm.parse(luau_toolkit.lasm.tokenise(src).tokens);
     assert(res.ok);
     
-    assert_ast_eq(res.root, t.AstChunk(_nil, {
-        t.AstStringDef(_nil, "S1", "Hello, World!"),
-        t.AstProtoDef(_nil, "P0", {}, {}, {
-            t.AstConstDef(_nil, "K0", t.AstValue(_nil, t.AstLiteral(_nil, nil))),
-            t.AstConstDef(_nil, "K1", t.AstValue(_nil, t.AstLiteral(_nil, true))),
-            t.AstConstDef(_nil, "K2", t.AstValue(_nil, t.AstLiteral(_nil, 123))),
-            t.AstConstDef(_nil, "K3", t.AstValue(_nil, t.AstIdentifier(_nil, "S1"))),
-            t.AstConstDef(_nil, "K4", t.AstValue(_nil, t.AstLiteral(_nil, {"print"}, "import"))),
-            t.AstConstDef(_nil, "K5", t.AstValue(_nil, t.AstLiteral(_nil, nil))),
-            t.AstConstDef(_nil, "K6", t.AstValue(_nil, t.AstIdentifier(_nil, "P0"))),
-            t.AstConstDef(_nil, "K7", t.AstValue(_nil, t.AstLiteral(_nil, {0, 1, 2}, "vector"))),
+    assert_ast_eq(res.root, t.LASM_AstChunk(_nil, {
+        t.LASM_AstStringDef(_nil, "S1", "Hello, World!"),
+        t.LASM_AstProtoDef(_nil, "P0", {}, {}, {
+            t.LASM_AstConstDef(_nil, "K0", t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, nil))),
+            t.LASM_AstConstDef(_nil, "K1", t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, true))),
+            t.LASM_AstConstDef(_nil, "K2", t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, 123))),
+            t.LASM_AstConstDef(_nil, "K3", t.LASM_AstValue(_nil, t.LASM_AstIdentifier(_nil, "S1"))),
+            t.LASM_AstConstDef(_nil, "K4", t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, {"print"}, "import"))),
+            t.LASM_AstConstDef(_nil, "K5", t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, nil))),
+            t.LASM_AstConstDef(_nil, "K6", t.LASM_AstValue(_nil, t.LASM_AstIdentifier(_nil, "P0"))),
+            t.LASM_AstConstDef(_nil, "K7", t.LASM_AstValue(_nil, t.LASM_AstLiteral(_nil, {0, 1, 2}, "vector"))),
         }),
     }));
 end);

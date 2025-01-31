@@ -1,6 +1,8 @@
-local luau_toolkit = {};
+local t = require("./typedefs");
 
-luau_toolkit.bytecode = require("./bytecode");
-luau_toolkit.lasm = require("./lasm");
+local luau_toolkit: t.luau_toolkit = {
+    bytecode = require("./bytecode");
+    lasm = require("./lasm");
+};
 
 return luau_toolkit;

@@ -6,15 +6,14 @@ local constants = require("./constants");
 local ir = require("./ir");
 local opcodes = require("./opcodes");
 local other = require("./other");
-local builders = require("./builders");
+local t = require("../typedefs");
 
-local bytecode = {};
-
-bytecode.encode = ir.encode;
-bytecode.decode = ir.decode;
-bytecode.constants = constants;
-bytecode.opcodes = opcodes;
-bytecode.builders = builders;
-bytecode.get_opcode_info = other.get_opcode_info;
+local bytecode: t.API_Bytecode = {
+    encode = ir.encode,
+    decode = ir.decode,
+    get_opcode_info = other.get_opcode_info,
+    constants = constants,
+    opcodes = opcodes,
+};
 
 return bytecode;
