@@ -1,7 +1,5 @@
 local t = {};
 
-t.any = nil :: any;
-
 --------------------------------------------------------------------------------
 --  API
 --------------------------------------------------------------------------------
@@ -20,21 +18,93 @@ export type API_BytecodeConstants = {
     min_version: number,
     max_version: number,
     constant_types: {[number]: string},
-    proto_flag: {
-        native_module: number,
-        native_cold: number,
-        native_function: number,
-    }
+    proto_flag: {[ProtoFlag]: number},
 };
 
 export type API_Bytecode = {
     encode: (ir_chunk: IR_Chunk) -> buffer,
     decode: (bc: buffer|string) -> IR_Chunk,
+    BytecodeBuilder: BytecodeBuilderImpl,
     get_opcode_info: (opcode: number|OpcodeName) -> OpcodeInfo?,
     constants: API_BytecodeConstants,
-    opcodes: {[number]: OpcodeInfo}
+    opcodes: {[number]: OpcodeInfo},
 };
 
+
+--------------------------------------------------------------------------------
+--  Bytecode Builder Types
+--------------------------------------------------------------------------------
+
+export type BytecodeBuilderImpl = {
+    __index: BytecodeBuilderImpl,
+
+    --[=[
+        Creates a new Bytecode Builder.
+    ]=]
+    new: () -> BytecodeBuilder,
+
+    --[=[
+        Sets the luau_version.
+    ]=]
+    set_version: (self: BytecodeBuilder, version: number) -> (),
+
+    --[=[
+        Sets the luau_version.
+    ]=]
+    set_types_version: (self: BytecodeBuilder, version: number) -> (),
+
+    --[=[
+        Adds a new string to the chunk string table, returning its index.
+    ]=]
+    add_string: (self: BytecodeBuilder, str: string, force: boolean?) -> number,
+
+    --[=[
+        Starts a new proto, returning it's ID.
+    ]=]
+    start_proto: (self: BytecodeBuilder) -> number,
+
+    --[=[
+        Returns the current proto ID, or nil if not currently in one.
+    ]=]
+    get_proto_id: (self: BytecodeBuilder) -> number,
+
+    set_max_stack_size: (self: BytecodeBuilder, value: number) -> (),
+    set_num_params: (self: BytecodeBuilder, value: number) -> (),
+    set_num_upvalues: (self: BytecodeBuilder, value: number) -> (),
+    set_is_vararg: (self: BytecodeBuilder, value: boolean) -> (),
+    set_line_defined: (self: BytecodeBuilder, value: number) -> (),
+    set_debug_name: (self: BytecodeBuilder, name: string) -> (),
+    set_main: (self: BytecodeBuilder, proto: number?) -> (),
+    set_flag: (self: BytecodeBuilder, flag: ProtoFlag, value: boolean) -> (),
+
+    --[=[
+        Adds a constant to the current proto, returning its ID.
+        If the constant type is a closure, it will also add it to the proto's
+        child proto table.
+    ]=]
+    add_constant: (self: BytecodeBuilder, type: ConstantType, value: any, force: boolean?) -> number,
+
+    --[=[
+        Adds an instruction to the current proto, returning the offset required
+        to jump to it.
+    ]=]
+    add_instruction: (self: BytecodeBuilder, opname_or_code: number, operands: {number}) -> number,
+
+    --[=[
+        Ends the current proto and adds it to the proto table, returning it's ID.
+    ]=]
+    end_proto: (self: BytecodeBuilder) -> number,
+
+    build_ir: (self: BytecodeBuilder) -> IR_Chunk,
+    build_bc: (self: BytecodeBuilder) -> buffer,
+};
+
+export type BytecodeBuilder = typeof(setmetatable({} :: {
+    _offset: number,
+    _chunk: IR_Chunk,
+    _proto: IR_Proto?,
+    _proto_id: number?,
+}, {} :: BytecodeBuilderImpl));
 
 --// luau_toolkit::lasm::*
 
@@ -113,8 +183,11 @@ export type OpcodeName =
     | "JUMPXEQKB"            | "JUMPXEQKN"            | "JUMPXEQKS"           
     | "IDIV"                 | "IDIVK"                ;
 
-export type ConstantType = "nil" | "boolean" | "number" | "string" | "import" | "table" | "closure" | "vector";
+export type ConstantType = 
+    | "nil" | "boolean" | "number" | "string" | "import" | "table" | "closure" | "vector";
 
+export type ProtoFlag = 
+    | "native_module" | "native_cold" | "native_function";
 
 --------------------------------------------------------------------------------
 --  Bytecode Table Representation Types
@@ -140,8 +213,8 @@ export type IR_Proto = {
     max_stack_size: u8,
     num_params: u8,
     num_upvalues: u8,
-    is_varag: boolean,
-    flags: u8,
+    is_vararg: boolean,
+    flags: {ProtoFlag},
     types: IR_ProtoTypeInfo?,
     instructions: {IR_Instruction},
     constants: {IR_Constant},
@@ -161,7 +234,7 @@ export type IR_Instruction = {
 };
 
 --[=[
-    Internal table representation of a bytecode constant.
+    Internal table representation of a bytecode constan
 ]=]
 export type IR_Constant = {
     type: ConstantType,

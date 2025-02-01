@@ -146,8 +146,16 @@ function ir.decode(bc: buffer|string): t.IR_Chunk
         proto.max_stack_size = reader.read_u8();
         proto.num_params = reader.read_u8();
         proto.num_upvalues = reader.read_u8();
-        proto.is_varag = reader.read_bool();
-        proto.flags = reader.read_u8();
+        proto.is_vararg = reader.read_bool();
+        proto.flags = {} :: any;
+
+        local raw_flags = reader.read_u8();
+
+        for flag, offset in constants.proto_flag do
+            if bit32.extract(raw_flags, offset) == 1 then
+                table.insert(proto.flags, flag);
+            end
+        end
 
         local types_size = reader.read_varint();
         if types_size > 0 then
@@ -349,8 +357,16 @@ function ir.encode(ir_chunk: t.IR_Chunk): buffer
         writer.write_u8(proto.max_stack_size);
         writer.write_u8(proto.num_params);
         writer.write_u8(proto.num_upvalues);
-        writer.write_bool(proto.is_varag);
-        writer.write_u8(proto.flags);
+        writer.write_bool(proto.is_vararg);
+
+        local flags = 0;
+
+        for _, flag in proto.flags do
+            local offset = constants.proto_flag[flag :: any] or error(`unknown flag '{flag}'`);
+            flags = bit32.replace(flags, 1, offset);
+        end
+
+        writer.write_u8(flags);
 
         if proto.types then
             write_type_info(proto.types);

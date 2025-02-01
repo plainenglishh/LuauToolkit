@@ -16,8 +16,7 @@
         - [ ] `P` VSC Textmate Grammar
         - [ ] `??` a very basic LSP (using lspsdk)
     - [X] Disassembler (emits LASM source from a given bytecode chunk/ir)
-    - [ ] `?` A bytecode interpeter?
-    - [ ] BytecodeBuilder class (emits IR)
+    - [X] BytecodeBuilder class (emits IR)
     - [ ] Optimiser
         - [ ] `P` Strip debug info
         - [ ] `??` Inlining
@@ -30,7 +29,7 @@
     - [ ] `???` Prettier/processor?
     - [ ] `???` Basic Obfuscator?
     - [ ] `???` Compiler (emits IR using BytecodeBuilder)
-- [ ] Virtual Machine
+- [ ] Virtual Machine / Interpretter
     - [ ] `??` 'partial' VM (interprets bytecode instructions and runs them on the VM running the library, similar to fiu),
     - [ ] `???` 'full' VM (interprets bytecode instructions in an isolated pure-luau implemented VM)\*\*
 

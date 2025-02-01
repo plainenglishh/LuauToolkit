@@ -10,7 +10,7 @@ bytecode.
 ## Why
 
 Fun and education mainly. As for why it's written exclusively in luau, I think
-it'd be cool to have a full luau IDE implemented in roblox.
+it'd be cool to be readily usable within tools like Roblox and Lune.
 
 ## Sister Projects
 
