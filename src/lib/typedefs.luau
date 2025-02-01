@@ -26,6 +26,19 @@ export type luau_toolkit = {
         tokenise: (src: string|buffer) -> LASM_TokeniseResult,
         parse: (tokens: {LASM_Token}) -> LASM_ParseResult,
     },
+    
+    --BEGIN_TYPE_CONSTRUCTORS
+    LASM_AstIdentifier: (span: Span, value: string) -> LASM_AstIdentifier,
+    LASM_AstLiteral: (span: Span, value: any, _type: string?) -> LASM_AstLiteral,
+    LASM_AstValue: (span: Span, value: LASM_AstIdentifier|LASM_AstLiteral) -> LASM_AstValue,
+    LASM_AstAttribute: (span: Span, name: string, value: LASM_AstLiteral?) -> LASM_AstAttribute,
+    LASM_AstConstDef: (span: Span, name: string, value: LASM_AstValue) -> LASM_AstConstDef,
+    LASM_AstAliasDef: (span: Span, name: string, value: LASM_AstValue) -> LASM_AstAliasDef,
+    LASM_AstInstruction: (span: Span, opcode: string, operands: {LASM_AstValue}, label: string?) -> LASM_AstInstruction,
+    LASM_AstProtoDef: (span: Span, name: string, attributes: {LASM_AstAttribute}, metadata: {LASM_AstLiteral}, body: {LASM_AstInstruction|LASM_AstAliasDef|LASM_AstConstDef}) -> LASM_AstProtoDef,
+    LASM_AstStringDef: (span: Span, name: string, value: string) -> LASM_AstStringDef,
+    LASM_AstChunk: (span: Span, body: {LASM_AstAttribute|LASM_AstStringDef|LASM_AstProtoDef|LASM_AstAliasDef}) -> LASM_AstChunk,
+--END_TYPE_CONSTRUCTORS
 };
 
 

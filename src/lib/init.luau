@@ -1,9 +1,9 @@
 local t = require("./typedefs");
 
-local luau_toolkit: t.luau_toolkit = {
-    bytecode = require("./bytecode");
-    lasm = require("./lasm");
-};
+local luau_toolkit = {};
+
+luau_toolkit.bytecode = require("./bytecode");
+luau_toolkit.lasm = require("./lasm");
 
 --BEGIN_REEXPORTS
 export type luau_toolkit = t.luau_toolkit;
@@ -49,6 +49,16 @@ export type LASM_AstInstruction = t.LASM_AstInstruction;
 export type LASM_AstProtoDef = t.LASM_AstProtoDef;
 export type LASM_AstStringDef = t.LASM_AstStringDef;
 export type LASM_AstChunk = t.LASM_AstChunk;
---BEGIN_REEXPORTS
+luau_toolkit.LASM_AstIdentifier = t.LASM_AstIdentifier;
+luau_toolkit.LASM_AstLiteral = t.LASM_AstLiteral;
+luau_toolkit.LASM_AstValue = t.LASM_AstValue;
+luau_toolkit.LASM_AstAttribute = t.LASM_AstAttribute;
+luau_toolkit.LASM_AstConstDef = t.LASM_AstConstDef;
+luau_toolkit.LASM_AstAliasDef = t.LASM_AstAliasDef;
+luau_toolkit.LASM_AstInstruction = t.LASM_AstInstruction;
+luau_toolkit.LASM_AstProtoDef = t.LASM_AstProtoDef;
+luau_toolkit.LASM_AstStringDef = t.LASM_AstStringDef;
+luau_toolkit.LASM_AstChunk = t.LASM_AstChunk;
+--END_REEXPORTS
 
-return luau_toolkit;
+return luau_toolkit :: t.luau_toolkit;
