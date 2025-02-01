@@ -265,14 +265,14 @@ function ir.encode(ir_chunk: t.IR_Chunk): buffer
         raw = bit32.replace(raw, inst.opcode, 0, 8);
 
         if data.mode == "abc" then
-            raw = bit32.replace(raw, inst.operands.a, 8, 8);
-            raw = bit32.replace(raw, inst.operands.b, 16, 8);
-            raw = bit32.replace(raw, inst.operands.c, 24, 8);
+            raw = bit32.replace(raw, inst.operands.a or 0, 8, 8);
+            raw = bit32.replace(raw, inst.operands.b or 0, 16, 8);
+            raw = bit32.replace(raw, inst.operands.c or 0, 24, 8);
         elseif data.mode == "ad" then
-            raw = bit32.replace(raw, inst.operands.a, 8, 8);
-            raw = bit32.replace(raw, inst.operands.d, 16, 16);
+            raw = bit32.replace(raw, inst.operands.a or 0, 8, 8);
+            raw = bit32.replace(raw, inst.operands.d or 0, 16, 16);
         elseif data.mode == "e" then
-            raw = bit32.replace(raw, inst.operands.e, 8, 24);
+            raw = bit32.replace(raw, inst.operands.e or 0, 8, 24);
         end 
 
         writer.write_u32(raw);

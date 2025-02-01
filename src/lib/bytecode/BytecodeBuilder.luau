@@ -47,6 +47,14 @@ function BytecodeBuilder:add_string(str: string, force: boolean?): number
     return add_to(self._chunk.strings, str, force);
 end
 
+function BytecodeBuilder:add_import(path: {string})
+    local new_path = {};
+    for i, v in path do
+        new_path[i] = self:add_string(v);
+    end
+
+    return other.encode_import_id(new_path);
+end
 
 --// Proto Methods
 
@@ -70,7 +78,7 @@ function BytecodeBuilder:start_proto()
         line_defined = 0,
     };
 
-    local proto_id = #self._chunk.protos - 1;
+    local proto_id = math.clamp(#self._chunk.protos, 0, math.huge);
     self._proto_id = proto_id;
     return proto_id;
 end
@@ -127,7 +135,7 @@ function BytecodeBuilder:set_debug_name(value: string): ()
 end
 
 function BytecodeBuilder:set_main(value: number?)
-    self._chunk.main_proto = value or self:get_proto_id();
+    self._chunk.main_proto = value or self._proto_id or error("");
 end
 
 function BytecodeBuilder:set_flag(flag: any, value: boolean)
@@ -162,7 +170,8 @@ function BytecodeBuilder:add_constant(type: any, value: any, force: boolean?): n
     }, force) - 1;
 end
 
-function BytecodeBuilder:add_instruction(opname_or_code: number|t.OpcodeName, operands: {number}): number
+function BytecodeBuilder:add_instruction(opname_or_code: number|any, ...: number): number
+    local operands = {...};
     if not self._proto then
         error("not in a function", 2);
     end
@@ -186,6 +195,10 @@ function BytecodeBuilder:add_instruction(opname_or_code: number|t.OpcodeName, op
     self._offset += info.size;
 
     return offset;
+end
+
+function BytecodeBuilder:get_offset(): number
+    return self._offset;
 end
 
 function BytecodeBuilder:end_proto()

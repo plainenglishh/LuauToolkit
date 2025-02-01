@@ -1,3 +1,4 @@
 {
-    "luau-lsp.platform.type": "standard"
+    "luau-lsp.platform.type": "standard",
+    "luau-lsp.fflags.enableNewSolver": false
 }

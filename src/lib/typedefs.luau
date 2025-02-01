@@ -26,6 +26,8 @@ export type API_Bytecode = {
     decode: (bc: buffer|string) -> IR_Chunk,
     BytecodeBuilder: BytecodeBuilderImpl,
     get_opcode_info: (opcode: number|OpcodeName) -> OpcodeInfo?,
+    encode_import_id: (path: {number}) -> number,
+    decode_import_id: (id: number) -> {number},
     constants: API_BytecodeConstants,
     opcodes: {[number]: OpcodeInfo},
 };
@@ -58,10 +60,13 @@ export type BytecodeBuilderImpl = {
     ]=]
     add_string: (self: BytecodeBuilder, str: string, force: boolean?) -> number,
 
+    add_import: (self: BytecodeBuilder, path: {string}) -> number,
+    
     --[=[
         Starts a new proto, returning it's ID.
     ]=]
     start_proto: (self: BytecodeBuilder) -> number,
+
 
     --[=[
         Returns the current proto ID, or nil if not currently in one.
@@ -88,7 +93,9 @@ export type BytecodeBuilderImpl = {
         Adds an instruction to the current proto, returning the offset required
         to jump to it.
     ]=]
-    add_instruction: (self: BytecodeBuilder, opname_or_code: number, operands: {number}) -> number,
+    add_instruction: (self: BytecodeBuilder, opname_or_code: OpcodeName|number, ...number) -> number,
+
+    get_offset: (self: BytecodeBuilder) -> number,
 
     --[=[
         Ends the current proto and adds it to the proto table, returning it's ID.

@@ -81,6 +81,16 @@ test("bytecode::{encode,decode}", function()
     assert(fn and fn() == "Hello, World!");
 end);
 
+test("bytecode::{encode_import_id,decode_import_id}", function()
+    local encoded = luau_toolkit.bytecode.encode_import_id({1, 2, 3});
+    local decoded = luau_toolkit.bytecode.decode_import_id(encoded);
+
+    assert(decoded[1] == 1);
+    assert(decoded[2] == 2);
+    assert(decoded[3] == 3);
+end);
+
+
 test("lasm::tokenise::punctuation", function()
     local src = "()[]@!=;:.,";
     local res = luau_toolkit.lasm.tokenise(src);
