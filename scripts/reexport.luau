@@ -1,11 +1,7 @@
 --[=[
-    A script for automatically generating a table of metadata about luau
-    bytecode using `Common/include/Luau/Bytecode.h`.
+    A script for automatically generating type reexports.
 ]=]
 
---!nonstrict
-
-local net = require("@lune/net");
 local fs = require("@lune/fs");
 
 local typedefs = fs.readFile("./src/lib/typedefs.luau");
