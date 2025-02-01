@@ -35,13 +35,12 @@ chunk:start_proto();
     chunk:set_debug_name("stack_utils");
 
     chunk:add_instruction("NEWTABLE", 0);
-
+    
     chunk:add_instruction("LOADK", 1, chunk:add_constant("closure", P_dump_stack));
     chunk:add_instruction("SETTABLEKS", 1, 0, 0, chunk:add_constant("string", chunk:add_string("dump_stack")));
 
     chunk:add_instruction("LOADK", 1, chunk:add_constant("closure", P_get_stack_size));
     chunk:add_instruction("SETTABLEKS", 1, 0, 0, chunk:add_constant("string", chunk:add_string("get_stack_size")));
-
 
     chunk:add_instruction("RETURN", 0, 2);
 chunk:end_proto();
