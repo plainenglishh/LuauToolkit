@@ -32,7 +32,6 @@
 
 --!native
 --!optimize 2
---!strict
 --!nolint LocalShadow
 
 local _BYTEPARSE_VERSION = "v1.2.0";
