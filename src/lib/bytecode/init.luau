@@ -6,7 +6,7 @@ local t = require("../typedefs");
 local ir = require("./ir");
 local other = require("./other");
 
-local bytecode: t.API_Bytecode = {
+local bytecode: typeof(({} :: t.luau_toolkit).bytecode) = {
     encode = ir.encode,
     decode = ir.decode,
     get_opcode_info = other.get_opcode_info,

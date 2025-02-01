@@ -64,6 +64,7 @@ local function assert_token(result, n: number, token: string, literal: any?)
     end
 end
 
+
 --------------------------------------------------------------------------------
 
 test("bytecode::{encode,decode}", function()
@@ -89,6 +90,7 @@ test("bytecode::{encode_import_id,decode_import_id}", function()
     assert(decoded[2] == 2);
     assert(decoded[3] == 3);
 end);
+
 
 
 test("lasm::tokenise::punctuation", function()

@@ -1,6 +1,6 @@
 local t = require("../typedefs");
 
-local lasm: t.API_Lasm = {
+local lasm: typeof(({} :: t.luau_toolkit).lasm) = {
     parse = require("./parser");
     tokenise = require("./tokeniser");
 };

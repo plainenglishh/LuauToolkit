@@ -1,6 +1,6 @@
 local t = require("../typedefs");
 
-local constants: t.API_BytecodeConstants = {
+local constants: typeof(({} :: t.luau_toolkit).bytecode.constants) = {
     min_version = 4,
     max_version = 6,
     
