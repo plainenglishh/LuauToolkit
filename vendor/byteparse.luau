@@ -1,7 +1,5 @@
---!nocheck
-
 --[[
-    plainenglishh/byteparse v1.2.0
+    plainenglishh/byteparse v1.2.1
    
     Pure-luau library for serialising and deserialising binary formats.
 ]]
@@ -32,9 +30,10 @@
 
 --!native
 --!optimize 2
+--!strict
 --!nolint LocalShadow
 
-local _BYTEPARSE_VERSION = "v1.2.0";
+local _BYTEPARSE_VERSION = "v1.2.1";
 
 export type u8 = number;
 export type u16 = number;
@@ -53,17 +52,6 @@ export type SerialisableArray = {Serialisable};
 export type SerialisableTable = {[Serialisable]: Serialisable};
 
 export type DataType = "u8" | "i8" | "u16" | "i16" | "u32" | "i32" | "f32" | "f64";
-
-local warned = false;
-local function warn_vector_lib()
-    if not (_G.BYTEPARSE_SUPPRESS_WARNINGS or warned) and type(vector) ~= "table" then
-        warned = true;
-        print(`[byteparse WARN]: expected global 'vector' to be a table, got {type(vector)}`);
-        if type(vector) == "function" then
-            print(`[byteparse WARN]: this is likely caused by mlua, which sets 'vector' to a function instead of the builtin vector library. either switch runtimes or polyfill 'vector'`);
-        end
-    end
-end
 
 local TYPE_IDS = {
     NIL = 0,
@@ -252,8 +240,6 @@ byteparse.version = _BYTEPARSE_VERSION;
     @return writer
 ]=]
 function byteparse.writer(start_size: number, expansion_rate: number?)
-    warn_vector_lib();
-
     local expansion_rate = expansion_rate or DEFAULT_EXPANSION_RATE;
 
     local b = buffer.create(start_size);
@@ -733,8 +719,6 @@ end
     @return reader -- The new reader instance.
 ]=]
 function byteparse.reader(b: buffer)
-    warn_vector_lib();
-
     local cursor = 0;
     local default_vector_size = 3;
 

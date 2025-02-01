@@ -1,3 +1,4 @@
 /test.luau
 /src_old
 /dist/
+*.luauc

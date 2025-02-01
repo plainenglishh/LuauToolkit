@@ -167,7 +167,7 @@ function BytecodeBuilder:add_constant(type: any, value: any, force: boolean?): n
     end
 
     if type == "closure" then
-        value = add_to(self._proto.protos, value) - 1;
+        add_to(self._proto.protos, value);
     end
 
     return add_to(self._proto.constants, {
