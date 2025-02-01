@@ -201,7 +201,7 @@ function ir.decode(bc: buffer|string): t.IR_Chunk
             end
 
             local insn = read_instruction();
-            proto.instructions[i] = insn;
+            table.insert(proto.instructions, insn);
             
             if insn.operands.aux then
                 skip_next = true;

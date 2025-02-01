@@ -47,15 +47,6 @@ function BytecodeBuilder:add_string(str: string, force: boolean?): number
     return add_to(self._chunk.strings, str, force);
 end
 
-function BytecodeBuilder:add_import(path: {string})
-    local new_path = {};
-    for i, v in path do
-        new_path[i] = self:add_string(v);
-    end
-
-    return other.encode_import_id(new_path);
-end
-
 --// Proto Methods
 
 function BytecodeBuilder:start_proto()
@@ -86,6 +77,21 @@ end
 function BytecodeBuilder:get_proto_id(): number
     return self._proto_id or error("not in a function", 2);
 end
+
+    
+function BytecodeBuilder:add_import(...: string)
+    if not self._proto then
+        error("not in a function", 2);
+    end
+    
+    local new_path = {};
+    for i, v in {...} do
+        new_path[i] = self:add_constant("string", self:add_string(v));
+    end
+
+    return other.encode_import_id(new_path);
+end
+
 
 function BytecodeBuilder:set_max_stack_size(value: number)
     if not self._proto then

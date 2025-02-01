@@ -40,39 +40,13 @@ export type API_Bytecode = {
 export type BytecodeBuilderImpl = {
     __index: BytecodeBuilderImpl,
 
-    --[=[
-        Creates a new Bytecode Builder.
-    ]=]
     new: () -> BytecodeBuilder,
-
-    --[=[
-        Sets the luau_version.
-    ]=]
     set_version: (self: BytecodeBuilder, version: number) -> (),
-
-    --[=[
-        Sets the luau_version.
-    ]=]
     set_types_version: (self: BytecodeBuilder, version: number) -> (),
-
-    --[=[
-        Adds a new string to the chunk string table, returning its index.
-    ]=]
     add_string: (self: BytecodeBuilder, str: string, force: boolean?) -> number,
-
-    add_import: (self: BytecodeBuilder, path: {string}) -> number,
-    
-    --[=[
-        Starts a new proto, returning it's ID.
-    ]=]
+    add_import: (self: BytecodeBuilder, ...string) -> number,
     start_proto: (self: BytecodeBuilder) -> number,
-
-
-    --[=[
-        Returns the current proto ID, or nil if not currently in one.
-    ]=]
     get_proto_id: (self: BytecodeBuilder) -> number,
-
     set_max_stack_size: (self: BytecodeBuilder, value: number) -> (),
     set_num_params: (self: BytecodeBuilder, value: number) -> (),
     set_num_upvalues: (self: BytecodeBuilder, value: number) -> (),
@@ -81,27 +55,10 @@ export type BytecodeBuilderImpl = {
     set_debug_name: (self: BytecodeBuilder, name: string) -> (),
     set_main: (self: BytecodeBuilder, proto: number?) -> (),
     set_flag: (self: BytecodeBuilder, flag: ProtoFlag, value: boolean) -> (),
-
-    --[=[
-        Adds a constant to the current proto, returning its ID.
-        If the constant type is a closure, it will also add it to the proto's
-        child proto table.
-    ]=]
     add_constant: (self: BytecodeBuilder, type: ConstantType, value: any, force: boolean?) -> number,
-
-    --[=[
-        Adds an instruction to the current proto, returning the offset required
-        to jump to it.
-    ]=]
     add_instruction: (self: BytecodeBuilder, opname_or_code: OpcodeName|number, ...number) -> number,
-
     get_offset: (self: BytecodeBuilder) -> number,
-
-    --[=[
-        Ends the current proto and adds it to the proto table, returning it's ID.
-    ]=]
     end_proto: (self: BytecodeBuilder) -> number,
-
     build_ir: (self: BytecodeBuilder) -> IR_Chunk,
     build_bc: (self: BytecodeBuilder) -> buffer,
 };
