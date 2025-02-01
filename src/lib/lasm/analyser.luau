@@ -43,8 +43,8 @@ return function(src: string|buffer): AnalyseReport
 
     if #diagnostics == 0 then
         return {
-            ok = true,
-            diagnostics = diagnostics,
+            ok = false,
+            diagnostics = {},
         };
     else
         return {
