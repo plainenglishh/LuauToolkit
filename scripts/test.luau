@@ -91,7 +91,7 @@ test("bytecode::{encode_import_id,decode_import_id}", function()
 end);
 
 
-
+--[==[]
 test("lasm::tokenise::punctuation", function()
     local src = "()[]@!=;:.,";
     local res = luau_toolkit.lasm.tokenise(src);
@@ -348,7 +348,7 @@ test("lasm::parse::constants", function()
         }),
     }));
 end);
-
+]==]
 
 --------------------------------------------------------------------------------
 

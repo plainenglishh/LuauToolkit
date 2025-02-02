@@ -3,7 +3,7 @@ local t = require("./typedefs");
 local luau_toolkit = {};
 
 luau_toolkit.bytecode = require("./bytecode");
-luau_toolkit.lasm = require("./lasm");
+--luau_toolkit.lasm = require("./lasm"); - temporarily shelved, needs proper design
 
 --BEGIN_REEXPORTS
 export type luau_toolkit = t.luau_toolkit;
