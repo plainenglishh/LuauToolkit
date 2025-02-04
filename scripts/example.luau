@@ -1,5 +1,5 @@
 --[=[
-    Run an example
+    Runs a program in the `examples/` directory.
 ]=]
 
 local process = require("@lune/process");
