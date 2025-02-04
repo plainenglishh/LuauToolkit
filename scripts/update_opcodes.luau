@@ -9,7 +9,7 @@ local net = require("@lune/net");
 local fs = require("@lune/fs");
  
 local HEADER = [=[
-local t = require("../typedefs");
+local t = require("./typedefs");
 ]=];
 
 local BYTECODE_H_URL = "https://raw.githubusercontent.com/luau-lang/luau/refs/heads/master/Common/include/Luau/Bytecode.h";
@@ -281,4 +281,4 @@ end
 
 local bytecode_h =  bytecode_h_res.body;
 
-fs.writeFile("./src/lib/bytecode/opcodes.luau", generate(bytecode_h));
+fs.writeFile("./modules/bytecode/lib/opcodes.luau", generate(bytecode_h));
