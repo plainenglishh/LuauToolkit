@@ -4,7 +4,7 @@ local vm = require("../modules/vm/lib");
 local bytecode = require("../modules/bytecode/lib");
 
 local bc = luau.compile([[
-    for i = 1, 100 do
+    for i = 1, 100, 2 do
         print(i);
     end
 
