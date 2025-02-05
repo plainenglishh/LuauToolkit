@@ -6,6 +6,7 @@ local bytecode = {};
 bytecode.encode = require("./encode");
 bytecode.decode = require("./decode");
 bytecode.opcodes = require("./opcodes");
+bytecode.constants = require("./constants");
 bytecode.BytecodeBuilder = require("./BytecodeBuilder");
 bytecode.get_opcode_info = misc.get_opcode_info;
 bytecode.encode_import_id = misc.encode_import_id;

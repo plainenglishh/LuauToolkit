@@ -8,7 +8,8 @@ local constants = require("./constants");
 local t = require("./typedefs");
 
 local function unsigned_to_signed(n: number, size: number)    
-    if bit32.extract(n, 1) == 1 then
+    local negative = bit32.extract(n, 1) == 1;
+    if negative then
         return n - 2^size;
     else
         return n;
@@ -47,7 +48,7 @@ return function(bc: buffer|string): t.BytecodeChunk
         for _, v in info.operands do
             if v.type[1] == "jump_offset" then
                 if v.name == "a" or v.name == "b" or v.name == "c" then
-                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 8);
+                    --instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 8);
                 elseif v.name == "d" then
                     instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 16);
                 elseif v.name == "e" then

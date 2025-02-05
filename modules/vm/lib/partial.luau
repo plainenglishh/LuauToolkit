@@ -123,7 +123,6 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                         return;
                     end
                 end
-
                 return current;
             end
 
@@ -142,14 +141,14 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                 Sets a register to a given value.
             ]=]
             local function set(r: number, value: any)
-                registers[r] = value;
+                registers[r + 1] = value;
             end
 
             --[=[
                 Returns a value from a register.
             ]=]
             local function get(r: number): any
-                return registers[r];
+                return registers[r + 1];
             end
 
             --[=[
@@ -176,6 +175,26 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                     end
                 end
                 return inst;
+            end
+
+            local function dump_registers()
+                local r = "";
+
+                for k, v in registers do
+                    r ..= `R{k - 1} = <{type(v)}> {v}, `;
+                end
+
+                print(r);
+            end
+
+            local function fastcall(id: number, ...): (boolean, any)
+                local fn = bytecode.constants.fastcalls[id];
+                if not fn then
+                    return false;
+                end
+                
+                local results = {fn(...)};
+                return true, results;
             end
 
             while true do
@@ -233,7 +252,6 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                 elseif name == "NEWCLOSURE" then
                     set(a, load_proto(get_proto(d)));
                 elseif name == "NAMECALL" then
-                    print(registers);
                     local obj = get(a);
                     set(a + 1, obj);
                     set(a, obj[get_constant(aux, {"string"})]);
@@ -256,15 +274,15 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                         retc -= 1;
                     end
 
-                    for i = 0, retc - 1 do
-                        set(a + i, returns[a + 1]);
+                    for i = 1, retc do
+                        set(a + i - 1, returns[i]);
                     end
                 elseif name == "RETURN" then
                     local retc = if b == 0 then stack_top else b-1;
 
                     local returns = {};
-                    for i = 0, retc - 1 do
-                        table.insert(returns, get(a + i));
+                    for i = 1, retc do
+                        table.insert(returns, get(a + i - 1));
                     end
                     return unpack(returns);
                 elseif name == "JUMP" then
@@ -399,18 +417,26 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                 elseif name == "FASTCALL3" then
                 elseif name == "FORGPREP_NEXT" then
                 elseif name == "NATIVECALL" then
+                    -- Do nothing
                 elseif name == "GETVARARGS" then
                 elseif name == "DUPCLOSURE" then
+                    set(a, load_proto(get_proto(d)));
                 elseif name == "PREPVARARGS" then
+                    
                 elseif name == "LOADKX" then
+                    set(a, get_constant(aux, {"number", "string"}));
                 elseif name == "JUMPX" then
+                    jump(e);
                 elseif name == "FASTCALL" then
                 elseif name == "COVERAGE" then
                 elseif name == "CAPTURE" then
                     panic("Unimplemeneted", "upvalues");
                 elseif name == "SUBRK" then
+                    set(a, get_constant(b) - get(c));
                 elseif name == "DIVRK" then
+                    set(a, get_constant(b) / get(c));
                 elseif name == "FASTCALL1" then
+                    
                 elseif name == "FASTCALL2" then
                 elseif name == "FASTCALL2K" then
                 elseif name == "FORGPREP" then
@@ -419,7 +445,9 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                 elseif name == "JUMPXEQKN" then
                 elseif name == "JUMPXEQKS" then
                 elseif name == "IDIV" then
+                    set(a, get(b) / get(c)); 
                 elseif name == "IDIVK" then
+                    set(a, get(b) // get_constant(c)); 
                 else
                     panic("InvalidInstruction", name);
                 end

@@ -25,6 +25,10 @@ local function display_instruction(inst: bytecode.BytecodeInstruction)
 end
 
 function vm.display_vm_error(err: t.VMError): string
+    if type(err) == "string" then
+        return err;
+    end
+
     local lines = {
         `{ERR_START}error:{RESET} {err.type}: {err.message}`,
         `{GREY}--> proto #{err.proto}{RESET}`,
