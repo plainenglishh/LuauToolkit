@@ -2,9 +2,8 @@ local t = require("./typedefs");
 local bytecode = require("../../bytecode/lib");
 
 local ERR_START = "\u{001b}[0;1;31m";
-local BOLD = "\u{001b}[1m";
 local RESET = "\u{001b}[0m";
-local GREY = "\u{001b}[30m"
+local GREY = "\u{001b}[2m"
 
 local vm = {};
 
