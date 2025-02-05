@@ -7,9 +7,13 @@ local opcodes = require("./opcodes");
 local constants = require("./constants");
 local t = require("./typedefs");
 
-local UTOI_8BIT = 2^(8);
-local UTOI_16BIT = 2^(16);
-local UTOS_24BIT = 2^(24);
+local function unsigned_to_signed(n: number, size: number)    
+    if bit32.extract(n, 1) == 1 then
+        return n - 2^size;
+    else
+        return n;
+    end
+end
 
 return function(bc: buffer|string): t.BytecodeChunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
@@ -43,13 +47,14 @@ return function(bc: buffer|string): t.BytecodeChunk
         for _, v in info.operands do
             if v.type[1] == "jump_offset" then
                 if v.name == "a" or v.name == "b" or v.name == "c" then
-                    instruction.operands[v.name] -= UTOI_8BIT;
+                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 8);
                 elseif v.name == "d" then
-                    instruction.operands[v.name] -= UTOI_16BIT;
-                elseif v.name == "aux" or v.name == "e" then
-                    instruction.operands[v.name] -= UTOS_24BIT;
+                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 16);
+                elseif v.name == "e" then
+                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 24);
+                elseif v.name == "aux" then
+                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 32);
                 end
-                print(instruction.operands[v.name])
             end
         end
 

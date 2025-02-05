@@ -13,7 +13,9 @@ local ERRORS = {
 
     InvalidInstruction = "encountered invalid instruction '%s'",
     UnknownObject = "attempt to get unknown %s '%s'",
-    WrongConstant = "attempt to get constant %s in an instruction that doesn't support it"
+    WrongConstant = "attempt to get constant %s in an instruction that doesn't support it",
+
+    InvalidJump = "attempt to jump to %i, which is an invalid location"
 };
 
 local partial_vm = {};
@@ -60,7 +62,7 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                     inst = current_inst,
                     proto = proto_id,
                     chunk = chunk,
-                });
+                } :: t.VMError);
             end
 
             local function get_string(s: number): string
@@ -154,7 +156,11 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                 Jumps to a given offset.
             ]=]
             local function jump(offset: number)
-                pc += offset;
+                local new_pc = pc + offset;
+                if new_pc < 0 or new_pc > #instructions then
+                    panic("InvalidJump", new_pc);
+                end 
+                pc = new_pc;
             end
 
             --[=[
@@ -369,7 +375,25 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                         target[i] = get(b + i);
                     end
                 elseif name == "FORNPREP" then
+                    local base = a;
+                    local limit = get(base);
+                    local index = get(base + 2);
+
+                    if index > limit then
+                        jump(d);
+                    end
+
+                    set(base + 3, get(base + 2));
                 elseif name == "FORNLOOP" then
+                    local base = a;
+
+                    set(base + 2, get(base + 2) + get(base + 1));
+
+                    local limit = get(base);
+                    local index = get(base + 2);
+                    if not (index > limit) then
+                        jump(d);
+                    end
                 elseif name == "FORGLOOP" then
                 elseif name == "FORGPREP_INEXT" then
                 elseif name == "FASTCALL3" then

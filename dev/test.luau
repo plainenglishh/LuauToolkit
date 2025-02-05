@@ -1,10 +1,17 @@
 local luau = require("@lune/luau");
+local fs = require("@lune/fs");
 local vm = require("../modules/vm/lib");
 local bytecode = require("../modules/bytecode/lib");
 
 local bc = luau.compile([[
-    return ("hello"):upper();
+    for i = 1, 0 do
+        print(i);
+    end
+
+    print("done");
 ]]);
+
+print(bytecode.decode(bc).protos[1].instructions);
 
 local function dump_inst(pc, inst, info)
     local operands = "";
@@ -21,4 +28,7 @@ local fn = vm.partial.load(bc, {
     step_callback = dump_inst
 });
 
-fn();
+local ok, err = pcall(fn);
+if not ok then
+    print(vm.display_vm_error(err));
+end
