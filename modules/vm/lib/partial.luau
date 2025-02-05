@@ -6,6 +6,29 @@ type PartialVMOptions = {
     step_callback: (pc: number, inst: bytecode.BytecodeInstruction, info: bytecode.OpcodeInfo) -> ()?,
 };
 
+local ERRORS = {
+    Unsupported = "%s not supported",
+    Unimplemeneted = "%s not yet supported",
+
+    InvalidInstruction = "encountered invalid instruction '%s'",
+    UnknownObject = "attempt to get unknown %s '%s'",
+    WrongConstant = "attempt to get constant %s in an instruction that doesn't support it"
+};
+
+local function display_instruction(inst: bytecode.BytecodeInstruction)
+    local info = bytecode.get_opcode_info(inst.opcode);
+    if not info then
+        return `Invalid Instruction {inst.opcode}`;
+    end
+
+    local operands = "";
+    for _, v in info.operands do
+        operands ..= `{inst.operands[v.name]}, `;
+    end
+
+    return `{info.name} {operands:sub(1, #operands-2)}`;
+end
+
 local partial_vm = {};
 
 --[=[
@@ -19,7 +42,7 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
 
     local function load_proto(proto: bytecode.BytecodeProto, env: {[any]: any}?)
         local env = env or {};
-        local proto_id = table.find(chunk.protos, proto) or error("unknown proto") - 1;
+        local proto_id = (table.find(chunk.protos, proto) or 0) - 1;
         local instructions = {};
         
         local stack_top = 0;
@@ -39,16 +62,18 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
             local registers = table.create(256);
             local pc = -1;
 
-            local function panic(message: string): never
-                error(`interpreter panic: {message}`);
+            local function panic(err_kind: string, ...): never
+                local current_inst = instructions[pc + 1];
+                local message = string.format(ERRORS[err_kind], ...);
+                error(`{err_kind}: {message}\n\tInstruction {pc} in Proto {proto_id}: {display_instruction(current_inst)}`);
             end
 
             local function get_string(s: number): string
-                return chunk.strings[s] or panic(`attempt to get unknown string {s}`);
+                return chunk.strings[s] or panic("UnknownObject", "string", s);
             end        
 
             local function get_global(name: string)
-                return env[name] or panic(`attempt to get unknown global '{name}'`);
+                return env[name];
             end
 
             local function set_global(name: string, value: any)
@@ -56,7 +81,7 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
             end
 
             local function get_proto(p: number)
-                return chunk.protos[p + 1] or panic(`attempt to get unknown proto {p}`);
+                return chunk.protos[p + 1] or panic("UnknownObject", "proto", p);
             end
 
             local get_import;
@@ -69,7 +94,7 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
 
                 if limit then
                     if not table.find(limit, constant.type) then
-                        panic(`can't get constant type {constant.type} here`);
+                        panic("WrongConstant", constant.type);
                     end
                 end
 
@@ -84,9 +109,9 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
                 elseif constant.type == "vector" then
                     return vector.create(unpack(constant.value));
                 elseif constant.type == "table" then
-                    return panic(`attempt to get table constant, which is not yet supported`);
+                    return panic("Unimplemeneted", "table constants");
                 else
-                    return panic(`unknown constant type '{constant.type}'`);
+                    return panic("Unsupported", `constant type '{constant.type}'`);
                 end
             end
             
@@ -185,11 +210,11 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
                 elseif name == "SETGLOBAL" then
                     set_global(get_constant(aux), get(a));
                 elseif name == "GETUPVAL" then
-                    panic(`upvalues not yet supported`); -- TODO
+                    panic("Unimplemeneted", "upvalues");
                 elseif name == "SETUPVAL" then
-                    panic(`upvalues not yet supported`); -- TODO
+                    panic("Unimplemeneted", "upvalues");
                 elseif name == "CLOSEUPVALS" then
-                    panic(`upvalues not yet supported`); -- TODO
+                    panic("Unimplemeneted", "upvalues");
                 elseif name == "GETIMPORT" then
                     set(a, get_constant(d, {"import"}));
                 elseif name == "GETTABLE" then
@@ -334,7 +359,7 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
                 elseif name == "NEWTABLE" then
                     set(a, table.create(aux));
                 elseif name == "DUBTABLE" then
-                    panic("table constants not yet supported");
+                    panic("Unimplemeneted", "table constants");
                 elseif name == "SETLIST" then
                     local target = get(a);
                 
@@ -363,7 +388,7 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
                 elseif name == "FASTCALL" then
                 elseif name == "COVERAGE" then
                 elseif name == "CAPTURE" then
-                    panic(`upvalues not yet supported`);
+                    panic("Unimplemeneted", "upvalues");
                 elseif name == "SUBRK" then
                 elseif name == "DIVRK" then
                 elseif name == "FASTCALL1" then
@@ -377,7 +402,7 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
                 elseif name == "IDIV" then
                 elseif name == "IDIVK" then
                 else
-                    panic(`unsupported instruction {name}`);
+                    panic("InvalidInstruction", name);
                 end
             end
         end
