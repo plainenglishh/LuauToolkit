@@ -21,6 +21,4 @@ local fn = vm.partial.load(bc, {
     step_callback = dump_inst
 });
 
-local returns = {fn()};
-print(returns);
-
+fn();

@@ -1,4 +1,5 @@
 local bytecode = require("../../bytecode/lib");
+local t = require("./typedefs");
 
 type PartialVMOptions = {
     interrupt_callback: () -> ()?,
@@ -15,30 +16,16 @@ local ERRORS = {
     WrongConstant = "attempt to get constant %s in an instruction that doesn't support it"
 };
 
-local function display_instruction(inst: bytecode.BytecodeInstruction)
-    local info = bytecode.get_opcode_info(inst.opcode);
-    if not info then
-        return `Invalid Instruction {inst.opcode}`;
-    end
-
-    local operands = "";
-    for _, v in info.operands do
-        operands ..= `{inst.operands[v.name]}, `;
-    end
-
-    return `{info.name} {operands:sub(1, #operands-2)}`;
-end
-
 local partial_vm = {};
 
 --[=[
     'Loads' a bytecode chunk, returning a function to execute it.
 ]=]
-function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: PartialVMOptions?)
+function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any]: any}?, options: PartialVMOptions?)
     print("[warn]: VM isnt fully implemented! most programs will not work");
     
     local options = options or {};
-    local chunk = bytecode.decode(bc);
+    local chunk = if type(chunk) ~= "table" then bytecode.decode(chunk) else chunk;
 
     local function load_proto(proto: bytecode.BytecodeProto, env: {[any]: any}?)
         local env = env or {};
@@ -62,10 +49,18 @@ function partial_vm.load(bc: string|buffer, env: {[any]: any}?, options: Partial
             local registers = table.create(256);
             local pc = -1;
 
-            local function panic(err_kind: string, ...): never
+            local function panic(err_type: string, ...): never
                 local current_inst = instructions[pc + 1];
-                local message = string.format(ERRORS[err_kind], ...);
-                error(`{err_kind}: {message}\n\tInstruction {pc} in Proto {proto_id}: {display_instruction(current_inst)}`);
+                local message = string.format(ERRORS[err_type], ...);
+                
+                error({
+                    type = err_type,
+                    message = message,
+                    pc = pc,
+                    inst = current_inst,
+                    proto = proto_id,
+                    chunk = chunk,
+                });
             end
 
             local function get_string(s: number): string
