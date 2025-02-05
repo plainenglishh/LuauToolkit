@@ -4,7 +4,7 @@ local vm = require("../modules/vm/lib");
 local bytecode = require("../modules/bytecode/lib");
 
 local bc = luau.compile([[
-    for i = 1, 0 do
+    for i = 1, 100 do
         print(i);
     end
 
@@ -25,7 +25,7 @@ end
 local fn = vm.partial.load(bc, {
     print = print,
 }, {
-    step_callback = dump_inst
+    --step_callback = dump_inst
 });
 
 local ok, err = pcall(fn);
