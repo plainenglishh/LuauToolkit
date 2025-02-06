@@ -4,11 +4,14 @@ local vm = require("../modules/vm/lib");
 local bytecode = require("../modules/bytecode/lib");
 
 local bc = luau.compile([[
-    local args = {...};
-    print(args);
-    return args;
+    local function funk()
+        print("AHHHHHHH");
+    end
+
+    funk();
+    funk();
 ]], {
-    optimizationLevel = 0,
+    optimizationLevel = 2,
 });
 
 local function dump_inst(pc, inst, info)

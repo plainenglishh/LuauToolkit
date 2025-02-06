@@ -126,12 +126,6 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
     ]=]
     local function new_closure(pid: number, fenv: Environment?, upvalues: {Upvalue}): Closure
         local fenv = fenv or genv;
-        for i, v in closures do
-            if v.id == pid and v.env == fenv and v.upvalues == upvalues then
-                return v.closure;
-            end
-        end
-
         local proto = get_proto(pid) or error("unknown proto");
 
         --[=[
@@ -143,6 +137,12 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
 
             local registers: {any} = table.create(256);
             local top = 0;
+
+            for i, const in proto.constants do
+                if const.type == "closure" then
+                    const.value = new_closure(const.value, fenv, upvalues);
+                end
+            end
 
             local instructions_length = buffer.len(instructions);
 
@@ -161,7 +161,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif constant.type == "import" then
                     return get_import(constant.value);
                 elseif constant.type == "closure" then
-                    return get_proto(constant.value);
+                    return constant.value;
                 elseif constant.type == "vector" then
                     return vector.create(unpack(constant.value));
                 elseif constant.type == "table" then
@@ -265,8 +265,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 local insn = buffer.readu32(instructions, pc * 4);
                 local op = INSN_OP(insn);
 
-                --[[local info = bytecode.get_opcode_info(op) or error("");
-                print(`    {pc}: {info.name}`);]]
+                local info = bytecode.get_opcode_info(op) or error("");
+                print(`    {pc}: {info.name}`);
 
                 if op == 0 then
                 elseif op == 1 then
@@ -294,7 +294,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 11 then -- CLOSEUPVALS
                     -- Do nothing for now.
                 elseif op == 12 then -- GETIMPORT
-                    set_reg(INSN_A(insn), get_const(INSN_D(insn)));
+                    set_reg(INSN_A(insn), get_import(get_aux()));
                 elseif op == 13 then -- GETTABLE
                     set_reg(INSN_A(insn), get_reg(INSN_B(insn))[get_reg(INSN_C(insn))]);
                 elseif op == 14 then -- SETTABLE
@@ -329,7 +329,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                             table.insert(uv, upvalues[cap_val]);
                         end
                     end
-                    
+
                     set_reg(INSN_A(insn), new_closure(INSN_D(insn), fenv, uv));
                 elseif op == 20 then -- NAMECALL
                     local a = INSN_A(insn);
@@ -339,7 +339,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 21 then -- CALL
                     try_interrupt();
 
-                    -- TODO! set unused args to nil.
+                    -- TODO? set unused args to nil.
 
                     local a, b, c = INSN_A(insn), INSN_B(insn), INSN_C(insn);
                     local func = get_reg(a);
@@ -509,7 +509,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
 
                     set_reg_range({...}, a, count);
                 elseif op == 64 then -- DUPCLOSURE
-                    --TODO!
+                    set_reg(INSN_A(insn), get_const(INSN_D(insn)));
                 elseif op == 65 then -- PREPVARARGS
                     top += #{...};
                 elseif op == 66 then
