@@ -193,7 +193,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 return registers[reg + 1];
             end
 
-            local function get_reg_range(start: number, count: number): {number}
+            local function get_reg_range(start: number, count: number): {any}
                 return {table.unpack(registers, start + 1, start + count)};
             end
 
@@ -203,11 +203,19 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
             ]=]
             local function set_reg(reg: number, value: any)
                 registers[reg + 1] = value;
+                --print(`R{reg} set to {value}`);
             end
 
-            local function set_reg_range(values: {number}, start: number, limit: number?)
-                local limit = limit or #values;
-                table.move(values, 1, limit, start + 1, registers);
+            local function set_reg_range(values: {any}, start: number, count: number?)
+                local count = count or #values;
+                if count == 0 then
+                    return;
+                end
+
+                table.move(values, 1, count, start + 1, registers);
+                --[[for i = start, start + count do
+                    print(`R{start} set to {values[i]}`);
+                end]]
             end
 
             --[=[
@@ -256,6 +264,9 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
 
                 local insn = buffer.readu32(instructions, pc * 4);
                 local op = INSN_OP(insn);
+
+                --[[local info = bytecode.get_opcode_info(op) or error("");
+                print(`    {pc}: {info.name}`);]]
 
                 if op == 0 then
                 elseif op == 1 then
@@ -365,48 +376,142 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 24 then -- JUMPBACK
                     try_interrupt();
                     jump(INSN_D(insn));
-                elseif op == 25 then
-                elseif op == 26 then
-                elseif op == 27 then
-                elseif op == 28 then
-                elseif op == 29 then
-                elseif op == 30 then
-                elseif op == 31 then
-                elseif op == 32 then
-                elseif op == 33 then
-                elseif op == 34 then
-                elseif op == 35 then
-                elseif op == 36 then
-                elseif op == 37 then
-                elseif op == 38 then
-                elseif op == 39 then
-                elseif op == 40 then
-                elseif op == 41 then
-                elseif op == 42 then
-                elseif op == 43 then
-                elseif op == 44 then
-                elseif op == 45 then
-                elseif op == 46 then
-                elseif op == 47 then
-                elseif op == 48 then
-                elseif op == 49 then
-                elseif op == 50 then
-                elseif op == 51 then
-                elseif op == 52 then
-                elseif op == 53 then
-                elseif op == 54 then
-                elseif op == 55 then
-                elseif op == 56 then
-                elseif op == 57 then
-                elseif op == 58 then
-                elseif op == 59 then
-                elseif op == 60 then
-                elseif op == 61 then
-                elseif op == 62 then
-                elseif op == 63 then
-                elseif op == 64 then
+                elseif op == 25 then -- JUMPIF
+                    try_interrupt();
+                    if get_reg(INSN_A(insn)) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 26 then -- JUMPIFNOT
+                    try_interrupt();
+                    if not get_reg(INSN_A(insn)) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 27 then -- JUMPIFEQ
+                    try_interrupt();
+                    if get_reg(INSN_A(insn)) == get_reg(get_aux()) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 28 then -- JUMPIFLE
+                    try_interrupt();
+                    if get_reg(INSN_A(insn)) <= get_reg(get_aux()) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 29 then -- JUMPIFLT
+                    try_interrupt();
+                    if get_reg(INSN_A(insn)) < get_reg(get_aux()) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 30 then -- JUMPIFNOTEQ
+                    try_interrupt();
+                    if not (get_reg(INSN_A(insn)) == get_reg(get_aux())) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 31 then -- JUMPIFNOTLE
+                    try_interrupt();
+                    if not (get_reg(INSN_A(insn)) <= get_reg(get_aux())) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 32 then -- JUMPIFNOTLT
+                    try_interrupt();
+                    if not (get_reg(INSN_A(insn)) < get_reg(get_aux())) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 33 then -- ADD
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) + get_reg(INSN_C(insn)));
+                elseif op == 34 then -- SUB
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) - get_reg(INSN_C(insn)));
+                elseif op == 35 then -- MUL                    
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) * get_reg(INSN_C(insn)));
+                elseif op == 36 then -- DIV
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) / get_reg(INSN_C(insn)));
+                elseif op == 37 then -- MOD
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) % get_reg(INSN_C(insn)));    
+                elseif op == 38 then -- POW
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) ^ get_reg(INSN_C(insn)));
+                elseif op == 39 then -- ADDK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) + get_const(INSN_C(insn)));
+                elseif op == 40 then -- SUBK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) - get_const(INSN_C(insn)));
+                elseif op == 41 then -- MULK                
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) * get_const(INSN_C(insn)));
+                elseif op == 42 then -- DIVK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) / get_const(INSN_C(insn)));
+                elseif op == 43 then -- MODK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) % get_const(INSN_C(insn)));    
+                elseif op == 44 then -- POWK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) ^ get_const(INSN_C(insn)));
+                elseif op == 45 then -- AND
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) and get_reg(INSN_C(insn)));
+                elseif op == 46 then -- OR
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) or get_reg(INSN_C(insn)));
+                elseif op == 47 then -- ANDK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) and get_const(INSN_C(insn)));
+                elseif op == 48 then -- ORK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) or get_const(INSN_C(insn)));
+                elseif op == 49 then -- CONCAT
+                    local b = INSN_B(insn);
+                    local str = get_reg_range(b, INSN_C(insn) - b);
+                    set_reg(INSN_A(insn), table.concat(str, ""));
+                elseif op == 50 then -- NOT
+                    set_reg(INSN_A(insn), not get_reg(INSN_B(insn)));
+                elseif op == 51 then -- MINUS
+                    set_reg(INSN_A(insn), -get_reg(INSN_B(insn)));
+                elseif op == 52 then -- LENGTH
+                    set_reg(INSN_A(insn), #get_reg(INSN_B(insn)));
+                elseif op == 53 then -- NEWTABLE
+                    set_reg(INSN_A(insn), table.create(get_aux()));
+                elseif op == 54 then -- DUPTABLE
+                    error("table constants not yet supported");
+                elseif op == 55 then -- SETLIST
+                    local count = INSN_C(insn) - 1;
+                    if count == -1 then
+                        count = top;
+                    end
+
+                    local target = get_reg(INSN_A(insn));
+                    local start = INSN_B(insn);
+                    for i = 0, count - 1 do
+                        target[i + 1] = get_reg(start + i);
+                    end
+                elseif op == 56 then -- FORNPREP
+                    local base = INSN_A(insn);
+                    local limit = get_reg(base);
+                    local index = get_reg(base + 2);
+                
+                    if index > limit then
+                        jump(INSN_D(insn));
+                    end
+
+                    set_reg(base + 3, get_reg(base + 2));
+                elseif op == 57 then -- FORNLOOP
+                    local base = INSN_A(insn);
+
+                    set_reg(base + 2, get_reg(base + 2) + get_reg(base + 1));
+
+                    local limit = get_reg(base);
+                    local index = get_reg(base + 2);
+                    if not (index > limit) then
+                        jump(INSN_D(insn));
+                    end
+                elseif op == 58 then -- FORGLOOP
+                elseif op == 59 then -- FORGPREP_INEXT
+                elseif op == 60 then -- FASTCALL3
+                elseif op == 61 then -- FORGPREP_NEXT
+                elseif op == 62 then -- NATIVECALL
+                elseif op == 63 then -- GETVARARGS
+                    local a = INSN_A(insn);
+                    local args = {...};
+                    local count = INSN_B(insn) - 1;
+                    if count == -1 then
+                        count = #args;
+                        top = a + (count - 1);
+                    end
+
+                    set_reg_range({...}, a, count);
+                elseif op == 64 then -- DUPCLOSURE
                     --TODO!
-                elseif op == 65 then
+                elseif op == 65 then -- PREPVARARGS
+                    top += #{...};
                 elseif op == 66 then
                 elseif op == 67 then
                 elseif op == 68 then

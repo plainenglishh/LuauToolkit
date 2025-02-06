@@ -4,7 +4,9 @@ local vm = require("../modules/vm/lib");
 local bytecode = require("../modules/bytecode/lib");
 
 local bc = luau.compile([[
-    return(("AHHHHHHHHHH"):lower());
+    local args = {...};
+    print(args);
+    return args;
 ]], {
     optimizationLevel = 0,
 });
@@ -20,4 +22,4 @@ end
 
 local fn = vm.new_partial.load(bc);
 
-print({fn()})
+print({fn("AHHHHHHHHHHHHHHHHHHHHH", "AHHHHH!!!!!!!!!!!", {})})
