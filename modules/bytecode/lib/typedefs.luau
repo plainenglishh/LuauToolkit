@@ -125,6 +125,7 @@ export type BytecodeProto = {
     flags: {ProtoFlag},
     types: BytecodeProtoTypeInfo?,
     instructions: {BytecodeInstruction},
+    _raw_instructions: buffer?,
     constants: {BytecodeConstant},
     protos: {number},
     line_defined: number,

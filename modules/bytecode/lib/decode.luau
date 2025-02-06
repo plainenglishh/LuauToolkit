@@ -218,6 +218,8 @@ return function(bc: buffer|string): t.BytecodeChunk
         local instruction_count = reader.read_varint();
         proto.instructions = table.create(instruction_count);
         local skip_next = false;
+
+        local start = reader.get_cursor();
         for i = 1, instruction_count do
             if skip_next then
                 skip_next = false;
@@ -231,8 +233,12 @@ return function(bc: buffer|string): t.BytecodeChunk
                 skip_next = true;
             end
         end
+        local stop = reader.get_cursor();
 
-        
+        local raw_inst = buffer.create(stop - start);
+        buffer.copy(bc, start, raw_inst, stop - start);
+
+        proto._raw_instructions = raw_inst;
         proto.constants = reader.read_larray(read_constant);
         proto.protos = reader.read_larray(reader.read_varint);
         proto.line_defined = reader.read_varint();

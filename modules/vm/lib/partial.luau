@@ -415,6 +415,7 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
                 elseif name == "FORGLOOP" then
                 elseif name == "FORGPREP_INEXT" then
                 elseif name == "FASTCALL3" then
+
                 elseif name == "FORGPREP_NEXT" then
                 elseif name == "NATIVECALL" then
                     -- Do nothing
