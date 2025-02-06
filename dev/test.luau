@@ -4,12 +4,10 @@ local vm = require("../modules/vm/lib");
 local bytecode = require("../modules/bytecode/lib");
 
 local bc = luau.compile([[
-    local function test()
-        print("hi from test");
-    end
-
-    test();
-]]);
+    print("AHHHHHHHHHH")
+]], {
+    optimizationLevel = 0,
+});
 
 local function dump_inst(pc, inst, info)
     local operands = "";
@@ -22,12 +20,4 @@ end
 
 local fn = vm.new_partial.load(bc);
 
-local ok, err = pcall(function()
-    return {fn()};
-end);
-
-if not ok then
-    print(vm.display_vm_error(err :: any));
-else
-    print(err);
-end
+print({fn()})

@@ -71,10 +71,11 @@ local function INSN_E(insn: number): number
     end
 end
 
-local function create_upvalue(val: any): Upvalue
+local function create_upvalue(val: any, type: "ref"|"val"): Upvalue
     local inner = val;
 
     return {
+        type = type,
         get = function()
             return inner;
         end,
@@ -193,8 +194,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
             end
 
             local function get_reg_range(start: number, count: number): {number}
-                local start = start + 1;
-                return {table.unpack(stack, start, start + count)};
+                return {table.unpack(stack, start + 1, start + count)};
             end
 
             --[=[
@@ -221,6 +221,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 Sets an upvalue to a given value.
             ]=]
             local function set_uv(uv: number, value: number)
+                print(value)
                 upvalues[uv + 1].set(value);
             end
 
@@ -237,7 +238,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
             ]=]
             local function get_aux()
                 pc += 1;
-                return buffer.readu32(instructions, pc);
+                return buffer.readu32(instructions, pc * 4);
             end
 
             --[=[
@@ -278,6 +279,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 9 then -- GETUPVAL
                     set_reg(INSN_A(insn), get_uv(INSN_B(insn)));
                 elseif op == 10 then -- SETUPVAL
+                    -- TODO! REF upvalues
                     set_uv(INSN_B(insn), get_reg(INSN_A(insn)));
                 elseif op == 11 then -- CLOSEUPVALS
                     -- Do nothing for now.
@@ -300,7 +302,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
 
                     while pc < instructions_length do
                         pc += 1;
-                        local capture = buffer.readu32(instructions, pc);
+                        local capture = buffer.readu32(instructions, pc * 4);
                         if INSN_OP(capture) ~= 70 then
                             pc -= 1;
                             break;
@@ -310,9 +312,9 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         local cap_val = INSN_B(capture);
 
                         if cap_type == 0 then -- VAL
-                            create_upvalue(cap_val);
+                            table.insert(uv, create_upvalue(cap_val, "val"));
                         elseif cap_type == 1 then -- REF
-                            create_upvalue(cap_val);
+                            table.insert(uv, create_upvalue(cap_val, "ref"));
                         elseif cap_type == 2 then -- UPVAL
                             table.insert(uv, upvalues[cap_val]);
                         end
