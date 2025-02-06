@@ -1,28 +1,32 @@
-local luau = require("@lune/luau");
-local fs = require("@lune/fs");
-local vm = require("../modules/vm/lib");
-local bytecode = require("../modules/bytecode/lib");
-
-local bc = luau.compile([[
-    local function funk()
-        print("AHHHHHHH");
-    end
-
-    funk();
-    funk();
-]], {
-    optimizationLevel = 2,
-});
-
-local function dump_inst(pc, inst, info)
+--[[local function dump_inst(pc, inst, info)
     local operands = "";
     for _, v in info.operands do
         operands ..= `{inst.operands[v.name]}, `;
     end
 
     print(`    {pc}: {info.name} {operands:sub(1, #operands-2)}`);
-end
+end]]
 
+local bytecode = require("../modules/bytecode/lib");
+local fs = require("@lune/fs");
+
+local luau = require("@lune/luau");
+local vm = require("../modules/vm/lib");
+
+local bc = luau.compile([[
+    for i = 1, 5_000 do
+        print("gobble");
+    end
+]], {
+    optimizationLevel = 2,
+});
+
+local setup_start = os.clock();
 local fn = vm.new_partial.load(bc);
+local setup_stop = os.clock();
 
-print({fn("AHHHHHHHHHHHHHHHHHHHHH", "AHHHHH!!!!!!!!!!!", {})})
+local run_start = os.clock();
+fn();
+local run_stop = os.clock();
+
+print(`ltk:\n\tsetup: {(setup_stop - setup_start) * 1000}ms\n\trun: {(run_stop - run_start) * 1000}ms`);

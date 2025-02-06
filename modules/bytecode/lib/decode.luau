@@ -16,7 +16,7 @@ local function unsigned_to_signed(n: number, size: number)
     end
 end
 
-return function(bc: buffer|string): t.BytecodeChunk
+return function(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bc);
 
@@ -202,29 +202,29 @@ return function(bc: buffer|string): t.BytecodeChunk
         end
 
         local instruction_count = reader.read_varint();
-        proto.instructions = table.create(instruction_count);
-        local skip_next = false;
-
-        local start = reader.get_cursor();
-        for i = 1, instruction_count do
-            if skip_next then
-                skip_next = false;
-                continue;
+       
+        proto._raw_instructions = reader.read_buffer(instruction_count * 4);
+        
+        if not skip_instructions then
+            reader.set_cursor(reader.get_cursor() - instruction_count * 4);
+            proto.instructions = table.create(instruction_count);
+            local skip_next = false;
+            for i = 1, instruction_count do
+                if skip_next then
+                    skip_next = false;
+                    continue;
+                end
+    
+                local insn = read_instruction();
+                table.insert(proto.instructions, insn);
+                
+                if insn.operands.aux then
+                    skip_next = true;
+                end
             end
-
-            local insn = read_instruction();
-            table.insert(proto.instructions, insn);
-            
-            if insn.operands.aux then
-                skip_next = true;
-            end
+        else
         end
-        local stop = reader.get_cursor();
 
-        local raw_inst = buffer.create(stop - start);
-        buffer.copy(raw_inst, 0, bc, start, stop - start);
-
-        proto._raw_instructions = raw_inst;
         proto.constants = reader.read_larray(read_constant);
         proto.protos = reader.read_larray(reader.read_varint);
         proto.line_defined = reader.read_varint();

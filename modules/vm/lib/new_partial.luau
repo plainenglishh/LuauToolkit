@@ -88,7 +88,7 @@ end
 local partial = {};
 
 function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: LoadOptions?)
-    local chunk = if type(chunk) ~= "table" then bytecode.decode(chunk) else chunk;
+    local chunk = if type(chunk) ~= "table" then bytecode.decode(chunk, true) else chunk;
     local options: LoadOptions = options or {
         globals = common.stdlib,
     };
@@ -232,14 +232,6 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 upvalues[uv + 1].set(value);
             end
 
-            local function get_global(k: string): any
-                return fenv[k];
-            end
-
-            local function set_global(k: string, v: any)
-                fenv[k] = v;
-            end
-
             --[=[
                 Returns the next "instruction", incrementing the pc.
             ]=]
@@ -265,8 +257,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 local insn = buffer.readu32(instructions, pc * 4);
                 local op = INSN_OP(insn);
 
-                local info = bytecode.get_opcode_info(op) or error("");
-                print(`    {pc}: {info.name}`);
+                --[[local info = bytecode.get_opcode_info(op) or error("");
+                print(`    {pc}: {info.name}`);]]
 
                 if op == 0 then
                 elseif op == 1 then
@@ -283,9 +275,9 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 6 then -- MOVE
                     set_reg(INSN_A(insn), get_reg(INSN_B(insn)));
                 elseif op == 7 then -- GETGLOBAL
-                    set_reg(INSN_A(insn), get_global(get_const(get_aux())));
+                    set_reg(INSN_A(insn), fenv[get_const(get_aux())]);
                 elseif op == 8 then -- SETGLOBAL
-                    set_global(get_const(get_aux()), get_reg(INSN_A(insn)));
+                    fenv[get_const(get_aux())] = get_reg(INSN_A(insn));
                 elseif op == 9 then -- GETUPVAL
                     set_reg(INSN_A(insn), get_uv(INSN_B(insn)));
                 elseif op == 10 then -- SETUPVAL
