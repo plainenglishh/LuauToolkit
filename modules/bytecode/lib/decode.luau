@@ -36,27 +36,13 @@ return function(bc: buffer|string): t.BytecodeChunk
             instruction.operands.c = bit32.extract(raw, 24, 8);
         elseif info.mode == "ad" then
             instruction.operands.a = bit32.extract(raw, 8, 8);
-            instruction.operands.d = bit32.extract(raw, 16, 16);
+            instruction.operands.d = unsigned_to_signed(bit32.extract(raw, 16, 16), 16);
         elseif info.mode == "e" then
-            instruction.operands.e = bit32.extract(raw, 8, 24);
+            instruction.operands.e = unsigned_to_signed(bit32.extract(raw, 8, 24), 24);
         end
 
         if info.aux then
             instruction.operands.aux = reader.read_u32();
-        end
-
-        for _, v in info.operands do
-            if v.type[1] == "jump_offset" then
-                if v.name == "a" or v.name == "b" or v.name == "c" then
-                    --instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 8);
-                elseif v.name == "d" then
-                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 16);
-                elseif v.name == "e" then
-                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 24);
-                elseif v.name == "aux" then
-                    instruction.operands[v.name] = unsigned_to_signed(instruction.operands[v.name], 32);
-                end
-            end
         end
 
         return instruction;
