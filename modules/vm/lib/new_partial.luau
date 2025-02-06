@@ -141,7 +141,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
             local pc = -1;
             local instructions = proto._raw_instructions or error("expected raw instructions");
 
-            local stack: {any} = table.create(256);
+            local registers: {any} = table.create(256);
             local top = 0;
 
             local instructions_length = buffer.len(instructions);
@@ -190,11 +190,11 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 This gets inlined in -O2
             ]=]
             local function get_reg(reg: number): any
-                return stack[reg + 1];
+                return registers[reg + 1];
             end
 
             local function get_reg_range(start: number, count: number): {number}
-                return {table.unpack(stack, start + 1, start + count)};
+                return {table.unpack(registers, start + 1, start + count)};
             end
 
             --[=[
@@ -202,12 +202,12 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 This gets inlined in -O2
             ]=]
             local function set_reg(reg: number, value: any)
-                stack[reg + 1] = value;
+                registers[reg + 1] = value;
             end
 
             local function set_reg_range(values: {number}, start: number, limit: number?)
                 local limit = limit or #values;
-                table.move(values, 1, limit, start + 1, stack);
+                table.move(values, 1, limit, start + 1, registers);
             end
 
             --[=[
@@ -221,7 +221,6 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 Sets an upvalue to a given value.
             ]=]
             local function set_uv(uv: number, value: number)
-                print(value)
                 upvalues[uv + 1].set(value);
             end
 
@@ -322,10 +321,14 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     
                     set_reg(INSN_A(insn), new_closure(INSN_D(insn), fenv, uv));
                 elseif op == 20 then -- NAMECALL
+                    local a = INSN_A(insn);
+                    local obj =  get_reg(a);
+                    set_reg(a, obj[get_const(get_aux())]);
+                    set_reg(a + 1, obj);
                 elseif op == 21 then -- CALL
                     try_interrupt();
 
-                    --todo set unused args to nil.
+                    -- TODO! set unused args to nil.
 
                     local a, b, c = INSN_A(insn), INSN_B(insn), INSN_C(insn);
                     local func = get_reg(a);
@@ -344,7 +347,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         top = a + (nresults - 1);
                     end
 
-                    set_reg_range(results, a + 1, nresults);
+                    set_reg_range(results, a, nresults);
                 elseif op == 22 then -- RETURN
                     try_interrupt();
 

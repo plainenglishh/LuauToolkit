@@ -4,7 +4,7 @@ local vm = require("../modules/vm/lib");
 local bytecode = require("../modules/bytecode/lib");
 
 local bc = luau.compile([[
-    print("AHHHHHHHHHH")
+    return(("AHHHHHHHHHH"):lower());
 ]], {
     optimizationLevel = 0,
 });
