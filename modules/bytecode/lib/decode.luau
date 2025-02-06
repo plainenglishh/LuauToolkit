@@ -222,7 +222,7 @@ return function(bc: buffer|string): t.BytecodeChunk
         local stop = reader.get_cursor();
 
         local raw_inst = buffer.create(stop - start);
-        buffer.copy(bc, start, raw_inst, stop - start);
+        buffer.copy(raw_inst, 0, bc, start, stop - start);
 
         proto._raw_instructions = raw_inst;
         proto.constants = reader.read_larray(read_constant);

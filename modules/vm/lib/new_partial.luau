@@ -37,16 +37,6 @@ export type LoadOptions = {
     script_timeout: number?,
 };
 
-local NOP = 0x00;
-local BREAK = 0x01;
-local LOADNIL = 0x02;
-local LOADB = 0x03;
-local LOADN = 0x04;
-local LOADK = 0x05;
-local MOVE = 0x06;
-local GETGLOBAL = 0x07;
-local SETGLOBAL = 0x08;
-
 local function INSN_OP(insn: number): number
     return bit32.extract(insn, 0, 8);
 end
@@ -148,10 +138,10 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
         ]=]
         local function closure(...)
             local pc = -1;
-            local constants = proto.constants;
             local instructions = proto._raw_instructions or error("expected raw instructions");
 
             local stack: {any} = table.create(256);
+            local top = 0;
 
             local instructions_length = buffer.len(instructions);
 
@@ -202,12 +192,22 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 return stack[reg + 1];
             end
 
+            local function get_reg_range(start: number, count: number): {number}
+                local start = start + 1;
+                return {table.unpack(stack, start, start + count)};
+            end
+
             --[=[
                 Sets a register to a given value.
                 This gets inlined in -O2
             ]=]
             local function set_reg(reg: number, value: any)
                 stack[reg + 1] = value;
+            end
+
+            local function set_reg_range(values: {number}, start: number, limit: number?)
+                local limit = limit or #values;
+                table.move(values, 1, limit, start + 1, stack);
             end
 
             --[=[
@@ -247,10 +247,14 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 pc += offset;
             end
 
-            while pc >= instructions_length do
+            while true do
                 pc += 1;
 
-                local insn = buffer.readu32(instructions, pc);
+                if (pc * 4) >= instructions_length then
+                    break;
+                end
+
+                local insn = buffer.readu32(instructions, pc * 4);
                 local op = INSN_OP(insn);
 
                 if op == 0 then
@@ -268,9 +272,9 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 6 then -- MOVE
                     set_reg(INSN_A(insn), get_reg(INSN_B(insn)));
                 elseif op == 7 then -- GETGLOBAL
-                    set_reg(INSN_A(insn), fenv[get_const(get_aux())]);
+                    set_reg(INSN_A(insn), get_global(get_const(get_aux())));
                 elseif op == 8 then -- SETGLOBAL
-                    fenv[get_const(get_aux())] = get_reg(INSN_A(insn));
+                    set_global(get_const(get_aux()), get_reg(INSN_A(insn)));
                 elseif op == 9 then -- GETUPVAL
                     set_reg(INSN_A(insn), get_uv(INSN_B(insn)));
                 elseif op == 10 then -- SETUPVAL
@@ -294,7 +298,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 19 then -- NEWCLOSURE
                     local uv: {Upvalue} = {};
 
-                    while pc >= instructions_length do
+                    while pc < instructions_length do
                         pc += 1;
                         local capture = buffer.readu32(instructions, pc);
                         if INSN_OP(capture) ~= 70 then
@@ -315,11 +319,47 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     end
                     
                     set_reg(INSN_A(insn), new_closure(INSN_D(insn), fenv, uv));
-                elseif op == 20 then
-                elseif op == 21 then
-                elseif op == 22 then
-                elseif op == 23 then
-                elseif op == 24 then
+                elseif op == 20 then -- NAMECALL
+                elseif op == 21 then -- CALL
+                    try_interrupt();
+
+                    --todo set unused args to nil.
+
+                    local a, b, c = INSN_A(insn), INSN_B(insn), INSN_C(insn);
+                    local func = get_reg(a);
+
+                    local nparams = b - 1;
+                    if nparams == -1 then
+                        nparams = top - a; 
+                    end
+
+                    local args = get_reg_range(a + 1, nparams);
+                    local results = {func(table.unpack(args))};
+
+                    local nresults = c - 1;
+                    if nresults == -1 then
+                        nresults = #results;
+                        top = a + (nresults - 1);
+                    end
+
+                    set_reg_range(results, a + 1, nresults);
+                elseif op == 22 then -- RETURN
+                    try_interrupt();
+
+                    local a = INSN_A(insn);
+                    
+                    local nresults = INSN_B(insn) - 1;
+                    if nresults == -1 then
+                        nresults = top - a;
+                    end
+
+                    local results = get_reg_range(a, nresults);
+                    return table.unpack(results);
+                elseif op == 23 then -- JUMP
+                    jump(INSN_D(insn));
+                elseif op == 24 then -- JUMPBACK
+                    try_interrupt();
+                    jump(INSN_D(insn));
                 elseif op == 25 then
                 elseif op == 26 then
                 elseif op == 27 then
@@ -360,6 +400,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 62 then
                 elseif op == 63 then
                 elseif op == 64 then
+                    --TODO!
                 elseif op == 65 then
                 elseif op == 66 then
                 elseif op == 67 then
@@ -391,6 +432,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
 
         return closure;
     end
+
+    return new_closure(chunk.main_proto, genv, {});
 end
 
 return partial;
