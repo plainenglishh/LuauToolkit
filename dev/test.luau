@@ -13,14 +13,20 @@ local fs = require("@lune/fs");
 local luau = require("@lune/luau");
 local vm = require("../modules/vm/lib");
 
+
 local bc = luau.compile([[
-    for i = 1, 5_000 do
-        print("gobble");
+    for i = 1, 5000 do
+        print("Department for Environment, Food and Rural Affairs");
     end
 ]], {
     optimizationLevel = 2,
 });
+--[=[
+fs.writeFile("test.luauc", bc)
 
+local bc = fs.readFile("test.luauc");
+
+]=]
 local setup_start = os.clock();
 local fn = vm.new_partial.load(bc);
 local setup_stop = os.clock();

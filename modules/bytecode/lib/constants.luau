@@ -22,7 +22,7 @@ constants.proto_flag = {
 
 local vector: any = if type(vector) == "table" then vector else {};
 
-constants.fastcalls = {
+constants.builtins = {
     assert,
     math.abs,
     math.acos,

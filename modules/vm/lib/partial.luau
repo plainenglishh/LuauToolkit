@@ -188,7 +188,7 @@ function partial_vm.load(chunk: string|buffer|bytecode.BytecodeChunk, env: {[any
             end
 
             local function fastcall(id: number, ...): (boolean, any)
-                local fn = bytecode.constants.fastcalls[id];
+                local fn = bytecode.constants.builtins[id];
                 if not fn then
                     return false;
                 end

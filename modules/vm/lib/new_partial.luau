@@ -71,6 +71,10 @@ local function INSN_E(insn: number): number
     end
 end
 
+local function fastcall(id: number, ...: any): ...any
+    return bytecode.constants.builtins[id](...);
+end
+
 local function create_upvalue(val: any, type: "ref"|"val"): Upvalue
     local inner = val;
 
@@ -134,6 +138,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
         local function closure(...)
             local pc = -1;
             local instructions = proto._raw_instructions or error("expected raw instructions");
+            local vararg = {...};
 
             local registers: {any} = table.create(256);
             local top = 0;
@@ -257,8 +262,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 local insn = buffer.readu32(instructions, pc * 4);
                 local op = INSN_OP(insn);
 
-                --[[local info = bytecode.get_opcode_info(op) or error("");
-                print(`    {pc}: {info.name}`);]]
+                --local info = bytecode.get_opcode_info(op) or error("");
+                --print(`    {pc}: {info.name}`);
 
                 if op == 0 then
                 elseif op == 1 then
@@ -268,8 +273,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 3 then -- LOADB
                     set_reg(INSN_A(insn), INSN_B(insn) ~= 0);
                     jump(INSN_C(insn));
-                elseif op == 4 then -- LOADK
-                    set_reg(INSN_A(insn), INSN_B(insn));
+                elseif op == 4 then -- LOADN
+                    set_reg(INSN_A(insn), INSN_D(insn));
                 elseif op == 5 then -- LOADK
                     set_reg(INSN_A(insn), get_const(INSN_B(insn)));
                 elseif op == 6 then -- MOVE
@@ -466,18 +471,19 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         target[i + 1] = get_reg(start + i);
                     end
                 elseif op == 56 then -- FORNPREP
+                    --print(registers)
                     local base = INSN_A(insn);
                     local limit = get_reg(base);
                     local index = get_reg(base + 2);
                 
+                    
                     if index > limit then
                         jump(INSN_D(insn));
                     end
 
-                    set_reg(base + 3, get_reg(base + 2));
+                    set_reg(base + 3, index);
                 elseif op == 57 then -- FORNLOOP
                     local base = INSN_A(insn);
-
                     set_reg(base + 2, get_reg(base + 2) + get_reg(base + 1));
 
                     local limit = get_reg(base);
@@ -488,22 +494,22 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 58 then -- FORGLOOP
                 elseif op == 59 then -- FORGPREP_INEXT
                 elseif op == 60 then -- FASTCALL3
+                    
                 elseif op == 61 then -- FORGPREP_NEXT
                 elseif op == 62 then -- NATIVECALL
                 elseif op == 63 then -- GETVARARGS
                     local a = INSN_A(insn);
-                    local args = {...};
                     local count = INSN_B(insn) - 1;
                     if count == -1 then
-                        count = #args;
+                        count = #vararg;
                         top = a + (count - 1);
                     end
 
-                    set_reg_range({...}, a, count);
+                    set_reg_range(vararg, a, count);
                 elseif op == 64 then -- DUPCLOSURE
                     set_reg(INSN_A(insn), get_const(INSN_D(insn)));
                 elseif op == 65 then -- PREPVARARGS
-                    top += #{...};
+                    top += #vararg;
                 elseif op == 66 then
                 elseif op == 67 then
                 elseif op == 68 then
@@ -521,6 +527,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 80 then
                 elseif op == 81 then
                 elseif op == 82 then
+                elseif op == 255 then -- ext: JUMPR (ABC)
+                    jump(get_reg(INSN_A(insn)));
                 end
             end
         end
