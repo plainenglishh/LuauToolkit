@@ -484,10 +484,10 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     set_reg(base + 3, index);
                 elseif op == 57 then -- FORNLOOP
                     local base = INSN_A(insn);
-                    set_reg(base + 2, get_reg(base + 2) + get_reg(base + 1));
+                    local index = get_reg(base + 2) + get_reg(base + 1);
+                    set_reg(base + 2, index);
 
                     local limit = get_reg(base);
-                    local index = get_reg(base + 2);
                     if not (index > limit) then
                         jump(INSN_D(insn));
                     end
@@ -497,6 +497,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     
                 elseif op == 61 then -- FORGPREP_NEXT
                 elseif op == 62 then -- NATIVECALL
+                    -- Do nothing
                 elseif op == 63 then -- GETVARARGS
                     local a = INSN_A(insn);
                     local count = INSN_B(insn) - 1;
@@ -510,23 +511,69 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     set_reg(INSN_A(insn), get_const(INSN_D(insn)));
                 elseif op == 65 then -- PREPVARARGS
                     top += #vararg;
-                elseif op == 66 then
-                elseif op == 67 then
-                elseif op == 68 then
-                elseif op == 69 then
-                elseif op == 70 then
-                elseif op == 71 then
-                elseif op == 72 then
-                elseif op == 73 then
-                elseif op == 74 then
-                elseif op == 75 then
-                elseif op == 76 then
-                elseif op == 77 then
-                elseif op == 78 then
-                elseif op == 79 then
-                elseif op == 80 then
-                elseif op == 81 then
-                elseif op == 82 then
+                elseif op == 66 then -- LOADKX
+                    set_reg(INSN_A(insn), get_const(get_aux()));
+                elseif op == 67 then -- JUMPX
+                    try_interrupt();
+                    jump(INSN_E(insn));
+                elseif op == 68 then -- FASTCALL
+
+                elseif op == 69 then -- COVERAGE
+                elseif op == 70 then -- CAPTURE
+                    error("unhandled CAPTURE instruction"); -- Handled by 'NEWCLOSURE'.
+                elseif op == 71 then -- SUBRK
+                    set_reg(INSN_A(insn), get_const(INSN_C(insn)) - get_reg(INSN_B(insn)));
+                elseif op == 72 then -- DIVRK
+                    set_reg(INSN_A(insn), get_const(INSN_C(insn)) / get_reg(INSN_B(insn)));
+                elseif op == 73 then -- FASTCALL1
+                elseif op == 74 then -- FASTCALL2
+                elseif op == 75 then -- FASTCALL2K
+                elseif op == 76 then -- FORGPREP
+                elseif op == 77 then -- JUMPXEQKNIL
+                    local aux = get_aux();
+                    local not_flag = bit32.extract(aux, 31) == 1;
+                    
+                    if not_flag then
+                        if get_reg(INSN_A(insn)) ~= nil then
+                            jump(INSN_D(insn));
+                        end
+                    else
+                        if get_reg(INSN_A(insn)) == nil then
+                            jump(INSN_D(insn));
+                        end
+                    end
+                elseif op == 78 then -- JUMPXEQKB
+                    local aux = get_aux();
+                    local not_flag = bit32.extract(aux, 31) == 1;
+                    local bool = bit32.extract(aux, 0) == 1;
+                    
+                    if not_flag then
+                        if get_reg(INSN_A(insn)) ~= bool then
+                            jump(INSN_D(insn));
+                        end
+                    else
+                        if get_reg(INSN_A(insn)) == bool then
+                            jump(INSN_D(insn));
+                        end
+                    end
+                elseif op == 79 or op == 80 then -- JUMPXEQKN
+                    local aux = get_aux();
+                    local not_flag = bit32.extract(aux, 31) == 1;
+                    local const = bit32.extract(aux, 0, 24);
+                    
+                    if not_flag then
+                        if get_reg(INSN_A(insn)) ~= get_const(const) then
+                            jump(INSN_D(insn));
+                        end
+                    else
+                        if get_reg(INSN_A(insn)) == get_const(const) then
+                            jump(INSN_D(insn));
+                        end
+                    end
+                elseif op == 81 then -- IDIV
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) // get_reg(INSN_C(insn)));
+                elseif op == 82 then -- ADDK
+                    set_reg(INSN_A(insn), get_reg(INSN_B(insn)) // get_const(INSN_C(insn)));
                 elseif op == 255 then -- ext: JUMPR (ABC)
                     jump(get_reg(INSN_A(insn)));
                 end
