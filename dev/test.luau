@@ -7,13 +7,14 @@
     print(`    {pc}: {info.name} {operands:sub(1, #operands-2)}`);
 end]]
 
-local bytecode = require("../modules/bytecode/lib");
+local bytecode = require("../bytecode");
 local fs = require("@lune/fs");
 
 local luau = require("@lune/luau");
-local vm = require("../modules/vm/lib");
+local vm = require("../vm");
 
 
+--[=[]]
 local bc = luau.compile([[
     for i = 1, 5000 do
         print("Department for Environment, Food and Rural Affairs");
@@ -21,12 +22,22 @@ local bc = luau.compile([[
 ]], {
     optimizationLevel = 2,
 });
---[=[
+--[=[]]
 fs.writeFile("test.luauc", bc)
 
 local bc = fs.readFile("test.luauc");
-
 ]=]
+
+local chunk = bytecode.BytecodeBuilder.new();
+
+chunk:start_proto();
+    chunk:set_main();
+    chunk:add_instruction("COVERAGE", 0);
+    chunk:add_instruction("JUMP", -2);
+chunk:end_proto();
+
+local bc = chunk:build_bc();
+
 local setup_start = os.clock();
 local fn = vm.new_partial.load(bc);
 local setup_stop = os.clock();

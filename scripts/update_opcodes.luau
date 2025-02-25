@@ -281,4 +281,4 @@ end
 
 local bytecode_h =  bytecode_h_res.body;
 
-fs.writeFile("./modules/bytecode/lib/opcodes.luau", generate(bytecode_h));
+fs.writeFile("./bytecode/opcodes.luau", generate(bytecode_h));
