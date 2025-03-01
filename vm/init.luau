@@ -8,7 +8,7 @@ local GREY = "\u{001b}[2m"
 
 local vm = {};
 
-vm.partial = require("./new_partial");
+vm.partial = require("./partial");
 
 local function display_instruction(inst: bytecode.BytecodeInstruction)
     local info = bytecode.get_opcode_info(inst.opcode);

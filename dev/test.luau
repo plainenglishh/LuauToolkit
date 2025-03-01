@@ -13,30 +13,17 @@ local fs = require("@lune/fs");
 local luau = require("@lune/luau");
 local vm = require("../vm");
 
+print(_VERSION)
 
---[=[]]
 local bc = luau.compile([[
-    for i = 1, 5000 do
-        print("Department for Environment, Food and Rural Affairs");
+    local bob =  {"a", "b", "c"};
+    
+    for i, v in bob do
+        
     end
 ]], {
     optimizationLevel = 2,
 });
---[=[]]
-fs.writeFile("test.luauc", bc)
-
-local bc = fs.readFile("test.luauc");
-]=]
-
-local chunk = bytecode.BytecodeBuilder.new();
-
-chunk:start_proto();
-    chunk:set_main();
-    chunk:add_instruction("COVERAGE", 0);
-    chunk:add_instruction("JUMP", -2);
-chunk:end_proto();
-
-local bc = chunk:build_bc();
 
 local setup_start = os.clock();
 local fn = vm.partial.load(bc);

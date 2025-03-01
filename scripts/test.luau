@@ -5,8 +5,6 @@ _G.BYTEPARSE_SUPPRESS_WARNINGS = true;
 local stdio = require("@lune/stdio");
 local serde = require("@lune/serde");
 local luau = require("@lune/luau");
-local luau_toolkit = require("../src/lib");
-
 
 local _nil = nil :: any;
 
@@ -41,10 +39,24 @@ local function strip_spans(tbl: any)
     return new;
 end
 
-local function assert_ast_eq(a: luau_toolkit.LASM_AstChunk, b: luau_toolkit.LASM_AstChunk)
-    a = strip_spans(a);
-    b = strip_spans(b);
-    assert(eq(a, b))
+if type(vector) == "function" then
+    local env = luau.load("return getfenv;")()(1);
+    local vec_mt = {
+        __eq = function(a, b)
+            return (a.x == b.x) and (a.y == b.y) and (a.z == b.z) and (a.w == b.w);
+        end
+    };
+
+    env.vector = {
+        create = function(x: number, y: number, z: number, w: number)
+            return setmetatable({
+                x = x or 0,
+                y = y or 0,
+                z = z or 0,
+                w = w or 0,
+            }, vec_mt);
+        end,
+    };
 end
 
 local function assert_token(result, n: number, token: string, literal: any?)
@@ -63,8 +75,10 @@ local function assert_token(result, n: number, token: string, literal: any?)
     end
 end
 
-
 --------------------------------------------------------------------------------
+
+local bytecode = require("@luau_toolkit/bytecode");
+local vm = require("@luau_toolkit/vm");
 
 test("bytecode::{encode,decode}", function()
     local original_bc = luau.compile([[
@@ -74,22 +88,192 @@ test("bytecode::{encode,decode}", function()
         debugLevel = 2,
     });
 
-    local ir_chunk = luau_toolkit.bytecode.decode(original_bc);
-    local reencoded_bc = luau_toolkit.bytecode.encode(ir_chunk);
+    local ir_chunk = bytecode.decode(original_bc);
+    local reencoded_bc = bytecode.encode(ir_chunk);
 
     local fn = luau.load(buffer.tostring(reencoded_bc));
     assert(fn and fn() == "Hello, World!");
 end);
 
 test("bytecode::{encode_import_id,decode_import_id}", function()
-    local encoded = luau_toolkit.bytecode.encode_import_id({1, 2, 3});
-    local decoded = luau_toolkit.bytecode.decode_import_id(encoded);
+    local encoded = bytecode.encode_import_id({1, 2, 3});
+    local decoded = bytecode.decode_import_id(encoded);
 
     assert(decoded[1] == 1);
     assert(decoded[2] == 2);
     assert(decoded[3] == 3);
 end);
 
+do --// partial VM
+    local function vm_inspector(): (any, {pc: number, stack: {any}})
+        local self = {};
+        
+        return {
+            break_callback = function(_pc: number, _stack: {any})
+                self.stack = _stack;
+                self.pc = _pc + 1;
+            end,
+        }, self;
+    end
+
+    local function assert_stack(a: {any}, b: {any}, msg: string?)
+        assert(#a == #b, `expected stacks to be of same size`);
+        for i, v in b do
+            if a[i] ~= v then
+                error(msg or `expected key '{i}' in table A to be {v}, got {a[i]}`, 2);
+            end
+        end
+    end
+
+    test("vm::partial::opcodes:nop", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("NOP");
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert(vm_info.pc == 2);
+        assert_stack(vm_info.stack, {});
+    end);
+
+    test("vm::partial::opcodes:break", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert(vm_info.pc == 1); -- if PC exists, then BREAK succeeded.
+    end);
+
+    test("vm::partial::opcodes:loadnil", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("LOADNIL", 0);
+            chunk:add_instruction("LOADB", 1, 1, 0);
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+        assert_stack(vm_info.stack, {nil, true});
+    end);
+
+    test("vm::partial::opcodes:loadb", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("LOADB", 0, 0, 0);
+            chunk:add_instruction("LOADB", 1, 1, 1);
+            chunk:add_instruction("LOADNIL", 1);
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert_stack(vm_info.stack, {false, true});
+    end);
+
+    test("vm::partial::opcodes:loadn", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("LOADN", 0, 128);
+            chunk:add_instruction("LOADN", 1, 255);
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert_stack(vm_info.stack, {128, 255});
+    end);
+
+    test("vm::partial::opcodes:loadk", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("LOADK", 0, chunk:add_constant("number", 0.1));
+            chunk:add_instruction("LOADK", 1, chunk:add_constant("vector", {1, 2, 3, 0}));
+            chunk:add_instruction("LOADK", 2, chunk:add_constant("string", chunk:add_string("hubert")));
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert_stack(vm_info.stack, {0.1, vector.create(1, 2, 3), "hubert"});
+    end);
+
+    test("vm::partial::opcodes:move", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("LOADB", 0, 1, 0);
+            chunk:add_instruction("MOVE", 1, 0);
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert_stack(vm_info.stack, {true, true});
+    end);
+
+    test("vm::partial::opcodes:getglobal", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        local bob = newproxy();
+        inspect.globals = { bob = bob };
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("GETGLOBAL", 0, chunk:add_constant("string", chunk:add_string("bob")));
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert_stack(vm_info.stack, {bob});
+    end);
+
+    test("vm::partial::opcodes:setglobal", function()
+        local chunk = bytecode.BytecodeBuilder.new();
+        local inspect, vm_info = vm_inspector();
+
+        local globals = { set = false };
+        inspect.globals = globals;
+
+        chunk:start_proto()
+            chunk:set_main();
+            chunk:add_instruction("LOADB", 0, 1, 0);
+            chunk:add_instruction("SETGLOBAL", 0, chunk:add_constant("string", chunk:add_string("set")));
+            chunk:add_instruction("BREAK");
+        chunk:end_proto();
+
+        vm.partial.load(chunk:build_bc(), inspect)();
+
+        assert_stack(vm_info.stack, {true});
+        assert(globals.set == true);
+    end);
+end
 
 --[==[]
 test("lasm::tokenise::punctuation", function()
