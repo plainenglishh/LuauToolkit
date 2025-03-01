@@ -15,9 +15,15 @@ local vm = require("@ltk/vm");
 local common = require("@ltk/common");
 
 local bc = luau.compile([[    
-    for i, v in ipairs({ "a", "b", "c" }) do
-        print(i, v);
+    local true_bob = true;
+    local function hugh()
+        print("before change (in fn):", true_bob);
+        true_bob = false;
+        print("after change (in fn):", true_bob);
     end
+    print("before fn call:", true_bob);
+    hugh();
+    print("after fn call:", true_bob);
 ]], {
     optimizationLevel = 2,
 });

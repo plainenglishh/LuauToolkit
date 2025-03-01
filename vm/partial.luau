@@ -380,7 +380,6 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         if cap_type == 0 then -- VAL
                             table.insert(uv, create_upvalue(cap_val, "val"));
                         elseif cap_type == 1 then -- REF
-                            error("REF upvalues not yet supported");
                             table.insert(uv, create_upvalue(cap_val, "ref"));
                         elseif cap_type == 2 then -- UPVAL
                             table.insert(uv, upvalues[cap_val]);
