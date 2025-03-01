@@ -11,26 +11,22 @@ local bytecode = require("../bytecode");
 local fs = require("@lune/fs");
 
 local luau = require("@lune/luau");
-local vm = require("../vm");
+local vm = require("@ltk/vm");
+local common = require("@ltk/common");
 
-print(_VERSION)
-
-local bc = luau.compile([[
-    local bob =  {"a", "b", "c"};
-    
-    for i, v in bob do
-        
+local bc = luau.compile([[    
+    for i, v in ipairs({ "a", "b", "c" }) do
+        print(i, v);
     end
 ]], {
     optimizationLevel = 2,
 });
 
-local setup_start = os.clock();
-local fn = vm.partial.load(bc);
-local setup_stop = os.clock();
-
-local run_start = os.clock();
+local fn = vm.partial.load(bc, { globals = common.stdlib, debug_prints = false, });
 fn();
-local run_stop = os.clock();
 
-print(`ltk:\n\tsetup: {(setup_stop - setup_start) * 1000}ms\n\trun: {(run_stop - run_start) * 1000}ms`);
+--local setup_start = os.clock();
+--local setup_stop = os.clock();
+--local run_start = os.clock();
+--local run_stop = os.clock();
+--print(`ltk:\n\tsetup: {(setup_stop - setup_start) * 1000}ms\n\trun: {(run_stop - run_start) * 1000}ms`);

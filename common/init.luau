@@ -17,17 +17,11 @@ function common.get_table_parts(tbl: {[any]: any})
                 array_part[k] = v;
             else
                 hash_size += 1;
-                hash_part[hash_size] = {
-                    key = k,
-                    value = v,
-                };
+                hash_part[hash_size] = {k, v};
             end
         else
             hash_size += 1;
-            hash_part[hash_size] = {
-                key = k,
-                value = v,
-            };
+            hash_part[hash_size] = {k, v};
         end
     end
 

@@ -127,9 +127,16 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
         end
     end
 
-    local function debug_print(...)
+    local function debug_print(msg: string, ident: boolean?)
         if debug_prints then
-            print(...);
+            local space = "";
+            local pfx = "";
+            if ident ~= false then
+                space = "|       ";
+            else
+                pfx = "[vm]:\n";
+            end
+            print(`{pfx}[vm]: {space}{msg}`);
         end
     end
 
@@ -155,6 +162,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
             This tha "loaded" function that runs.
         ]=]
         local function closure(...)
+            debug_print(`executing closure {pid}`);
             local pc = -1;
             local instructions = proto._raw_instructions or error("expected raw instructions");
             local vararg = {...};
@@ -226,6 +234,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 This gets inlined in -O2
             ]=]
             local function set_reg(reg: number, value: any)
+                debug_print(`set register {reg} to {value}`);
                 registers[reg + 1] = value;
                 --print(`R{reg} set to {value}`);
             end
@@ -237,9 +246,11 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 end
 
                 table.move(values, 1, count, start + 1, registers);
-                --[[for i = start, start + count do
-                    print(`R{start} set to {values[i]}`);
-                end]]
+                if debug_prints then
+                    for i = start, start + count do
+                        debug_print(`set register {i} to {registers[i + 1]}`);
+                    end
+                end
             end
 
             --[=[
@@ -268,7 +279,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 Jumps to a given offset.
             ]=]
             local function jump(offset: number)
-                debug_print("jumping by", offset);
+                debug_print(`jumping: {offset}`);
                 pc += offset;
             end
 
@@ -282,9 +293,36 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 local insn = buffer.readu32(instructions, pc * 4);
                 local op = INSN_OP(insn);
 
-                local info = bytecode.get_opcode_info(op) or error("");
-                debug_print(`    {pc}: {info.name}`);
-                --print(string.format("%08x", insn))
+                if debug_prints then
+                    local info = bytecode.get_opcode_info(op) or error("");
+                    local args = "";
+                    local aux = "";
+
+                    for i, operand in info.operands do
+                        if i == 1 then
+                            args ..= " ";
+                        else
+                            args ..= ", ";
+                        end
+
+                        if operand.name == "a" then
+                            args ..= INSN_A(insn);
+                        elseif operand.name == "b" then
+                            args ..= INSN_B(insn);
+                        elseif operand.name == "c" then
+                            args ..= INSN_C(insn);
+                        elseif operand.name == "d" then
+                            args ..= INSN_D(insn);
+                        elseif operand.name == "e" then
+                            args ..= INSN_E(insn);
+                        elseif operand.name == "aux" then
+                            args ..= buffer.readu32(instructions, (pc + 1) * 4);
+                            aux = ` 0x{string.format("%08X",  buffer.readu32(instructions, (pc + 1) * 4))}`;
+                        end
+                    end
+
+                    debug_print(`{pid}:{pc} {info.name}{args} (0x{string.format("%08X", insn)}{aux})`, false);
+                end
 
                 if op == 0 then
                 elseif op == 1 then
@@ -357,8 +395,6 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     set_reg(a + 1, obj);
                 elseif op == 21 then -- CALL
                     try_interrupt();
-
-                    -- TODO? set unused args to nil.
 
                     local a, b, c = INSN_A(insn), INSN_B(insn), INSN_C(insn);
                     local func = get_reg(a);
@@ -494,7 +530,6 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         target[idx_start + i] = get_reg(start + i);
                     end
                 elseif op == 56 then -- FORNPREP
-                    --print(registers)
                     local base = INSN_A(insn);
                     local limit = get_reg(base);
                     local index = get_reg(base + 2);
@@ -516,23 +551,18 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     end
                 elseif op == 58 then -- FORGLOOP
                     try_interrupt();
+                    local ra = INSN_A(insn);
 
+                    local aux = get_aux();
+                    local var_count = bit32.extract(aux, 0, 8);
+                    local _ipairs_fast_iter = bit32.extract(aux, 31, 1) == 1;
 
-                    local register_start = INSN_A(insn);
-                    --local jump_offset = INSN_D(insn);
-
-                    local ra_generator = register_start + 0;
-                    local ra_state = register_start + 1;
-                    local ra_index = register_start + 2;
-                    local ra_var_start = register_start + 3;
-
-                    local var_count = get_aux();
-
-                    local generator = get_reg(ra_generator);
-                    local state = get_reg(ra_state);
-                    local index = get_reg(ra_index);
+                    local generator = get_reg(ra);
+                    local state = get_reg(ra + 1);
+                    local index = get_reg(ra + 2);
 
                     if typeof(generator) == "nil" then
+                        debug_print("iter mode: generalised");
                         local parts = common.get_table_parts(state);
                         local array_size = parts.array_size;
                         local array_part = parts.array;
@@ -542,7 +572,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         -- Clear extra variables
                         if var_count > 2 then
                             for i = 2, var_count do
-                                set_reg(ra_var_start + i, nil);
+                                set_reg(ra + 3 + i, nil);
                             end
                         end
 
@@ -551,25 +581,26 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                             continue;
                         end
 
-                        local breakout = false;
-
                         -- Array Portion
+                        local goto_dispatch = false;
+
                         while index < array_size do
                             local e = array_part[index + 1];
                             
                             if e ~= nil then
-                                set_reg(ra_index, index + 1);
-                                set_reg(ra_var_start, index + 1);
-                                set_reg(ra_var_start + 1, e);
+                                set_reg(ra + 2, index + 1);
+                                set_reg(ra + 3, index + 1);
+                                set_reg(ra + 4, e);
 
-                                jump(INSN_D(insn));
-                                breakout = true;
+                                jump(INSN_D(insn) - 1);
+                                goto_dispatch = true;
+                                break;
                             end
                             
                             index += 1;
                         end
 
-                        if breakout then
+                        if goto_dispatch then
                             continue;
                         end
                         
@@ -577,23 +608,40 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         while index - array_size < hash_size do
                             local e = hash_part[index - array_size + 1];
                             
-                            if e.value ~= nil then
-                                set_reg(ra_index, index + 1);
-                                set_reg(ra_var_start, e.key);
-                                set_reg(ra_var_start + 1, e.value);
+                            if e[1] ~= nil then
+                                set_reg(ra + 2, index + 1);
+                                set_reg(ra + 3, e[1]);
+                                set_reg(ra + 4, e[2]);
 
-                                jump(INSN_D(insn));
+                                jump(INSN_D(insn) - 1);
+                                goto_dispatch = true;
+                                break;
                             end
 
                             index += 1;
                         end
+
+                        if goto_dispatch then
+                            continue;
+                        end
+                    else
+                        debug_print("iter mode: iterator func");
+
+                        local args = {generator(state, index)};
+                        if args[1] == nil then
+                            continue;
+                        end
+
+                        set_reg(ra + 2, args[1]);
+                        set_reg_range(args, ra + 3, var_count);
+                        jump(INSN_D(insn) - 1);
                     end
                 elseif op == 59 then -- FORGPREP_INEXT
-                    error("generalised iteration not yet supported");
+                    jump(INSN_D(insn));
                 elseif op == 60 then -- FASTCALL3
                     -- fallthrough for now
                 elseif op == 61 then -- FORGPREP_NEXT
-                    error("generalised iteration not yet supported");
+                    jump(INSN_D(insn));
                 elseif op == 62 then -- NATIVECALL
                     -- Do nothing
                 elseif op == 63 then -- GETVARARGS
@@ -666,8 +714,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                         end
                     end
 
-                    local offset = INSN_D(insn);
-                    jump(offset);
+                    jump(INSN_D(insn));
                 elseif op == 77 then -- JUMPXEQKNIL
                     local aux = get_aux();
                     local not_flag = bit32.extract(aux, 31) == 1;
@@ -725,6 +772,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
             upvalues = upvalues,
             env = fenv,
         });
+
+        debug_print(`loaded closure {pid}`);
 
         return closure;
     end
