@@ -5,10 +5,24 @@ authors = ["plainenglish <plainenglish@spearhead.industries>"]
 repository = "https://github.com/plainenglishh/luauc-toolkit"
 license = "MIT"
 private = true
+includes = [
+    # Metadata
+    "pesde.toml",
+    "LICENCE.txt",
+    "README.md",
+
+    # Entrypoint
+    "init.luau",
+
+    # Modules
+    "vm",
+    "common",
+    "bytecode",
+]
 
 [target]
 environment = "luau"
-lib = "lib/init.luau"
+lib = "init.luau"
 
 [indices]
 default = "https://github.com/pesde-pkg/index"

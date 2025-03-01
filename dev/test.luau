@@ -39,7 +39,7 @@ chunk:end_proto();
 local bc = chunk:build_bc();
 
 local setup_start = os.clock();
-local fn = vm.new_partial.load(bc);
+local fn = vm.partial.load(bc);
 local setup_stop = os.clock();
 
 local run_start = os.clock();
