@@ -5,8 +5,8 @@
 local fs = require("@lune/fs");
 
 local paths = {
-    "./bytecode",
-    "./vm",
+    "./Bytecode",
+    "./VM",
 };
 
 for _, path in paths do

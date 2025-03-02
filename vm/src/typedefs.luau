@@ -1,4 +1,4 @@
-local bytecode = require("../bytecode");
+local bytecode = require("../../bytecode");
 
 export type VMError = {
     type: string,
