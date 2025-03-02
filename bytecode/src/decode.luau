@@ -2,7 +2,7 @@
     Decodes a bytecode chunk
 ]]
 
-local byteparse = require("./vendor/byteparse");
+local byteparse = require("../vendor/byteparse");
 local opcodes = require("./opcodes");
 local constants = require("./constants");
 local t = require("./typedefs");

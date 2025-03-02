@@ -33,6 +33,6 @@ function common.get_table_parts(tbl: {[any]: any})
     };
 end
 
-common.stdlib = require("./stdlib");
+common.stdlib = require("./src/stdlib");
  
 return common;

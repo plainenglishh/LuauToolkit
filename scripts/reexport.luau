@@ -5,11 +5,12 @@
 local fs = require("@lune/fs");
 
 local paths = {
-    "./bytecode"
+    "./bytecode",
+    "./vm",
 };
 
 for _, path in paths do
-    local typedefs = fs.readFile(`{path}/typedefs.luau`);
+    local typedefs = fs.readFile(`{path}/src/typedefs.luau`);
     local reexports = "";
     local type_constructors = "";
     
@@ -23,7 +24,7 @@ for _, path in paths do
     end
     
     typedefs = string.gsub(typedefs, "%-%-BEGIN_TYPE_CONSTRUCTORS(.-)%-%-END_TYPE_CONSTRUCTORS", "--BEGIN_TYPE_CONSTRUCTORS\n"..type_constructors.."--END_TYPE_CONSTRUCTORS");
-    fs.writeFile(`{path}/typedefs.luau`, typedefs);
+    fs.writeFile(`{path}/src/typedefs.luau`, typedefs);
     
     local root = fs.readFile(`{path}/init.luau`);
     root = string.gsub(root, "%-%-BEGIN_REEXPORTS(.-)%-%-END_REEXPORTS", "--BEGIN_REEXPORTS\n"..reexports.."--END_REEXPORTS");

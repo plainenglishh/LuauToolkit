@@ -1,5 +1,5 @@
 
-local t = require("./typedefs");
+local t = require("./src/typedefs");
 local bytecode = require("../bytecode");
 
 local ERR_START = "\u{001b}[0;1;31m";
@@ -8,7 +8,7 @@ local GREY = "\u{001b}[2m"
 
 local vm = {};
 
-vm.partial = require("./partial");
+vm.partial = require("./src/partial");
 
 local function display_instruction(inst: bytecode.BytecodeInstruction)
     local info = bytecode.get_opcode_info(inst.opcode);
@@ -37,5 +37,9 @@ function vm.display_vm_error(err: t.VMError): string
 
     return table.concat(lines, "\n");
 end
+
+--BEGIN_REEXPORTS
+export type VMError = t.VMError;
+--END_REEXPORTS
 
 return vm;

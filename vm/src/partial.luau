@@ -1,5 +1,5 @@
-local bytecode = require("../bytecode");
-local common = require("../common");
+local bytecode = require("../../bytecode");
+local common = require("../../common");
 
 type Closure = (...any) -> (...any);
 type Environment = {[any]: any};
