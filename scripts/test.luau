@@ -4,6 +4,7 @@ _G.BYTEPARSE_SUPPRESS_WARNINGS = true;
 
 local stdio = require("@lune/stdio");
 local serde = require("@lune/serde");
+local fs = require("@lune/fs");
 local luau = require("@lune/luau");
 
 local _nil = nil :: any;
@@ -77,8 +78,9 @@ end
 
 --------------------------------------------------------------------------------
 
-local bytecode = require("@luau_toolkit/bytecode");
-local vm = require("@luau_toolkit/vm");
+local bytecode = require("@ltk/bytecode");
+local vm = require("@ltk/vm");
+local common = require("@ltk/common");
 
 test("bytecode::{encode,decode}", function()
     local original_bc = luau.compile([[
@@ -123,6 +125,17 @@ do --// partial VM
                 error(msg or `expected key '{i}' in table A to be {v}, got {a[i]}`, 2);
             end
         end
+    end
+
+    for _, file in fs.readDir("./tests/vm") do
+        test(`vm::partial::conformance::{file}`, function()
+            local src = fs.readFile(`./tests/vm/{file}`);
+            local bc = luau.compile(src);
+    
+            local stdlib = table.clone(common.stdlib);
+            stdlib.print = function() end :: any;
+            vm.partial.load(bc, {globals = stdlib, debug_prints = true })();
+        end);
     end
 
     test("vm::partial::opcodes:nop", function()

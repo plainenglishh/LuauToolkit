@@ -170,15 +170,16 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
             local registers: {any} = table.create(256);
             local top = 0;
 
-            for i, const in proto.constants do
-                if const.type == "closure" then
-                    const.value = new_closure(const.value, fenv, upvalues);
-                end
-            end
-
             local instructions_length = buffer.len(instructions);
 
             local get_import;
+
+            local function dump_registers()
+                debug_print("register dump:");
+                for k, v in registers do
+                    debug_print(`    {k - 1}: {v}`);
+                end
+            end
 
             --[=[
                 Returns a value from the constant table.
@@ -197,7 +198,13 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif constant.type == "vector" then
                     return vector.create(unpack(constant.value));
                 elseif constant.type == "table" then
-                    return error("");
+                    local tbl = {};
+
+                    for k, v in constant.value do
+                        tbl[get_const(k)] = get_const(v);
+                    end
+
+                    return tbl;
                 else
                     return error("");
                 end
@@ -245,11 +252,8 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                     return;
                 end
 
-                table.move(values, 1, count, start + 1, registers);
-                if debug_prints then
-                    for i = start, start + count do
-                        debug_print(`set register {i} to {registers[i + 1]}`);
-                    end
+                for i = 1, count do
+                    set_reg(start + i - 1, values[i]);
                 end
             end
 
@@ -345,7 +349,6 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 9 then -- GETUPVAL
                     set_reg(INSN_A(insn), get_uv(INSN_B(insn)));
                 elseif op == 10 then -- SETUPVAL
-                    -- TODO! REF upvalues
                     set_uv(INSN_B(insn), get_reg(INSN_A(insn)));
                 elseif op == 11 then -- CLOSEUPVALS
                     -- Do nothing for now.
@@ -395,24 +398,20 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 21 then -- CALL
                     try_interrupt();
 
-                    local a, b, c = INSN_A(insn), INSN_B(insn), INSN_C(insn);
-                    local func = get_reg(a);
+                    local ra = INSN_A(insn);
+                    local func = get_reg(ra);
 
-                    local nparams = b - 1;
-                    if nparams == -1 then
-                        nparams = top - a; 
-                    end
+                    local nparams = INSN_B(insn) - 1;
+                    local nresults = INSN_C(insn) - 1;
 
-                    local args = get_reg_range(a + 1, nparams);
+                    local argtop = if nparams == -1 then top else ra + 1 + nparams;
+
+                    local args = get_reg_range(ra + 1, nparams);
                     local results = {func(table.unpack(args))};
 
-                    local nresults = c - 1;
-                    if nresults == -1 then
-                        nresults = #results;
-                        top = a + (nresults - 1);
-                    end
+                    top = argtop;
 
-                    set_reg_range(results, a, nresults);
+                    set_reg_range(results, ra, nresults);
                 elseif op == 22 then -- RETURN
                     try_interrupt();
 
@@ -515,18 +514,19 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
                 elseif op == 53 then -- NEWTABLE
                     set_reg(INSN_A(insn), table.create(get_aux()));
                 elseif op == 54 then -- DUPTABLE
-                    error("table constants not yet supported");
+                    set_reg(INSN_A(insn), get_const(INSN_D(insn)));
                 elseif op == 55 then -- SETLIST
+                    local target = get_reg(INSN_A(insn));
+                    local reg_start = INSN_B(insn);
                     local count = INSN_C(insn) - 1;
                     local idx_start = get_aux();
+
                     if count == -1 then
                         count = top;
                     end
 
-                    local target = get_reg(INSN_A(insn));
-                    local start = INSN_B(insn);
                     for i = 0, count - 1 do
-                        target[idx_start + i] = get_reg(start + i);
+                        target[idx_start + i] = get_reg(reg_start + i);
                     end
                 elseif op == 56 then -- FORNPREP
                     local base = INSN_A(insn);
@@ -653,7 +653,29 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
 
                     set_reg_range(vararg, a, count);
                 elseif op == 64 then -- DUPCLOSURE
-                    set_reg(INSN_A(insn), get_const(INSN_D(insn)));
+                    local uv: {Upvalue} = {};
+
+                    while pc < instructions_length do
+                        pc += 1;
+                        local capture = buffer.readu32(instructions, pc * 4);
+                        if INSN_OP(capture) ~= 70 then
+                            pc -= 1;
+                            break;
+                        end
+
+                        local cap_type = INSN_A(capture);
+                        local cap_val = INSN_B(capture);
+
+                        if cap_type == 0 then -- VAL
+                            table.insert(uv, create_upvalue(cap_val, "val"));
+                        elseif cap_type == 1 then -- REF
+                            table.insert(uv, create_upvalue(cap_val, "ref"));
+                        elseif cap_type == 2 then -- UPVAL
+                            table.insert(uv, upvalues[cap_val]);
+                        end
+                    end
+
+                    set_reg(INSN_A(insn), new_closure(get_const(INSN_D(insn)), fenv, uv));
                 elseif op == 65 then -- PREPVARARGS
                     top += #vararg;
                 elseif op == 66 then -- LOADKX

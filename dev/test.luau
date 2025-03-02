@@ -7,26 +7,23 @@
     print(`    {pc}: {info.name} {operands:sub(1, #operands-2)}`);
 end]]
 
-local bytecode = require("../bytecode");
-local fs = require("@lune/fs");
-
 local luau = require("@lune/luau");
+local bytecode = require("@ltk/bytecode");
 local vm = require("@ltk/vm");
 local common = require("@ltk/common");
 
 local bc = luau.compile([[    
-    local true_bob = true;
-    local function hugh()
-        print("before change (in fn):", true_bob);
-        true_bob = false;
-        print("after change (in fn):", true_bob);
+    local function bob(...)
+        print(...);
+        return "blah", "wah";
     end
-    print("before fn call:", true_bob);
-    hugh();
-    print("after fn call:", true_bob);
+
+    local wehh = {bob("wopp", "plop")};
+    print(wehh);
 ]], {
-    optimizationLevel = 2,
+    optimizationLevel = 0,
 });
+
 
 local fn = vm.partial.load(bc, { globals = common.stdlib, debug_prints = false, });
 fn();
@@ -35,4 +32,4 @@ fn();
 --local setup_stop = os.clock();
 --local run_start = os.clock();
 --local run_stop = os.clock();
---print(`ltk:\n\tsetup: {(setup_stop - setup_start) * 1000}ms\n\trun: {(run_stop - run_start) * 1000}ms`);
+--print(`ltk:\n\trun: {(run_stop - run_start) * 1000}ms`);
