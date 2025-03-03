@@ -15,11 +15,11 @@ local common = require("@ltk/common");
 local bc = luau.compile([[    
     local function bob(...)
         print(...);
-        return "blah", "wah";
+        return "blah", "wggggggggggggah";
     end
 
-    local wehh = {bob("wopp", "plop")};
-    print(wehh);
+    local wehh = {bob("fdhdfhfghfgh", "fgfgfgfgfgfgfgfgfgfgfgfgfgfg")};
+    error("AHHHHHHHHHHHHHHHH");
 ]], {
     optimizationLevel = 0,
 });
