@@ -1,4 +1,5 @@
 {
     "luau-lsp.platform.type": "standard",
-    "luau-lsp.fflags.enableNewSolver": false
+    "luau-lsp.fflags.enableNewSolver": false,
+    "editor.formatOnSave": true
 }
