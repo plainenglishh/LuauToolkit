@@ -7,11 +7,11 @@ bytecode.encode = require("@self/encode");
 bytecode.decode = require("@self/decode");
 bytecode.opcodes = require("@self/opcodes");
 bytecode.constants = require("@self/constants");
-bytecode.BytecodeBuilder = require("@self/BytecodeBuilder");
+bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");
 bytecode.get_opcode_info = misc.get_opcode_info;
 bytecode.encode_import_id = misc.encode_import_id;
 bytecode.decode_import_id = misc.decode_import_id;
-
+ 
 --BEGIN_REEXPORTS
 export type OperandName = t.OperandName;
 export type OperandMode = t.OperandMode;
@@ -21,8 +21,8 @@ export type OpcodeInfo = t.OpcodeInfo;
 export type OpcodeName = t.OpcodeName;
 export type ConstantType = t.ConstantType;
 export type ProtoFlag = t.ProtoFlag;
-export type BytecodeBuilderImpl = t.BytecodeBuilderImpl;
-export type BytecodeBuilder = t.BytecodeBuilder;
+export type BytecodeAssemblerImpl = t.BytecodeAssemblerImpl;
+export type BytecodeAssembler = t.BytecodeAssembler;
 export type BytecodeChunk = t.BytecodeChunk;
 export type BytecodeProto = t.BytecodeProto;
 export type BytecodeInstruction = t.BytecodeInstruction;

@@ -1,8 +1,7 @@
 {
     "languageMode": "strict",
     "aliases": {
-        "lune": "~/.lune/.typedefs/0.8.9/",
-        "ltk": "."
+        "lune": "~/.lune/.typedefs/0.8.9/"
     },
     "lint": {
         "LocalShadow": false

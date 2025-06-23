@@ -1,5 +1,13 @@
 {
     "luau-lsp.platform.type": "standard",
     "luau-lsp.fflags.enableNewSolver": false,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.rulers": [80],
+    "spellchecker.language": "en_GB-ise",
+    "spellchecker.checkInterval": 0,
+    "spellchecker.documentTypes": ["markdown", "latex", "plaintext"],
+    "spellchecker.suggestionSeverity": "Error",
+    "spellchecker.ignoreWordsList": [
+        "bytecode", "Bytecode", "Lunes"
+    ]
 }

@@ -15,10 +15,10 @@ local function add_to<T>(tbl: {T}, value: T, force: boolean?): number
     return idx;
 end
 
-local BytecodeBuilder = {};
-BytecodeBuilder.__index = BytecodeBuilder;
+local BytecodeAssembler = {};
+BytecodeAssembler.__index = BytecodeAssembler;
 
-function BytecodeBuilder.new(): t.BytecodeBuilder
+function BytecodeAssembler.new(): t.BytecodeAssembler
     return setmetatable({
         _offset = 0,
         _proto = nil,
@@ -30,26 +30,26 @@ function BytecodeBuilder.new(): t.BytecodeBuilder
             protos = {},
             main_proto = -1,
         },
-    }, BytecodeBuilder);
+    }, BytecodeAssembler);
 end
 
 --// Chunk Methods
 
-function BytecodeBuilder:set_version(version: number)
+function BytecodeAssembler:set_version(version: number)
     self._chunk.luau_version = version;
 end
 
-function BytecodeBuilder:set_types_version(version: number)
+function BytecodeAssembler:set_types_version(version: number)
     self._chunk.types_version = version;
 end
 
-function BytecodeBuilder:add_string(str: string, force: boolean?): number
+function BytecodeAssembler:add_string(str: string, force: boolean?): number
     return add_to(self._chunk.strings, str, force);
 end
 
 --// Proto Methods
 
-function BytecodeBuilder:start_proto()
+function BytecodeAssembler:start_function()
     if self._proto then
         error("already in a function", 2);
     end
@@ -74,12 +74,12 @@ function BytecodeBuilder:start_proto()
     return proto_id;
 end
 
-function BytecodeBuilder:get_proto_id(): number
+function BytecodeAssembler:get_proto_id(): number
     return self._proto_id or error("not in a function", 2);
 end
 
     
-function BytecodeBuilder:add_import(...: string)
+function BytecodeAssembler:add_import(...: string)
     if not self._proto then
         error("not in a function", 2);
     end
@@ -93,7 +93,7 @@ function BytecodeBuilder:add_import(...: string)
 end
 
 
-function BytecodeBuilder:set_max_stack_size(value: number)
+function BytecodeAssembler:set_max_stack_size(value: number)
     if not self._proto then
         error("not in a function", 2);
     end
@@ -101,7 +101,7 @@ function BytecodeBuilder:set_max_stack_size(value: number)
     self._proto.max_stack_size = value;
 end
 
-function BytecodeBuilder:set_num_params(value: number)
+function BytecodeAssembler:set_num_params(value: number)
     if not self._proto then
         error("not in a function", 2);
     end
@@ -109,7 +109,7 @@ function BytecodeBuilder:set_num_params(value: number)
     self._proto.num_params = value;
 end
 
-function BytecodeBuilder:set_num_upvalues(value: number)
+function BytecodeAssembler:set_num_upvalues(value: number)
     if not self._proto then
         error("not in a function", 2);
     end
@@ -117,14 +117,14 @@ function BytecodeBuilder:set_num_upvalues(value: number)
     self._proto.num_upvalues = value;
 end
 
-function BytecodeBuilder:set_is_vararg(value: boolean)
+function BytecodeAssembler:set_is_vararg(value: boolean)
     if not self._proto then
         error("not in a function", 2);
     end
 
     self._proto.is_vararg = value;
 end
-function BytecodeBuilder:set_line_defined(value: number)
+function BytecodeAssembler:set_line_defined(value: number)
     if not self._proto then
         error("not in a function", 2);
     end
@@ -132,7 +132,7 @@ function BytecodeBuilder:set_line_defined(value: number)
     self._proto.line_defined = value;
 end
 
-function BytecodeBuilder:set_debug_name(value: string): ()
+function BytecodeAssembler:set_debug_name(value: string): ()
     if not self._proto then
         error("not in a function", 2);
     end
@@ -140,11 +140,11 @@ function BytecodeBuilder:set_debug_name(value: string): ()
     self._proto.debug_name = self:add_string(value);
 end
 
-function BytecodeBuilder:set_main(value: number?)
+function BytecodeAssembler:set_main(value: number?)
     self._chunk.main_proto = value or self._proto_id or error("");
 end
 
-function BytecodeBuilder:set_flag(flag: any, value: boolean)
+function BytecodeAssembler:set_flag(flag: any, value: boolean)
     if not self._proto then
         error("not in a function", 2);
     end
@@ -161,7 +161,7 @@ function BytecodeBuilder:set_flag(flag: any, value: boolean)
     end
 end
 
-function BytecodeBuilder:add_constant(type: any, value: any, force: boolean?): number
+function BytecodeAssembler:add_constant(type: any, value: any, force: boolean?): number
     if not self._proto then
         error("not in a function", 2);
     end
@@ -176,7 +176,7 @@ function BytecodeBuilder:add_constant(type: any, value: any, force: boolean?): n
     }, force) - 1;
 end
 
-function BytecodeBuilder:add_instruction(opname_or_code: number|any, ...: number): number
+function BytecodeAssembler:add_instruction(opname_or_code: number|any, ...: number): number
     local operands = {...};
     if not self._proto then
         error("not in a function", 2);
@@ -203,11 +203,11 @@ function BytecodeBuilder:add_instruction(opname_or_code: number|any, ...: number
     return offset;
 end
 
-function BytecodeBuilder:get_offset(): number
+function BytecodeAssembler:get_offset(): number
     return self._offset;
 end
 
-function BytecodeBuilder:end_proto()
+function BytecodeAssembler:end_function()
     if not self._proto then
         error("not in a function", 2);
     end
@@ -219,7 +219,7 @@ function BytecodeBuilder:end_proto()
     return proto_id;
 end
 
-function BytecodeBuilder:build_ir()
+function BytecodeAssembler:to_ir()
     if self._proto then
         error("unended function", 2);
     end
@@ -231,8 +231,8 @@ function BytecodeBuilder:build_ir()
     return table.clone(self._chunk);
 end
 
-function BytecodeBuilder:build_bc()
-    return encode(self:build_ir());
+function BytecodeAssembler:assemble()
+    return encode(self:to_ir());
 end
 
-return (BytecodeBuilder :: any) :: t.BytecodeBuilderImpl;
+return (BytecodeAssembler :: any) :: t.BytecodeAssemblerImpl;

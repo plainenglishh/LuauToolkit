@@ -69,38 +69,38 @@ export type ProtoFlag =
 --  Bytecode Builder Types
 ----------------------------------------------------------------------------
 
-export type BytecodeBuilderImpl = {
-    __index: BytecodeBuilderImpl,
+export type BytecodeAssemblerImpl = {
+    __index: BytecodeAssemblerImpl,
 
-    new: () -> BytecodeBuilder,
-    set_version: (self: BytecodeBuilder, version: number) -> (),
-    set_types_version: (self: BytecodeBuilder, version: number) -> (),
-    add_string: (self: BytecodeBuilder, str: string, force: boolean?) -> number,
-    add_import: (self: BytecodeBuilder, ...string) -> number,
-    start_proto: (self: BytecodeBuilder) -> number,
-    get_proto_id: (self: BytecodeBuilder) -> number,
-    set_max_stack_size: (self: BytecodeBuilder, value: number) -> (),
-    set_num_params: (self: BytecodeBuilder, value: number) -> (),
-    set_num_upvalues: (self: BytecodeBuilder, value: number) -> (),
-    set_is_vararg: (self: BytecodeBuilder, value: boolean) -> (),
-    set_line_defined: (self: BytecodeBuilder, value: number) -> (),
-    set_debug_name: (self: BytecodeBuilder, name: string) -> (),
-    set_main: (self: BytecodeBuilder, proto: number?) -> (),
-    set_flag: (self: BytecodeBuilder, flag: ProtoFlag, value: boolean) -> (),
-    add_constant: (self: BytecodeBuilder, type: ConstantType, value: any, force: boolean?) -> number,
-    add_instruction: (self: BytecodeBuilder, opname_or_code: OpcodeName|number, ...number) -> number,
-    get_offset: (self: BytecodeBuilder) -> number,
-    end_proto: (self: BytecodeBuilder) -> number,
-    build_ir: (self: BytecodeBuilder) -> BytecodeChunk,
-    build_bc: (self: BytecodeBuilder) -> buffer,
+    new: () -> BytecodeAssembler,
+    set_version: (self: BytecodeAssembler, version: number) -> (),
+    set_types_version: (self: BytecodeAssembler, version: number) -> (),
+    add_string: (self: BytecodeAssembler, str: string, force: boolean?) -> number,
+    add_import: (self: BytecodeAssembler, ...string) -> number,
+    start_function: (self: BytecodeAssembler) -> number,
+    get_proto_id: (self: BytecodeAssembler) -> number,
+    set_max_stack_size: (self: BytecodeAssembler, value: number) -> (),
+    set_num_params: (self: BytecodeAssembler, value: number) -> (),
+    set_num_upvalues: (self: BytecodeAssembler, value: number) -> (),
+    set_is_vararg: (self: BytecodeAssembler, value: boolean) -> (),
+    set_line_defined: (self: BytecodeAssembler, value: number) -> (),
+    set_debug_name: (self: BytecodeAssembler, name: string) -> (),
+    set_main: (self: BytecodeAssembler, proto: number?) -> (),
+    set_flag: (self: BytecodeAssembler, flag: ProtoFlag, value: boolean) -> (),
+    add_constant: (self: BytecodeAssembler, type: ConstantType, value: any, force: boolean?) -> number,
+    add_instruction: (self: BytecodeAssembler, opname_or_code: OpcodeName|number, ...number) -> number,
+    get_offset: (self: BytecodeAssembler) -> number,
+    end_function: (self: BytecodeAssembler) -> number,
+    to_ir: (self: BytecodeAssembler) -> BytecodeChunk,
+    assemble: (self: BytecodeAssembler) -> buffer,
 };
 
-export type BytecodeBuilder = typeof(setmetatable({} :: {
+export type BytecodeAssembler = typeof(setmetatable({} :: {
     _offset: number,
     _chunk: BytecodeChunk,
     _proto: BytecodeProto?,
     _proto_id: number?,
-}, {} :: BytecodeBuilderImpl));
+}, {} :: BytecodeAssemblerImpl));
 
 --[=[
     Internal table representation of a bytecode chunk.
