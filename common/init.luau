@@ -33,6 +33,10 @@ function common.get_table_parts(tbl: {[any]: any})
     };
 end
 
-common.stdlib = require("./src/stdlib");
+function common.unimplemented()
+    error("unimplemented", 2);
+end
+
+common.stdlib = require("@self/stdlib"); 
  
 return common;

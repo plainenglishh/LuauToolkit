@@ -1,13 +1,13 @@
-local misc = require("./src/misc");
-local t = require("./src/typedefs");
+local misc = require("@self/misc");
+local t = require("@self/typedefs");
 
 local bytecode = {};
 
-bytecode.encode = require("./src/encode");
-bytecode.decode = require("./src/decode");
-bytecode.opcodes = require("./src/opcodes");
-bytecode.constants = require("./src/constants");
-bytecode.BytecodeBuilder = require("./src/BytecodeBuilder");
+bytecode.encode = require("@self/encode");
+bytecode.decode = require("@self/decode");
+bytecode.opcodes = require("@self/opcodes");
+bytecode.constants = require("@self/constants");
+bytecode.BytecodeBuilder = require("@self/BytecodeBuilder");
 bytecode.get_opcode_info = misc.get_opcode_info;
 bytecode.encode_import_id = misc.encode_import_id;
 bytecode.decode_import_id = misc.decode_import_id;

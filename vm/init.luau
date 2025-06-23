@@ -1,6 +1,6 @@
 
-local t = require("./src/typedefs");
-local bytecode = require("../bytecode");
+local t = require("@self/typedefs");
+local bytecode = require("./bytecode");
 
 local ERR_START = "\u{001b}[0;1;31m";
 local RESET = "\u{001b}[0m";
@@ -8,7 +8,7 @@ local GREY = "\u{001b}[2m"
 
 local vm = {};
 
-vm.partial = require("./src/partial");
+vm.partial = require("@self/partial");
 
 local function display_instruction(inst: bytecode.BytecodeInstruction)
     local info = bytecode.get_opcode_info(inst.opcode);
