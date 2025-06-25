@@ -7,48 +7,10 @@ local opcodes = require("./opcodes");
 local constants = require("./constants");
 local t = require("./types");
 
---[=[
-    Reinterprets an unsigned integer as a two's complement signed integer.
-]=]
-local function reinterpret_signed(n: number, bitwidth: number): number
-    if n >= 2 ^ (bitwidth - 1)  then
-        return n - 2 ^ bitwidth;
-    else
-        return n;
-    end
-end
 
 local function decode(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bc);
-
-    local function read_instruction(): t.BytecodeInstruction
-        local raw = reader.read_u32();
-        local instruction = {};
-
-        instruction.opcode = bit32.extract(raw, 0, 8);
-        
-        local info = opcodes[instruction.opcode] or error("unknown opcode");
-
-        instruction.operands = {};
-
-        if info.mode == "abc" then
-            instruction.operands.a = bit32.extract(raw, 8, 8);
-            instruction.operands.b = bit32.extract(raw, 16, 8);
-            instruction.operands.c = bit32.extract(raw, 24, 8);
-        elseif info.mode == "ad" then
-            instruction.operands.a = bit32.extract(raw, 8, 8);
-            instruction.operands.d = reinterpret_signed(bit32.extract(raw, 16, 16), 16);
-        elseif info.mode == "e" then
-            instruction.operands.e = reinterpret_signed(bit32.extract(raw, 8, 24), 24);
-        end
-
-        if info.aux then
-            instruction.operands.aux = reader.read_u32();
-        end
-
-        return instruction;
-    end
 
     local function read_constant(): t.BytecodeConstant
         local ktype_id = reader.read_u8();
@@ -204,28 +166,7 @@ local function decode(bc: buffer|string, skip_instructions: boolean?): t.Bytecod
         end
 
         local instruction_count = reader.read_varint();
-       
-        proto.raw_instructions = reader.read_buffer(instruction_count * 4);
-        
-        if not skip_instructions then
-            reader.set_cursor(reader.get_cursor() - instruction_count * 4);
-            proto.instructions = table.create(instruction_count);
-            local skip_next = false;
-            for i = 1, instruction_count do
-                if skip_next then
-                    skip_next = false;
-                    continue;
-                end
-    
-                local insn = read_instruction();
-                table.insert(proto.instructions, insn);
-                
-                if insn.operands.aux then
-                    skip_next = true;
-                end
-            end
-        end
-
+        proto.instructions = reader.read_buffer(instruction_count * 4);
         proto.constants = reader.read_larray(read_constant);
         proto.protos = reader.read_larray(reader.read_varint);
         proto.line_defined = reader.read_varint();

@@ -6,6 +6,7 @@ local bytecode = {};
 bytecode.encode = require("@self/encode");
 bytecode.encode_instructions = require("@self/encode_instructions");
 bytecode.decode = require("@self/decode");
+bytecode.decode_instructions = require("@self/decode_instructions");
 bytecode.opcodes = require("@self/opcodes");
 bytecode.constants = require("@self/constants");
 bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");

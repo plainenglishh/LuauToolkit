@@ -28,6 +28,7 @@ function BytecodeAssembler.new(): t.BytecodeAssembler
         _offset = 0,
         _proto = nil,
         _proto_id = nil,
+        _instructions = {},
         _chunk = {
             luau_version = 6,
             types_version = 1,
@@ -60,6 +61,7 @@ function BytecodeAssembler:start_function()
     end
 
     self._offset = 0;
+    self._instructions = {};
 
     self._proto = {
         num_params = 0,
@@ -68,8 +70,7 @@ function BytecodeAssembler:start_function()
         flags = {},
         max_stack_size = 0,
         constants = {},
-        instructions = {},
-        raw_instructions = nil :: any,
+        instructions = nil :: any, -- populated later
         protos = {},
         debug_name = 0,
         line_defined = 0,
@@ -199,7 +200,7 @@ function BytecodeAssembler:add_instruction(opname_or_code: number|any, ...: numb
         current += 1;
     end
 
-    table.insert(self._proto.instructions, {
+    table.insert(self._instructions, {
         opcode = info.opcode,
         operands = inst_operands,
     });
@@ -218,7 +219,7 @@ function BytecodeAssembler:end_function()
         error("not in a function", 2);
     end
 
-    self._proto.raw_instructions = encode_instructions(self._proto.instructions);
+    self._proto.instructions = encode_instructions(self._instructions);
 
     table.insert(self._chunk.protos, table.clone(self._proto));
     local proto_id = self._proto_id or error("");

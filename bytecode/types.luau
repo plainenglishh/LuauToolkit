@@ -106,6 +106,7 @@ export type BytecodeAssembler = typeof(setmetatable({} :: {
     _chunk: BytecodeChunk,
     _proto: BytecodeProto?,
     _proto_id: number?,
+    _instructions: {BytecodeInstruction},
 }, {} :: BytecodeAssemblerImpl));
 
 
@@ -135,8 +136,7 @@ export type BytecodeProto = {
     is_vararg: boolean,
     flags: {ProtoFlag},
     types: BytecodeProtoTypeInfo?,
-    instructions: {BytecodeInstruction},
-    raw_instructions: buffer,
+    instructions: buffer,
     constants: {BytecodeConstant},
     protos: {number},
     line_defined: number,

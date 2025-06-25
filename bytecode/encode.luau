@@ -117,16 +117,8 @@ local function encode(bytecode_chunk: t.BytecodeChunk): buffer
             writer.write_varint(0);
         end
     
-        local instruction_count = 0;
-        for _, inst in proto.instructions do
-            instruction_count += 1;
-            if inst.operands.aux then
-                instruction_count += 1;
-            end
-        end
-
-        writer.write_varint(instruction_count);
-        writer.write_buffer(encode_instructions(proto.instructions));
+        writer.write_varint(buffer.len(proto.instructions) / 4);
+        writer.write_buffer(proto.instructions);
 
         writer.write_larray(proto.constants, write_constant);
         writer.write_larray(proto.protos, writer.write_varint);
