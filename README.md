@@ -6,9 +6,12 @@
 
 Luau-Toolkit is a pure-luau library for working with luau bytecode.
 
+## Luau Version
+
+The luau version this library targets can be found in `./luau_version`.
+
 ## Modules
 
 - [`bytecode`](./bytecode/) for parsing, manipulating and assembling Luau
   bytecode;
-- [`vm`](./vm/) for executing Luau bytecode;
-- [`common`](./common/) for utilities used across modules.
+- [`vm`](./vm/) Luau virtual machine implementations;

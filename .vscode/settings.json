@@ -8,6 +8,6 @@
     "spellchecker.documentTypes": ["markdown", "latex", "plaintext"],
     "spellchecker.suggestionSeverity": "Error",
     "spellchecker.ignoreWordsList": [
-        "bytecode", "Bytecode", "Lunes"
+        "bytecode", "Bytecode", "plainengish"
     ]
 }
