@@ -3,6 +3,7 @@
 ]]
 
 local encode = require("./encode");
+local encode_instructions = require("./encode_instructions")
 local misc = require("./misc");
 local t = require("./types");
 
@@ -68,6 +69,7 @@ function BytecodeAssembler:start_function()
         max_stack_size = 0,
         constants = {},
         instructions = {},
+        raw_instructions = nil :: any,
         protos = {},
         debug_name = 0,
         line_defined = 0,
@@ -215,6 +217,8 @@ function BytecodeAssembler:end_function()
     if not self._proto then
         error("not in a function", 2);
     end
+
+    self._proto.raw_instructions = encode_instructions(self._proto.instructions);
 
     table.insert(self._chunk.protos, table.clone(self._proto));
     local proto_id = self._proto_id or error("");

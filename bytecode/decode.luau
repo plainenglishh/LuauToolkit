@@ -205,7 +205,7 @@ local function decode(bc: buffer|string, skip_instructions: boolean?): t.Bytecod
 
         local instruction_count = reader.read_varint();
        
-        proto._raw_instructions = reader.read_buffer(instruction_count * 4);
+        proto.raw_instructions = reader.read_buffer(instruction_count * 4);
         
         if not skip_instructions then
             reader.set_cursor(reader.get_cursor() - instruction_count * 4);
@@ -224,7 +224,6 @@ local function decode(bc: buffer|string, skip_instructions: boolean?): t.Bytecod
                     skip_next = true;
                 end
             end
-        else
         end
 
         proto.constants = reader.read_larray(read_constant);

@@ -2,27 +2,35 @@
 
 ## Current State of Security
 
-The luau-toolkit library is a largely untested work-in-progress project. You
-should not use this library where security is of major concern.
+The luau-toolkit library is a largely untested work-in-progress project intended
+for experimental use only. You should not use this library where security is of
+any concern.
 
 ### Bytecode Module
 
-The bytecode module is capable of emitting arbitrary bytecode. Unlike luau
-source code, bytecode can iterate through the VMs registers to access and
-interact with old uncleared objects.
+The `bytecode` module is capable of creating arbitrary bytecode chunks. Unlike
+luau source code, arbitrary bytecode can iterate through the VMs registers to
+access and interact with old uncleared objects.
+
+Furthermore, the `bytecode.decode` function doesn't yet validate a given chunks
+validity. When given invalid data, it can either throw an error or return an
+invalid `BytecodeChunk` object.
 
 ### VM Module
 
-The luau-toolkit VM module is a largely untested work-in-progress and therefore
-cannot guarantee a safe sandbox.
+The `vm` module is a largely untested work-in-progress and therefore cannot
+guarantee a safe sandbox.
 
-When passed securely\* compiled bytecode, the luau-toolkit VMs shouldn't provide
-access to any objects not accessible from the chunks environment table.
+When passed officially\* compiled bytecode, the virtual machines _shouldn't_ be
+able access to any objects not accessible from the given environment table.
 
-\* "securely" in this sense refers to bytecode compiled from the
-`luau-lang/luau` compiler.
+\* Refers to bytecode compiled using the official `luau-lang/luau` compiler.
 
 ## Reporting Security Issues
 
-To report any security issues, message me on Discord @plainengish
-<203958045640884234>.
+Even though I can't guarantee the library is secure, I aim to promptly fix any
+vulnerabilities brought to my attention.
+
+To report security issues, message me on Discord @plainenglish
+<203958045640884234>. Don't hesitate to reach out to report vulnerabilities,
+even if they're seemingly minor, or only effect old/wip versions.

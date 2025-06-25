@@ -5,6 +5,7 @@
 local byteparse = require("./byteparse");
 local opcodes = require("./opcodes");
 local constants = require("./constants");
+local encode_instructions = require("./encode_instructions")
 local t = require("./types");
 
 --[=[
@@ -21,32 +22,8 @@ local function get_constant_type(const_type: t.ConstantType): number
     error(`unknown constant type '{const_type}'`, 2);
 end
 
-local function encode(Bytecodechunk: t.BytecodeChunk): buffer
+local function encode(bytecode_chunk: t.BytecodeChunk): buffer
     local writer = byteparse.writer(100);
-
-    local function write_instruction(inst: t.BytecodeInstruction)
-        local raw = 0;
-        local data = opcodes[inst.opcode];
-
-        raw = bit32.replace(raw, inst.opcode, 0, 8);
-
-        if data.mode == "abc" then
-            raw = bit32.replace(raw, inst.operands.a or 0, 8, 8);
-            raw = bit32.replace(raw, inst.operands.b or 0, 16, 8);
-            raw = bit32.replace(raw, inst.operands.c or 0, 24, 8);
-        elseif data.mode == "ad" then
-            raw = bit32.replace(raw, inst.operands.a or 0, 8, 8);
-            raw = bit32.replace(raw, inst.operands.d or 0, 16, 16);
-        elseif data.mode == "e" then
-            raw = bit32.replace(raw, inst.operands.e or 0, 8, 24);
-        end 
-
-        writer.write_u32(raw);
-
-        if inst.operands.aux then
-            writer.write_u32(inst.operands.aux);
-        end
-    end
 
     local function write_constant(const: t.BytecodeConstant)
         writer.write_u8(get_constant_type(const.type) or error("unknown constant type"));
@@ -149,9 +126,7 @@ local function encode(Bytecodechunk: t.BytecodeChunk): buffer
         end
 
         writer.write_varint(instruction_count);
-        for i, inst in proto.instructions do
-            write_instruction(inst);
-        end
+        writer.write_buffer(encode_instructions(proto.instructions));
 
         writer.write_larray(proto.constants, write_constant);
         writer.write_larray(proto.protos, writer.write_varint);
@@ -184,7 +159,7 @@ local function encode(Bytecodechunk: t.BytecodeChunk): buffer
         writer.write_varint(chunk.main_proto);
     end
 
-    write_chunk(Bytecodechunk);
+    write_chunk(bytecode_chunk);
 
     return writer.to_buffer();
 end

@@ -1,3 +1,9 @@
+local t = {};
+
+----------------------------------------------------------------------------
+--  Constant Types
+----------------------------------------------------------------------------
+
 export type OperandName = "a" | "b" | "c" | "d" | "e" | "aux";
 export type OperandMode = "abc" | "ad" | "e" | "none";
 
@@ -102,8 +108,13 @@ export type BytecodeAssembler = typeof(setmetatable({} :: {
     _proto_id: number?,
 }, {} :: BytecodeAssemblerImpl));
 
+
+----------------------------------------------------------------------------
+--  Table representation
+----------------------------------------------------------------------------
+
 --[=[
-    Internal table representation of a bytecode chunk.
+    Table representation of a bytecode chunk.
 ]=]
 export type BytecodeChunk = {
     luau_version: number,
@@ -115,7 +126,7 @@ export type BytecodeChunk = {
 };
 
 --[=[
-    Internal table representation of a bytecode proto.
+    Table representation of a bytecode proto.
 ]=]
 export type BytecodeProto = {
     max_stack_size: number,
@@ -125,7 +136,7 @@ export type BytecodeProto = {
     flags: {ProtoFlag},
     types: BytecodeProtoTypeInfo?,
     instructions: {BytecodeInstruction},
-    _raw_instructions: buffer?,
+    raw_instructions: buffer,
     constants: {BytecodeConstant},
     protos: {number},
     line_defined: number,
@@ -135,7 +146,7 @@ export type BytecodeProto = {
 };
 
 --[=[
-    Internal table representation of a bytecode instruction.
+    Table representation of a bytecode instruction.
 ]=]
 export type BytecodeInstruction = {
     opcode: number,
@@ -143,7 +154,7 @@ export type BytecodeInstruction = {
 };
 
 --[=[
-    Internal table representation of a bytecode constan
+    Table representation of a bytecode constant.
 ]=]
 export type BytecodeConstant = {
     type: ConstantType,
@@ -151,7 +162,7 @@ export type BytecodeConstant = {
 };
 
 --[=[
-    Internal table representation of a bytecode proto's debug information.
+    Table representation of a bytecode proto's debug information.
 ]=]
 export type BytecodeProtoDebugInfo = {
     locals: {{
@@ -166,7 +177,7 @@ export type BytecodeProtoDebugInfo = {
 };
 
 --[=[
-    Internal table representation of a bytecode proto's type information.
+    Table representation of a bytecode proto's type information.
 ]=]
 export type BytecodeProtoTypeInfo = {
     func: string,
@@ -179,4 +190,34 @@ export type BytecodeProtoTypeInfo = {
     }},
 };
 
-return {};
+
+----------------------------------------------------------------------------
+--  Validation Types
+----------------------------------------------------------------------------
+
+export type ValidationIssueSeverity = "warn" | "error";
+
+export type ValidationIssue = {
+    severity: ValidationIssueSeverity,
+    message: string,
+};
+
+export type ValidationResult = {
+    ok: boolean,
+    issues: {ValidationIssue},
+};
+
+
+----------------------------------------------------------------------------
+--  Misc Types
+----------------------------------------------------------------------------
+
+export type bstring = buffer | string;
+
+export type IntoBytecodeChunk = BytecodeChunk | bstring;
+
+----------------------------------------------------------------------------
+--  Export
+----------------------------------------------------------------------------
+
+return t;
