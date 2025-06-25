@@ -4,6 +4,7 @@ local t = require("@self/types");
 local bytecode = {};
 
 bytecode.encode = require("@self/encode");
+bytecode.encode_instructions = require("@self/encode_instructions");
 bytecode.decode = require("@self/decode");
 bytecode.opcodes = require("@self/opcodes");
 bytecode.constants = require("@self/constants");
