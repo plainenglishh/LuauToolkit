@@ -3,7 +3,8 @@
 ]]
 
 local encode = require("./chunk/encode");
-local instructions = require("./instructions")
+local import_id = require("./import_id");
+local instructions = require("./instructions");
 local misc = require("./misc");
 local t = require("./types");
 
@@ -39,8 +40,6 @@ function BytecodeAssembler.new(): t.BytecodeAssembler
     }, BytecodeAssembler);
 end
 
---// Chunk Methods
-
 function BytecodeAssembler:set_version(version: number)
     self._chunk.luau_version = version;
 end
@@ -52,8 +51,6 @@ end
 function BytecodeAssembler:add_string(str: string, force: boolean?): number
     return add_to(self._chunk.strings, str, force);
 end
-
---// Proto Methods
 
 function BytecodeAssembler:start_function()
     if self._proto then
@@ -84,7 +81,6 @@ end
 function BytecodeAssembler:get_proto_id(): number
     return self._proto_id or error("not in a function", 2);
 end
-
     
 function BytecodeAssembler:add_import(...: string)
     if not self._proto then
@@ -96,9 +92,8 @@ function BytecodeAssembler:add_import(...: string)
         new_path[i] = self:add_constant("string", self:add_string(v));
     end
 
-    return misc.encode_import_id(new_path);
+    return import_id.encode(new_path);
 end
-
 
 function BytecodeAssembler:set_max_stack_size(value: number)
     if not self._proto then
@@ -131,6 +126,7 @@ function BytecodeAssembler:set_is_vararg(value: boolean)
 
     self._proto.is_vararg = value;
 end
+
 function BytecodeAssembler:set_line_defined(value: number)
     if not self._proto then
         error("not in a function", 2);
