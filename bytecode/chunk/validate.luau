@@ -74,7 +74,7 @@ local function validate(chunk: t.IntoBytecodeChunk): t.ValidationResult
         if ok then
             chunk = chunk_or_err;
         else
-            report_issue("error", `failed to decode chunk: {chunk_or_err}`, "this usually means the decoder was fed a non-bytecode buffer, a 'count' varint was too long or a struct had too few fields.");
+            report_issue("error", `error when decoding chunk: {chunk_or_err}`, "this usually means the decoder was fed a non-bytecode buffer, a 'count' varint was too long or a struct had too few fields.");
             return ValidationResult(issues); -- No further diagnostics possible.
         end
     else 
