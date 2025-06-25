@@ -3,10 +3,15 @@
 ]=]
 local constants = {};
 
---- The range of bytecode versions supported by the library.
+--[=[
+    The range of supported bytecode versions. 
+    Encoded as `luau_version` in `BytecodeChunk` objects.
+]=]
 constants.supported_bytecode_versions = { min = 4, max = 6 };
 
---- Map of bytecode constant types.
+--[=[
+    Map of bytecode constant types.
+]=]
 constants.constant_types = {
     [0] = "nil",
     [1] = "boolean",
@@ -18,15 +23,19 @@ constants.constant_types = {
     [7] = "vector",
 };
 
---- Proto bitfield flags.
+--[=[ 
+    Proto bitfield flags.
+]=]
 constants.proto_flag = {
     native_module = bit32.lshift(1, 0),
     native_cold = bit32.lshift(1, 1), 
     native_function = bit32.lshift(1, 2),
 };
 
---- Map of builtin fastcall functions.
-constants.builtins = {
+--[=[
+    Map of builtin fastcall functions.
+]=]
+local builtins: {(...any) -> ...any} = {
     assert,
     math.abs,
     math.acos,
@@ -116,6 +125,7 @@ constants.builtins = {
     vector.min,
     vector.max,
     math.lerp,
-} :: {[number]: (...any) -> (...any)};
+};
+constants.builtins = builtins;
 
 return constants;

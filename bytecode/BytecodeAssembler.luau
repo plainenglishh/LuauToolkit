@@ -17,6 +17,9 @@ local function add_to<T>(tbl: {T}, value: T, force: boolean?): number
     return idx;
 end
 
+--[=[
+    Builder class for generating bytecode chunks.
+]=]
 local BytecodeAssembler = {};
 BytecodeAssembler.__index = BytecodeAssembler;
 
@@ -236,4 +239,4 @@ function BytecodeAssembler:assemble()
     return encode(self:to_ir());
 end
 
-return (BytecodeAssembler :: any) :: t.BytecodeAssemblerImpl;
+return BytecodeAssembler;

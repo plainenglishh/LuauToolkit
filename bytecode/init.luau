@@ -11,15 +11,7 @@ bytecode.instructions = require("@self/instructions");
 bytecode.constants = require("@self/constants");
 bytecode.import_id = require("@self/import_id");
 bytecode.get_opcode_info = misc.get_opcode_info;
-
---[=[
-    Builder class for generating bytecode chunks.
-]=]
 bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");
-
---[=[
-    Array of information about Luau opcodes.
-]=]
 bytecode.opcodes = require("@self/opcodes");
  
 --BEGIN_REEXPORTS

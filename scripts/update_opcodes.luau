@@ -13,6 +13,12 @@ local HEADER = [=[
 local t = require("./types");
 ]=];
 
+local DOC_COMMENT = [==[
+--[=[
+    Array of information about Luau opcodes.
+]=]
+]==];
+
 local BYTECODE_H_URL = "https://raw.githubusercontent.com/luau-lang/luau/refs/heads/master/Common/include/Luau/Bytecode.h";
 
 --[=[
@@ -202,6 +208,7 @@ local function generate(bytecode_h: string): string
         Writes a table containing opcode information.
     ]=]
     local function write_opcodes(opcodes: {Opcode})
+        write(DOC_COMMENT);
         write("local opcodes: {[number]: t.OpcodeInfo} = {\n");
         for i, opcode in opcodes do
             local has_aux = false;
@@ -257,8 +264,8 @@ local function generate(bytecode_h: string): string
 
     write(HEADER.."\n");
     local opcodes = extract_opcodes(bytecode_h);
-    write_opcode_name_type(opcodes);
     write_opcodes(opcodes)
+    write_opcode_name_type(opcodes);
     write("return opcodes;\n");
 
     --[[local opcode_grammar = "Paste the following line in lasm.tmLanguage.json:\n\n\\\\b(";
