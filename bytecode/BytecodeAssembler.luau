@@ -2,8 +2,8 @@
     This file contains the implementation for the `BytecodeAssembler` class.
 ]]
 
-local encode = require("./encode");
-local encode_instructions = require("./encode_instructions")
+local encode = require("./chunk/encode");
+local instructions = require("./instructions")
 local misc = require("./misc");
 local t = require("./types");
 
@@ -219,7 +219,7 @@ function BytecodeAssembler:end_function()
         error("not in a function", 2);
     end
 
-    self._proto.instructions = encode_instructions(self._instructions);
+    self._proto.instructions = instructions.encode(self._instructions);
 
     table.insert(self._chunk.protos, table.clone(self._proto));
     local proto_id = self._proto_id or error("");

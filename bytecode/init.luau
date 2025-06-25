@@ -3,10 +3,8 @@ local t = require("@self/types");
 
 local bytecode = {};
 
-bytecode.encode = require("@self/encode");
-bytecode.encode_instructions = require("@self/encode_instructions");
-bytecode.decode = require("@self/decode");
-bytecode.decode_instructions = require("@self/decode_instructions");
+bytecode.chunk = require("@self/chunk");
+bytecode.instructions = require("@self/instructions");
 bytecode.opcodes = require("@self/opcodes");
 bytecode.constants = require("@self/constants");
 bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");

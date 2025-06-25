@@ -2,11 +2,9 @@
     This file contains the function used to encode a bytecode chunk.
 ]]
 
-local byteparse = require("./byteparse");
-local opcodes = require("./opcodes");
-local constants = require("./constants");
-local encode_instructions = require("./encode_instructions")
-local t = require("./types");
+local byteparse = require("../byteparse");
+local constants = require("../constants");
+local t = require("../types");
 
 --[=[
     Returns a constant type id from a constant type name.

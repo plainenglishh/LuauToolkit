@@ -4,7 +4,7 @@
 
 local common = require("../common");
 local constants = require("./constants")
-local decode = require("./decode")
+local decode = require("./chunk/decode")
 local t = require("./types");
 
 local function into_bytecodechuck(chunk: t.IntoBytecodeChunk): t.BytecodeChunk

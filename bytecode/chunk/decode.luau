@@ -2,11 +2,9 @@
     This file contains the function used to decode a bytecode chunk.
 ]]
 
-local byteparse = require("./byteparse");
-local opcodes = require("./opcodes");
-local constants = require("./constants");
-local t = require("./types");
-
+local byteparse = require("../byteparse");
+local constants = require("../constants");
+local t = require("../types");
 
 local function decode(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
