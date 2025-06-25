@@ -21,6 +21,7 @@ The library is split into _mostly_ separate modules:
 | [`bytecode`](./bytecode/) | Functions and constants for working with Luau bytecode. | None             | Work in Progress   |
 | [`vm`](./vm/)             | Luau virtual machine/interpreter implementations.       | `bytecode`       | Work in Progress   |
 | [`lexer`](./lexer/)       | Luau source code lexer.                                 |                  | Planned            |
+| [`misc`](./misc/)         | Miscellaneous luau related items.                       | None             | Work in Progress   |
 | `parser`                  |                                                         |                  | In Consideration\* |
 | `compiler`                | (Unlikely)                                              |                  | In Consideration\* |
 
