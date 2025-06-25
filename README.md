@@ -16,14 +16,14 @@ file.
 
 The library is split into _mostly_ separate modules:
 
-| Name                      | Contents                                                | Dependencies\*\* | State              |
-| ------------------------- | ------------------------------------------------------- | ---------------- | ------------------ |
-| [`bytecode`](./bytecode/) | Functions and constants for working with Luau bytecode. | None             | Work in Progress   |
-| [`vm`](./vm/)             | Luau virtual machine/interpreter implementations.       | `bytecode`       | Work in Progress   |
-| [`lexer`](./lexer/)       | Luau source code lexer.                                 |                  | Planned            |
-| [`misc`](./misc/)         | Miscellaneous luau related items.                       | None             | Work in Progress   |
-| `parser`                  |                                                         |                  | In Consideration\* |
-| `compiler`                | (Unlikely)                                              |                  | In Consideration\* |
+| Name                      | Description                                                        | Dependencies\*\* |
+| ------------------------- | ------------------------------------------------------------------ | ---------------- |
+| [`bytecode`](./bytecode/) | **\[WIP]** Functions and constants for working with Luau bytecode. | None             |
+| [`vm`](./vm/)             | **\[WIP]** Luau virtual machine/interpreter implementations.       | `bytecode`       |
+| [`lexer`](./lexer/)       | **\[WIP]** Luau source code lexer.                                 |                  |
+| `parser`                  | **\[Not Started]** Luau source code parser.                        |                  |
+| `compiler`                | **\[Not Started/Unlikely]** Simple Luau compiler.                  |                  |
+| [`misc`](./misc/)         | **\[WIP]** Miscellaneous luau related items.                       | None             |
 
 \* In Consideration = Not for a _long_ time, if ever.
 
