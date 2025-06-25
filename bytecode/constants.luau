@@ -5,7 +5,7 @@
 local constants = {};
 
 --- The range of bytecode versions supported by the library.
-constants.supported = { min = 4, max = 6 };
+constants.supported_bytecode_versions = { min = 4, max = 6 };
 
 --- Map of bytecode constant types.
 constants.constant_types = {
