@@ -20,7 +20,13 @@ local function get_constant_type(const_type: t.ConstantType): number
     error(`unknown constant type '{const_type}'`, 2);
 end
 
-local function encode(bytecode_chunk: t.BytecodeChunk): buffer
+--[=[
+    Encodes a BytecodeChunk to a buffer.
+
+    NOTE: This function intentionally does **not** check for validity. 
+          Run `bytecode.chunk.validate` beforehand if this is desired.
+]=]
+local function encode(chunk: t.BytecodeChunk): buffer
     local writer = byteparse.writer(100);
 
     local function write_constant(const: t.BytecodeConstant)
@@ -149,7 +155,7 @@ local function encode(bytecode_chunk: t.BytecodeChunk): buffer
         writer.write_varint(chunk.main_proto);
     end
 
-    write_chunk(bytecode_chunk);
+    write_chunk(chunk);
 
     return writer.to_buffer();
 end

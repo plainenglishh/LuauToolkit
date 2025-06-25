@@ -6,7 +6,13 @@ local byteparse = require("../byteparse");
 local constants = require("../constants");
 local t = require("../types");
 
-local function decode(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
+--[=[
+    Decodes a bytecode chunk into a `BytecodeChunk` object.
+
+    NOTE: This function intentionally does **not** check for validity. 
+          Run `bytecode.chunk.validate` beforehand if this is desired.
+]=]
+local function decode(bc: t.bstring): t.BytecodeChunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bc);
 
