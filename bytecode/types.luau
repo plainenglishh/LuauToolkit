@@ -200,6 +200,7 @@ export type ValidationIssueSeverity = "warn" | "error";
 export type ValidationIssue = {
     severity: ValidationIssueSeverity,
     message: string,
+    note: string?,
 };
 
 export type ValidationResult = {
