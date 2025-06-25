@@ -7,7 +7,10 @@
     "spellchecker.checkInterval": 0,
     "spellchecker.documentTypes": ["markdown", "latex", "plaintext"],
     "spellchecker.suggestionSeverity": "Error",
-    "spellchecker.ignoreWordsList": [
-        "bytecode", "Bytecode", "plainengish"
+    "spellchecker.ignoreRegExp": [
+        "(?i)bytecode",
+
+        // LICENCE.md
+        "(?i)plainenglish", "sublicense", "MERCHANTABILITY", "NONINFRINGEMENT"
     ]
 }
