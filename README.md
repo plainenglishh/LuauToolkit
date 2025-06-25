@@ -19,10 +19,10 @@ The library is split into _mostly_ separate modules:
 | Name                      | Contents                                                | Dependencies\*\* | State              |
 | ------------------------- | ------------------------------------------------------- | ---------------- | ------------------ |
 | [`bytecode`](./bytecode/) | Functions and constants for working with Luau bytecode. | None             | Work in Progress   |
-| [`vm`](./vm/)             | Luau virtual machine implementation                     | `bytecode`       | Work in Progress   |
-| [`lexer`](./lexer/)       |                                                         |                  | Planned            |
+| [`vm`](./vm/)             | Luau virtual machine/interpreter implementations.       | `bytecode`       | Work in Progress   |
+| [`lexer`](./lexer/)       | Luau source code lexer.                                 |                  | Planned            |
 | `parser`                  |                                                         |                  | In Consideration\* |
-| `compiler`                |                                                         |                  | In Consideration\* |
+| `compiler`                | (Unlikely)                                              |                  | In Consideration\* |
 
 \* In Consideration = Not for a _long_ time, if ever.
 

@@ -1,5 +1,5 @@
 --[=[
-    Library for tokenising Luau source code.
+    Library for lexing Luau source code.
 ]=]
 local lexer = {};
 
