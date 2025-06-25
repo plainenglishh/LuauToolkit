@@ -36,7 +36,5 @@ end
 function common.unimplemented()
     error("unimplemented", 2);
 end
-
-common.stdlib = require("@self/stdlib"); 
  
 return common;

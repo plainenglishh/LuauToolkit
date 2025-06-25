@@ -1,5 +1,7 @@
 local bytecode = require("../bytecode");
 local common = require("../common");
+local stdlib = require("./stdlib");
+local builtins = bytecode.constants.builtins;
 
 type Closure = (...any) -> (...any);
 type Environment = {[any]: any};
@@ -83,7 +85,7 @@ local function PATCH_INSN_E(insn: number, e: number?): number
 end
 
 local function fastcall(id: number, ...: any): ...any
-    return bytecode.constants.builtins[id](...);
+    return builtins[id](...);
 end
 
 local function create_upvalue(val: any, type: "ref"|"val"): Upvalue
@@ -108,7 +110,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
     
     local chunk = if type(chunk) ~= "table" then bytecode.decode(chunk, true) else chunk;
     local options: LoadOptions = options or {
-        globals = common.stdlib,
+        globals = stdlib,
     };
     local debug_prints = options.debug_prints or false;
 

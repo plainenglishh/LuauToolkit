@@ -1,3 +1,7 @@
+--[[
+    This file contains the implementation for the `BytecodeAssembler` class.
+]]
+
 local encode = require("./encode");
 local misc = require("./misc");
 local t = require("./typedefs");

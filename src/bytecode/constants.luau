@@ -20,8 +20,6 @@ constants.proto_flag = {
     native_function = bit32.lshift(1, 2),
 };
 
-local vector: any = if type(vector) == "table" then vector else {};
-
 constants.builtins = {
     assert,
     math.abs,
@@ -76,7 +74,7 @@ constants.builtins = {
     rawequal,
     table.insert,
     table.unpack,
-    vector,
+    vector.create,
     bit32.countlz,
     bit32.countrz,
     select,
@@ -111,7 +109,7 @@ constants.builtins = {
     vector.clamp,
     vector.min,
     vector.max,
-    (math :: any).lerp
-} :: {any};
+    math.lerp,
+} :: {[number]: (...any) -> (...any)};
 
 return constants;

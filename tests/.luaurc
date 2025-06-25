@@ -1,0 +1,6 @@
+{
+    "languageMode": "strict",
+    "aliases": {
+        "test": "./testing_api.luau"
+    }
+}

@@ -1,5 +1,5 @@
 --[[
-    plainenglishh/byteparse v1.2.1
+    plainenglishh/byteparse v1.3.1
    
     Pure-luau library for serialising and deserialising binary formats.
 ]]
@@ -33,7 +33,7 @@
 --!strict
 --!nolint LocalShadow
 
-local _BYTEPARSE_VERSION = "v1.2.1";
+local _BYTEPARSE_VERSION = "v1.3.1";
 
 export type u8 = number;
 export type u16 = number;
@@ -45,10 +45,9 @@ export type f32 = number;
 export type f64 = number;
 export type varint = number;
 
-export type Endianness = "le" | "be";
+export type Endianness = "le" | "be"; -- TODO!
 
-export type Serialisable = boolean | number | string | buffer | vector | nil | SerialisableArray | SerialisableTable;
-export type SerialisableArray = {Serialisable};
+export type Serialisable = boolean | number | string | buffer | vector | nil | SerialisableTable;
 export type SerialisableTable = {[Serialisable]: Serialisable};
 
 export type DataType = "u8" | "i8" | "u16" | "i16" | "u32" | "i32" | "f32" | "f64";
@@ -92,7 +91,7 @@ local error_mt = {
     end,
 };
 
-local function BPError(reason: string, message: string)
+local function Error(reason: string, message: string)
     return setmetatable({ reason = reason, message = message, }, error_mt);
 end
 
@@ -169,7 +168,7 @@ end
     @return string
 ]=]
 function byteparse.trim_zstring(str: string): string
-    return string.gsub(str, "%z.+$", "");
+    return (string.gsub(str, "%z.+$", ""));
 end
 
 
@@ -193,7 +192,7 @@ end
     Creates a new buffer from a hexadecimal string, ignoring any characters that
     aren't [0-9A-Fa-f].
 ]=]
-function byteparse.buffer_from_hex(hex: string)
+function byteparse.buffer_from_hex(hex: string): buffer
     local hex = string.gsub(hex, "%W", "");
     local writer = byteparse.writer(0);
     
@@ -345,7 +344,7 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
     ]=]
     function writer.set_default_vector_size(vec_size: number)
         if vec_size ~= 3 and vec_size ~= 4 then
-            error(BPError("InvalidVecSize", `expected either 3 or 4, got {vec_size}`), 2);
+            error(Error("InvalidVecSize", `expected either 3 or 4, got {vec_size}`), 2);
         end
 
         default_vector_size = vec_size;
@@ -588,7 +587,7 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
 
         @param ... B... -- Additional parameters to pass to the writer_callback.
     ]=]
-    function writer.write_array<T, B...>(value: {T}, writer_callback: (T) -> (), ...: B...)
+    function writer.write_array<T, B...>(value: {T}, writer_callback: (T, B...) -> (), ...: B...)
         for _, v in value do
             writer_callback(v, ...);
         end
@@ -601,7 +600,7 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
 
         @param ... B... -- Additional parameters to pass to the writer_callback.
     ]=]
-    function writer.write_larray<T, B...>(value: {T}, writer_callback: (T) -> (), ...: B...)
+    function writer.write_larray<T, B...>(value: {T}, writer_callback: (T, B...) -> (), ...: B...)
         writer.write_varint(#value);
         writer.write_array(value, writer_callback, ...);
     end
@@ -614,7 +613,7 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
 
         @param ... B... -- Additional parameters to pass to the writer_callback.
     ]=]
-    function writer.write_zarray<T, B...>(value: {T}, writer_callback: (T) -> (), ...: B...)
+    function writer.write_zarray<T, B...>(value: {T}, writer_callback: (T, B...) -> (), ...: B...)
         writer.write_array(value, writer_callback, ...);
         writer.write_null();
     end
@@ -676,7 +675,7 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
         elseif type(value) == "number" then
             writer.write_u8(TYPE_IDS.NUMBER);
             writer.write_f64(value);
-        elseif type(value) == "vector" or (type(value) == "table" and getmetatable(value) and getmetatable(value).__type == "vector") then
+        elseif type(value) == "vector" then
             writer.write_u8(TYPE_IDS.VECTOR);
             writer.write_vector(value :: any);
         elseif type(value) == "string" then
@@ -688,6 +687,8 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
         elseif type(value) == "table" then
             writer.write_u8(TYPE_IDS.TABLE);
             writer.write_table(value);
+        else
+            error(Error("Unserialisable", `can't serialise value of type {type(value)}`));
         end
     end
 
@@ -703,7 +704,7 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
         writer.write_optional(nil, writer.write_u8); -- Writes `00`
         ```
     ]=]
-    function writer.write_optional<T, B...>(value: T?, writer_callback: (T) -> (), ...: B...)
+    function writer.write_optional<T, B...>(value: T?, writer_callback: (T, B...) -> (), ...: B...)
         writer.write_bool(value ~= nil);
         if value ~= nil then
             writer_callback(value, ...);
@@ -768,7 +769,7 @@ function byteparse.reader(b: buffer)
     ]=]
     function reader.set_default_vector_size(vec_size: number)
         if vec_size ~= 3 and vec_size ~= 4 then
-            error(BPError("InvalidVecSize", `expected either 3 or 4, got {vec_size}`), 2);
+            error(Error("InvalidVecSize", `expected either 3 or 4, got {vec_size}`), 2);
         end
 
         default_vector_size = vec_size;
@@ -1033,7 +1034,7 @@ function byteparse.reader(b: buffer)
         
         if (vector_size or default_vector_size) == 4 then
             local w = reader.read_f32();
-            return (vector.create :: any)(x, y, z, w);
+            return (vector.create :: any)(x, y, z, w) :: vector;
         end
 
         return vector.create(x, y, z);
@@ -1093,7 +1094,7 @@ function byteparse.reader(b: buffer)
             return reader.read_table();
         end
 
-        error(BPError("InvalidTypeID", `got invalid type id {type_id}`));
+        error(Error("InvalidTypeID", `got invalid type id {type_id}`));
     end
 
     --[=[
@@ -1115,7 +1116,7 @@ function byteparse.reader(b: buffer)
             return reader_callback(...);
         end
 
-        return;
+        return nil;
     end
 
     return reader;

@@ -1,4 +1,8 @@
-local stdlib = {
+--[[
+    This file contains the Luau standard library as a dictionary.
+]]
+
+return {
     assert = assert,
     error = error,
     gcinfo = gcinfo,
@@ -32,5 +36,3 @@ local stdlib = {
     buffer = buffer,
     vector = vector,
 };
-
-return stdlib;

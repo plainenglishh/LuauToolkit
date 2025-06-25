@@ -12,6 +12,6 @@ The luau version this library targets can be found in `./luau_version`.
 
 ## Modules
 
-- [`bytecode`](./bytecode/) for parsing, manipulating and assembling Luau
+- [`bytecode`](./src/bytecode/) for parsing, manipulating and assembling Luau
   bytecode;
-- [`vm`](./vm/) Luau virtual machine implementations;
+- [`vm`](./src/vm/) Luau virtual machine implementations;

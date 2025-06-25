@@ -2,3 +2,4 @@
 
 - [ ] Bytecode Tests
 - [ ] Rework VM
+- [ ] VM Tests
