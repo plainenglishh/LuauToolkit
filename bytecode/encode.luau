@@ -1,14 +1,27 @@
 --[[
-    Encodes a bytecode chunk
+    This file contains the function used to encode a bytecode chunk.
 ]]
 
 local byteparse = require("./byteparse");
 local opcodes = require("./opcodes");
-local common = require("./common");
 local constants = require("./constants");
-local t = require("./typedefs");
+local t = require("./types");
 
-return function(Bytecodechunk: t.BytecodeChunk): buffer
+--[=[
+    Returns a constant type id from a constant type name.
+    Errors if given an invalid constant type.
+]=]
+local function get_constant_type(const_type: t.ConstantType): number
+    for i, v in constants.constant_types do
+        if v == const_type then
+            return i;
+        end
+    end
+
+    error(`unknown constant type '{const_type}'`, 2);
+end
+
+local function encode(Bytecodechunk: t.BytecodeChunk): buffer
     local writer = byteparse.writer(100);
 
     local function write_instruction(inst: t.BytecodeInstruction)
@@ -36,7 +49,7 @@ return function(Bytecodechunk: t.BytecodeChunk): buffer
     end
 
     local function write_constant(const: t.BytecodeConstant)
-        writer.write_u8(common.find_from_0(constants.constant_types, const.type) or error("unknown constant type"));
+        writer.write_u8(get_constant_type(const.type) or error("unknown constant type"));
 
         if const.type == "nil" then
         elseif const.type == "boolean" then
@@ -175,3 +188,5 @@ return function(Bytecodechunk: t.BytecodeChunk): buffer
 
     return writer.to_buffer();
 end
+
+return encode;

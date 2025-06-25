@@ -4,7 +4,7 @@
 
 local encode = require("./encode");
 local misc = require("./misc");
-local t = require("./typedefs");
+local t = require("./types");
 
 local function add_to<T>(tbl: {T}, value: T, force: boolean?): number
     if force then

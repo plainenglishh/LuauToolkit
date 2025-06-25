@@ -1,5 +1,5 @@
 local misc = require("@self/misc");
-local t = require("@self/typedefs");
+local t = require("@self/types");
 
 local bytecode = {};
 

@@ -9,7 +9,7 @@ local net = require("@lune/net");
 local fs = require("@lune/fs");
  
 local HEADER = [=[
-local t = require("./typedefs");
+local t = require("./types");
 ]=];
 
 local BYTECODE_H_URL = "https://raw.githubusercontent.com/luau-lang/luau/refs/heads/master/Common/include/Luau/Bytecode.h";

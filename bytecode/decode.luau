@@ -1,22 +1,24 @@
 --[[
-    Decodes a bytecode chunk
+    This file contains the function used to decode a bytecode chunk.
 ]]
 
 local byteparse = require("./byteparse");
 local opcodes = require("./opcodes");
 local constants = require("./constants");
-local t = require("./typedefs");
+local t = require("./types");
 
-local function unsigned_to_signed(n: number, size: number)    
-    local negative = bit32.extract(n, 1) == 1;
-    if negative then
-        return n - 2^size;
+--[=[
+    Reinterprets an unsigned integer as a two's complement signed integer.
+]=]
+local function reinterpret_signed(n: number, bitwidth: number): number
+    if n >= 2 ^ (bitwidth - 1)  then
+        return n - 2 ^ bitwidth;
     else
         return n;
     end
 end
 
-return function(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
+local function decode(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bc);
 
@@ -36,9 +38,9 @@ return function(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
             instruction.operands.c = bit32.extract(raw, 24, 8);
         elseif info.mode == "ad" then
             instruction.operands.a = bit32.extract(raw, 8, 8);
-            instruction.operands.d = unsigned_to_signed(bit32.extract(raw, 16, 16), 16);
+            instruction.operands.d = reinterpret_signed(bit32.extract(raw, 16, 16), 16);
         elseif info.mode == "e" then
-            instruction.operands.e = unsigned_to_signed(bit32.extract(raw, 8, 24), 24);
+            instruction.operands.e = reinterpret_signed(bit32.extract(raw, 8, 24), 24);
         end
 
         if info.aux then
@@ -270,3 +272,5 @@ return function(bc: buffer|string, skip_instructions: boolean?): t.BytecodeChunk
 
     return read_chunk();
 end
+
+return decode;

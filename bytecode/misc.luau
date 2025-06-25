@@ -2,7 +2,7 @@
     Miscellaneous utility functions for interacting with bytecode.
 ]]
 
-local t = require("./typedefs");
+local t = require("./types");
 local opcodes = require("./opcodes");
 
 local misc = {};

@@ -1,5 +1,5 @@
 
-local t = require("@self/typedefs");
+local t = require("@self/types");
 local bytecode = require("./bytecode");
 
 local ERR_START = "\u{001b}[0;1;31m";

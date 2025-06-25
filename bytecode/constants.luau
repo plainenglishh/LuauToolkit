@@ -1,8 +1,13 @@
+--[[
+    This file contains bytecode related constants.
+]]
+
 local constants = {};
 
-constants.min_version = 4;
-constants.max_version = 6;
+--- The range of bytecode versions supported by the library.
+constants.supported = { min = 4, max = 6 };
 
+--- Map of bytecode constant types.
 constants.constant_types = {
     [0] = "nil",
     [1] = "boolean",
@@ -14,12 +19,14 @@ constants.constant_types = {
     [7] = "vector",
 };
 
+--- Proto bitfield flags.
 constants.proto_flag = {
     native_module = bit32.lshift(1, 0),
     native_cold = bit32.lshift(1, 1), 
     native_function = bit32.lshift(1, 2),
 };
 
+--- Map of builtin fastcall functions.
 constants.builtins = {
     assert,
     math.abs,
