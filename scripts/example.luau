@@ -12,6 +12,6 @@ if not fs.isFile(example_path) then
     error(`unknown example '{example}'`);
 end
 
-process.spawn("lune", {"run", example_path}, {
+process.exec("lune", {"run", example_path}, {
     stdio = "forward",
 });
