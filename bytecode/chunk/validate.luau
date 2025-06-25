@@ -1,11 +1,5 @@
---[[
-    This file contains the function used to validate a bytecode chunk.
-
-    This file will have LONGG lines, I apologise.
-]]
-
-local constants = require("../constants")
-local decode = require("./decode")
+local constants = require("../constants");
+local decode = require("./decode");
 local t = require("../types");
 
 local luau_versions = constants.supported_bytecode_versions;
@@ -56,6 +50,9 @@ local function validate_chunk(chunk: t.BytecodeChunk, report_issue: ReportIssueF
     end
 end
 
+--[=[
+    Checks a given bytecode chunk for issues.
+]=]
 local function validate(chunk: t.IntoBytecodeChunk): t.ValidationResult        
     local issues = {};
 

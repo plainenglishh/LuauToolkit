@@ -1,7 +1,15 @@
+--[=[
+    Library for encoding and decoding bytecode import IDs.
+]=]
 local import_id = {};
 
+--[=[
+    Encodes an import_id from an array of up to three string_id path members.
+]=]
 function import_id.encode(path: {number}): number
     local count = #path;
+    assert(count <= 3, "too many path members");
+
     local id0 = path[1] or 0;
     local id1 = path[2] or 0;
     local id2 = path[3] or 0;
@@ -15,6 +23,9 @@ function import_id.encode(path: {number}): number
     return id;
 end
 
+--[=[
+    Decodes an import_id into an array of up to three string_id path members.
+]=]
 function import_id.decode(id: number): {number}
     local count = bit32.rshift(id, 30);
     local id0 = bit32.band(bit32.rshift(id, 20), 1023);
@@ -28,7 +39,7 @@ function import_id.decode(id: number): {number}
     elseif count == 3 then
         return {id0, id1, id2};
     else
-        error("invalid count");
+        error("too many path members");
     end
 end
 

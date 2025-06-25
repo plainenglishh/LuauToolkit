@@ -1,10 +1,11 @@
---[[
-    This file contains the function used to encode an array of bytecode instructions.
-]]
-
 local byteparse = require("./byteparse");
 local opcodes = require("./opcodes");
 local t = require("./types");
+
+--[=[
+    Library for encoding and decoding Luau bytecode instructions.
+]=]
+local instructions = {};
 
 --[=[
     Reinterprets an unsigned integer as a two's complement signed integer.
@@ -16,8 +17,6 @@ local function reinterpret_signed(n: number, bitwidth: number): number
         return n;
     end
 end
-
-local instructions = {};
 
 function instructions.decode(raw_instructions: buffer): {t.BytecodeInstruction}
     local reader = byteparse.reader(raw_instructions);

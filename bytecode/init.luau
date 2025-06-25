@@ -1,15 +1,26 @@
 local misc = require("@self/misc");
 local t = require("@self/types");
 
+--[=[
+    Library for working with Luau bytecode.
+]=]
 local bytecode = {};
 
 bytecode.chunk = require("@self/chunk");
 bytecode.instructions = require("@self/instructions");
-bytecode.opcodes = require("@self/opcodes");
 bytecode.constants = require("@self/constants");
-bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");
 bytecode.import_id = require("@self/import_id");
 bytecode.get_opcode_info = misc.get_opcode_info;
+
+--[=[
+    Builder class for generating bytecode chunks.
+]=]
+bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");
+
+--[=[
+    Array of information about Luau opcodes.
+]=]
+bytecode.opcodes = require("@self/opcodes");
  
 --BEGIN_REEXPORTS
 export type OperandName = t.OperandName;

@@ -1,7 +1,6 @@
---[[
-    This file contains bytecode related constants.
-]]
-
+--[=[
+    Various bytecode related constants.
+]=]
 local constants = {};
 
 --- The range of bytecode versions supported by the library.

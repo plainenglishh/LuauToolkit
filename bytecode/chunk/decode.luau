@@ -1,7 +1,3 @@
---[[
-    This file contains the function used to decode a bytecode chunk.
-]]
-
 local byteparse = require("../byteparse");
 local constants = require("../constants");
 local t = require("../types");

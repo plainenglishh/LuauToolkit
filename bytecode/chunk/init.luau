@@ -1,3 +1,6 @@
+--[=[
+    Library for encoding, decoding and validating Luau bytecode chunks.
+]=]
 local chunk = {};
 
 chunk.encode = require("@self/encode");

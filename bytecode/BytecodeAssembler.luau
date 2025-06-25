@@ -1,7 +1,3 @@
---[[
-    This file contains the implementation for the `BytecodeAssembler` class.
-]]
-
 local encode = require("./chunk/encode");
 local import_id = require("./import_id");
 local instructions = require("./instructions");

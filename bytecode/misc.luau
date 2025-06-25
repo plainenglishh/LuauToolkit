@@ -1,9 +1,3 @@
---[[
-    Miscellaneous utility functions for interacting with bytecode.
-
-    Functions are either exposed a the module top-level, or used internally.
-]]
-
 local t = require("./types");
 local opcodes = require("./opcodes");
 
