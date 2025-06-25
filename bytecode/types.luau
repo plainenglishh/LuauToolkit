@@ -5,10 +5,9 @@ local t = {};
 ----------------------------------------------------------------------------
 
 export type OperandName = "a" | "b" | "c" | "d" | "e" | "aux";
-export type OperandMode = "abc" | "ad" | "e" | "none";
 
 --[=[
-    The type of an operand.
+    The 'type' of an operand.
 ]=]
 export type OperandType = "register" | "jump_offset" | "constant" | "proto" | "number"; 
 
@@ -16,21 +15,64 @@ export type OperandType = "register" | "jump_offset" | "constant" | "proto" | "n
     Metadata about an instruction operand.
 ]=]
 export type OperandInfo = {
+    --[=[
+        The name of the operand.
+    ]=]
     name: string,
+
+    --[=[
+        What types the operand can be.
+    ]=]
     type: {OperandType},
+    
+    --[=[
+        A description of what the operand does.
+    ]=]
     description: string,
 };
+
+--[=[
+    How the operands are encoded for an opcode.
+]=]
+export type OperandMode = "abc" | "ad" | "e" | "none";
 
 --[=[
     Metadata about a bytecode instruction.
 ]=]
 export type OpcodeInfo = {
+    --[=[
+        The name of the opcode.
+    ]=]
     name: string,
+
+    --[=[
+        The opcode number.
+    ]=]
     opcode: number,
+
+    --[=[
+        The opcode's operand encoding mode.
+    ]=]
     mode: OperandMode,
+
+    --[=[
+        Whether the opcode has an auxillary instruction.
+    ]=]
     aux: boolean,
+
+    --[=[
+        A description of what the opcode does.
+    ]=]
     description: string,
+
+    --[=[
+        An array of operands used by the instruction.
+    ]=]
     operands: {OperandInfo},
+
+    --[=[
+        How many `u32`s the opcode takes up. (`if aux then 2 else 1`)
+    ]=]
     size: number,
 };
 
@@ -115,6 +157,19 @@ export type BytecodeAssembler = typeof(setmetatable({} :: {
 ----------------------------------------------------------------------------
 
 --[=[
+    Zero-indexed number referring to a proto.
+    
+    Remember to add 1 when indexing Luau's one-indexed arrays.
+]=]
+export type ProtoId = number;
+
+--[=[
+    One-indexed number referring to a string table entry.
+    A StringId of zero usually refers to an absent value.
+]=]
+export type StringId = number;
+
+--[=[
     Table representation of a bytecode chunk.
 ]=]
 export type BytecodeChunk = {
@@ -123,7 +178,7 @@ export type BytecodeChunk = {
     strings: {string},
     userdata_types: {number}?,
     protos: {BytecodeProto},
-    main_proto: number,
+    main_proto: ProtoId,
 };
 
 --[=[
@@ -138,9 +193,9 @@ export type BytecodeProto = {
     types: BytecodeProtoTypeInfo?,
     instructions: buffer,
     constants: {BytecodeConstant},
-    protos: {number},
+    protos: {ProtoId},
     line_defined: number,
-    debug_name: number,
+    debug_name: StringId,
     line_info: buffer?,
     debug_info: BytecodeProtoDebugInfo?,
 };

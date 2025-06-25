@@ -64,7 +64,7 @@ local function validate(chunk: t.IntoBytecodeChunk): t.ValidationResult
         });
     end
    
-    report_issue("warn", "bytecode.validate is incomplete"); --common.unimplemented();
+    report_issue("warn", "`bytecode.validate` is incomplete", "do not take a lack of issues to mean a bytecode chunk is safe."); --common.unimplemented();
 
     local maybechunk = chunk;
     local chunk;
@@ -74,7 +74,7 @@ local function validate(chunk: t.IntoBytecodeChunk): t.ValidationResult
         if ok then
             chunk = chunk_or_err;
         else
-            report_issue("error", `failed to decode chunk: {chunk_or_err}`, "this usually means the decoder was fed a non-bytecode buffer, or a 'count' varint was invalid somewhere.");
+            report_issue("error", `failed to decode chunk: {chunk_or_err}`, "this usually means the decoder was fed a non-bytecode buffer, a 'count' varint was too long or a struct had too few fields.");
             return ValidationResult(issues); -- No further diagnostics possible.
         end
     else 
