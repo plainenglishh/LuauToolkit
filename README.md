@@ -29,3 +29,13 @@ The library is split into _mostly_ separate modules:
 
 \*\* There is an additional hidden `common` module that contains shared items.
 It should be assumed that all modules depend on this.
+
+### Using Modules
+
+To use a module, require it like so:
+
+```luau
+-- Assuming @luau_toolkit is aliased to the library root.
+local bytecode = require("@luau_toolkit/bytecode");
+...
+```
