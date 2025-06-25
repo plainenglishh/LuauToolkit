@@ -13,6 +13,7 @@ The luau version this library targets can be found in
 
 ## Modules
 
-- [`bytecode`](./bytecode/) for parsing, manipulating and assembling Luau
-  bytecode;
-- [`vm`](./vm/) Luau virtual machine implementations;
+| Name                      | Contents                                                |
+| ------------------------- | ------------------------------------------------------- |
+| [`bytecode`](./bytecode/) | Functions and constants for working with Luau bytecode. |
+| [`vm`](./vm/)             | Luau virtual machine implementation                     |
