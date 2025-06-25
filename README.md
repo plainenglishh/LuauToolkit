@@ -8,7 +8,7 @@ Luau-Toolkit is a pure-luau library for working with luau bytecode.
 
 ## Luau Version
 
-The luau version this library targets can be found in `./luau_version`.
+The luau version this library targets can be found in `./.luau_version`.
 
 ## Modules
 
