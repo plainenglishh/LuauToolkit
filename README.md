@@ -13,7 +13,10 @@ The luau version this library targets can be found in
 
 ## Modules
 
-| Name                      | Contents                                                |
-| ------------------------- | ------------------------------------------------------- |
-| [`bytecode`](./bytecode/) | Functions and constants for working with Luau bytecode. |
-| [`vm`](./vm/)             | Luau virtual machine implementation                     |
+| Name                      | Contents                                                | State            |
+| ------------------------- | ------------------------------------------------------- | ---------------- |
+| [`bytecode`](./bytecode/) | Functions and constants for working with Luau bytecode. | Work in Progress |
+| [`vm`](./vm/)             | Luau virtual machine implementation                     | Work in Progress |
+| `lexer`                   |                                                         | Planned          |
+| `parser`                  |                                                         | In Consideration |
+| `compiler`                |                                                         | In Consideration |
