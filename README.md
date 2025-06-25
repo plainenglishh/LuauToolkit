@@ -4,13 +4,7 @@
 > This library is work in progress. Many features aren't implemented yet and the
 > API structure is subject to change.
 
-A pure-luau library for working with luau, within luau.
-
-## Luau Version
-
-Each version of the library is designed to target a specific luau version. The
-currently target version can be found in the [`.luau_version`](./.luau_version)
-file.
+A library for working with luau, within luau.
 
 ## Modules
 
@@ -39,3 +33,14 @@ To use a module, require it like so:
 local bytecode = require("@luau_toolkit/bytecode");
 ...
 ```
+
+## Documentation
+
+Each module contains its own README file, which should be the first port of call
+for module-specific documentation.
+
+## Luau Version
+
+Each version of the library is designed to target a specific luau version. The
+currently targeted version can be found in the
+[`.luau_version`](./.luau_version) file.
