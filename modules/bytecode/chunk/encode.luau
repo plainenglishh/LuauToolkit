@@ -113,7 +113,7 @@ local function encode(chunk: t.Chunk): buffer
                 next += 1;
             end
 
-            buffer.writeu32(baseline, offset // span, min);
+            buffer.writeu32(baseline, (offset // span) * 4, min);
 
             offset += span;
         end
@@ -124,7 +124,10 @@ local function encode(chunk: t.Chunk): buffer
         local last_offset = 0;
         for i = 0, count - 1 do
             local delta = buffer.readu32(lines, i * 4) - buffer.readu32(baseline, bit32.rshift(i, logspan) * 4);
-            assert(delta >= 0 and delta <= 255, "delta too large");
+            if not (delta >= 0 and delta <= 255) then
+                error(`delta too large ({delta})`);
+            end
+
             writer.write_u8(delta - last_offset);
             last_offset = delta;
         end
