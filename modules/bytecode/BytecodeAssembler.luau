@@ -179,25 +179,39 @@ function BytecodeAssembler:add_constant(type: any, value: any, force: boolean?):
 end
 
 function BytecodeAssembler:add_instruction(opname_or_code: number|any, ...: number): number
-    local operands = {...};
     if not self._proto then
         error("not in a function", 2);
     end
     
     local offset = self._offset;
     local info = misc.get_opcode_info(opname_or_code) or error("unknown opcode", 2);
+    local mode: t.OperandMode = info.mode;
 
-    local inst_operands = {};
-    local current = 1;
+    local raw_operands = { ... };
+    local operands = vector.zero;
+    local aux;
+    local aux_idx = 0;
 
-    for _, v in info.operands do
-        inst_operands[string.lower(v.name)] = operands[current] or 0;
-        current += 1;
+    if mode == "abc" then
+        operands = vector.create(raw_operands[1], raw_operands[2], raw_operands[3]);
+        aux_idx = 4;
+    elseif mode == "ad" then
+        operands = vector.create(raw_operands[1], raw_operands[2]);
+        aux_idx = 3;
+    elseif mode == "e" then
+        operands = vector.create(raw_operands[1], 0);
+        aux_idx = 2;
+    end
+
+    if info.aux then
+        aux = raw_operands[aux_idx];
     end
 
     table.insert(self._instructions, {
         opcode = info.opcode,
-        operands = inst_operands,
+        operands = operands,
+        mode = mode,
+        aux = aux,
     });
 
     self._offset += info.size;
