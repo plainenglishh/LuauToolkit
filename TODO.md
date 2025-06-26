@@ -2,12 +2,14 @@
 
 ## Bytecode Module
 
+- [ ] Decode/Encode line info
+- [ ] Bytecode Tests
+
 ## VM Module
+
+- [ ] Rework VM
+- [ ] VM Tests
 
 ## Lexer Module
 
-## Decompiler Module
-
-- [ ] Bytecode Tests
-- [ ] Rework VM
-- [ ] VM Tests
+- [ ] Needs starting (use Lexer.cpp as reference)

@@ -23,7 +23,7 @@ local function strip(bc: buffer|string): buffer
         proto.types = nil;
     end
 
-    bytecode.util.strip_unreferenced_strings(chunk);
+    bytecode.util.strip_unused_strings(chunk);
 
     return bytecode.chunk.encode(chunk);
 end

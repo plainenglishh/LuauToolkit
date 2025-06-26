@@ -3,6 +3,7 @@
 ]=]
 local util = {};
 
-util.strip_unreferenced_strings = require("@self/strip_unreferenced_strings");
+util.add_string = require("@self/add_string");
+util.strip_unused_strings = require("@self/strip_unused_strings");
 
 return util;
