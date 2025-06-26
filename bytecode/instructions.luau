@@ -1,4 +1,3 @@
-local byteparse = require("./byteparse");
 local opcodes = require("./opcodes");
 local t = require("./types");
 
