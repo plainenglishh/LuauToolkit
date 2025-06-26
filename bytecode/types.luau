@@ -205,7 +205,9 @@ export type BytecodeProto = {
 ]=]
 export type BytecodeInstruction = {
     opcode: number,
-    operands: {[string]: number},
+    operands: vector,
+    aux: number?,
+    mode: OperandMode,
 };
 
 --[=[

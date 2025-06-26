@@ -10,7 +10,7 @@ local instructions = {};
 --[=[
     Reinterprets an unsigned integer as a two's complement signed integer.
 ]=]
-local function reinterpret_signed(n: number, bitwidth: number): number
+local function _reinterpret_signed(n: number, bitwidth: number): number
     if n >= 2 ^ (bitwidth - 1)  then
         return n - 2 ^ bitwidth;
     else
@@ -18,90 +18,130 @@ local function reinterpret_signed(n: number, bitwidth: number): number
     end
 end
 
-function instructions.decode(raw_instructions: buffer): {t.BytecodeInstruction}
-    local reader = byteparse.reader(raw_instructions); --TODO! it's probably faster to deal with the buffer manually.
-
-    local function read_instruction(): t.BytecodeInstruction
-        local raw = reader.read_u32();
-        local instruction = {};
-
-        instruction.opcode = bit32.extract(raw, 0, 8);
-        
-        local info = opcodes[instruction.opcode] or error("unknown opcode");
-
-        instruction.operands = {};
-
-        if info.mode == "abc" then
-            instruction.operands.a = bit32.extract(raw, 8, 8);
-            instruction.operands.b = bit32.extract(raw, 16, 8);
-            instruction.operands.c = bit32.extract(raw, 24, 8);
-        elseif info.mode == "ad" then
-            instruction.operands.a = bit32.extract(raw, 8, 8);
-            instruction.operands.d = reinterpret_signed(bit32.extract(raw, 16, 16), 16);
-        elseif info.mode == "e" then
-            instruction.operands.e = reinterpret_signed(bit32.extract(raw, 8, 24), 24);
-        end
-
-        if info.aux then
-            instruction.operands.aux = reader.read_u32();
-        end
-
-        return instruction;
+local function i16(n: number): number
+    if n < 0x8000 then
+        return n;
+    else
+        return n - 0x10000;
     end
-    
-    local instruction_count = buffer.len(raw_instructions) / 4;
-    local instructions = table.create(instruction_count);
+end
+
+local function i24(n: number): number    
+    if n < 0x800000 then
+        return n;
+    else
+        return n - 0x1000000;
+    end
+end
+
+--[=[
+    Decodes a buffer containing an array of instructions into an array of 
+    `BytecodeInstruction`s.
+]=]
+function instructions.decode(insn_buffer: buffer): {t.BytecodeInstruction}
+    local count = buffer.len(insn_buffer) / 4;
+    local instructions = table.create(count);
 
     local skip_next = false;
-    for i = 1, instruction_count do
+
+    for i = 0, count - 1 do
         if skip_next then
             skip_next = false;
             continue;
         end
 
-        local instruction = read_instruction();
-        table.insert(instructions, instruction);
+        local offset = i * 4;
+        local raw = buffer.readu32(insn_buffer, offset);
+
+        local opcode = bit32.extract(raw, 0, 8);
+        local operands = vector.zero;
+        local aux;
         
-        if instruction.operands.aux then
-            skip_next = true; -- Aux instructions are parsed already.
+        local info = opcodes[opcode] or error(`unknown opcode {opcode}`);
+        local mode: t.OperandMode = info.mode;
+
+        if mode == "abc" then
+            operands = vector.create(bit32.extract(raw, 8, 8), bit32.extract(raw, 16, 8), bit32.extract(raw, 24, 8));
+        elseif mode == "ad" then
+            operands = vector.create(bit32.extract(raw, 8, 8), i16(bit32.extract(raw, 16, 16)), 0);
+        elseif mode == "e" then
+            operands = vector.create(i24(bit32.extract(raw, 8, 24)), 0, 0);
         end
+
+        if info.aux then
+            aux = buffer.readu32(insn_buffer, offset + 4);
+            skip_next = true;
+        end
+
+        table.insert(instructions, {
+            opcode = opcode,
+            operands = operands,
+            aux = aux,
+            mode = mode,
+        });
     end
 
     return instructions;
 end
 
+--[=[
+    Encodes a single `BytecodeInstruction` as up to two `u32`-containing numbers.
+
+    The first number contains the encoded instruction.
+    The second contains the aux instruction, or nil if it doesn't have one.
+]=]
+function instructions.encode_instruction(insn: t.BytecodeInstruction): (number, number?)
+    local raw = insn.opcode;
+    local mode: t.OperandMode, operands = insn.mode, insn.operands;
+
+    if mode == "abc" then
+        raw = bit32.replace(raw, operands.x or 0, 8, 8);
+        raw = bit32.replace(raw, operands.y or 0, 16, 8);
+        raw = bit32.replace(raw, operands.z or 0, 24, 8);
+    elseif mode == "ad" then
+        raw = bit32.replace(raw, operands.x or 0, 8, 8);
+        raw = bit32.replace(raw, operands.y or 0, 16, 16);
+    elseif mode == "e" then
+        raw = bit32.replace(raw, operands.x or 0, 8, 24);
+    end 
+
+    return raw, insn.aux;
+end
+
+--[=[
+    Encodes an array of `BytecodeInstruction`s into a buffer.
+]=]
 function instructions.encode(instructions: {t.BytecodeInstruction}): buffer
-    local writer = byteparse.writer(1024);
+    local buf = buffer.create(#instructions * 2 * 4); -- Assume every instruction as an aux insn, trim later.
+    local cursor = 0;
 
-    local function write_instruction(inst: t.BytecodeInstruction)
-        local raw = 0;
-        local data = opcodes[inst.opcode];
+    for i, insn in instructions do
+        local raw = insn.opcode;
+        local mode: t.OperandMode, operands = insn.mode, insn.operands;
 
-        raw = bit32.replace(raw, inst.opcode, 0, 8);
-
-        if data.mode == "abc" then
-            raw = bit32.replace(raw, inst.operands.a or 0, 8, 8);
-            raw = bit32.replace(raw, inst.operands.b or 0, 16, 8);
-            raw = bit32.replace(raw, inst.operands.c or 0, 24, 8);
-        elseif data.mode == "ad" then
-            raw = bit32.replace(raw, inst.operands.a or 0, 8, 8);
-            raw = bit32.replace(raw, inst.operands.d or 0, 16, 16);
-        elseif data.mode == "e" then
-            raw = bit32.replace(raw, inst.operands.e or 0, 8, 24);
+        if mode == "abc" then
+            raw = bit32.replace(raw, operands.x or 0, 8, 8);
+            raw = bit32.replace(raw, operands.y or 0, 16, 8);
+            raw = bit32.replace(raw, operands.z or 0, 24, 8);
+        elseif mode == "ad" then
+            raw = bit32.replace(raw, operands.x or 0, 8, 8);
+            raw = bit32.replace(raw, operands.y or 0, 16, 16);
+        elseif mode == "e" then
+            raw = bit32.replace(raw, operands.x or 0, 8, 24);
         end 
 
-        writer.write_u32(raw);
+        buffer.writeu32(buf, cursor, raw); 
+        cursor += 4;
 
-        if inst.operands.aux then
-            writer.write_u32(inst.operands.aux);
+        if insn.aux then
+            buffer.writeu32(buf, cursor, insn.aux);
+            cursor += 4;
         end
     end
-    
-    for i, inst in instructions do
-        write_instruction(inst);
-    end
 
-    return writer.to_buffer();
+    local trimmed = buffer.create(cursor);
+    buffer.copy(trimmed, 0, buf, 0, cursor);
+    return trimmed;
 end
 
 --[=[
