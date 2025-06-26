@@ -35,11 +35,6 @@ local bytecode = require("@luau_toolkit/bytecode");
 ...
 ```
 
-## Documentation
-
-Each module contains its own README file, which should be the first port of call
-for module-specific documentation.
-
 ## Luau Version
 
 Each version of the library is designed to target a specific luau version. The

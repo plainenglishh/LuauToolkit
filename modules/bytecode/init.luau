@@ -13,6 +13,7 @@ bytecode.import_id = require("@self/import_id");
 bytecode.get_opcode_info = misc.get_opcode_info;
 bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");
 bytecode.opcodes = require("@self/opcodes");
+bytecode.util = require("@self/util");
  
 --BEGIN_REEXPORTS
 export type OperandName = t.OperandName;
