@@ -1,9 +1,10 @@
 {
-  "languageMode": "strict",
-  "aliases": {
-    "lune": "~/.lune/.typedefs/0.9.4/"
-  },
-  "lint": {
-    "LocalShadow": false
-  }
+    "languageMode": "strict",
+    "aliases": {
+        "lune": "~/.lune/.typedefs/0.9.4/",
+        "luau_toolkit": "."
+    },
+    "lint": {
+        "LocalShadow": false
+    }
 }
