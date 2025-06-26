@@ -7,7 +7,7 @@ local constants = {};
     The range of supported bytecode versions. 
     Encoded as `luau_version` in `Chunk` objects.
 ]=]
-constants.supported_bytecode_versions = { min = 6, max = 6 };
+constants.supported_bytecode_versions = { min = 4, max = 6 };
 
 --[=[
     Map of bytecode constant types.
