@@ -90,11 +90,8 @@ local function decode(bytecode: t.bstring): t.Chunk
         end
 
         local line_info = buffer.create(instruction_count * 4);
-        local last_line = -1;
         for i = 0, instruction_count - 1 do
             local line = intervals[(i // 2^logspan) + 1] + deltas[i + 1];
-            assert(line >= last_line, `line numbering unexpectedly decreased`);
-            last_line = line;
             buffer.writeu32(line_info, i * 4, line);
         end
 
