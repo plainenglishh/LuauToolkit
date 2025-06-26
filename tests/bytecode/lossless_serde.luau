@@ -25,9 +25,14 @@ for _, file in files do
                     coverageLevel = coverage_level,
                 }));
 
-                local serde_bc = bytecode.chunk.encode(bytecode.chunk.decode(bc));
+                local chunk = bytecode.chunk.decode(bc);
+                
+                for _, proto in chunk.protos do
+                    proto.instructions = bytecode.instructions.encode(bytecode.instructions.decode(proto.instructions));
+                end
+
+                local serde_bc = bytecode.chunk.encode(chunk);
                 local eq = buffer_eq(bc, serde_bc);
-                print(eq);
                 assert(eq, `not equal! file="{file}", optimisation_level={optimisation_level}, debug_level={debug_level}, coverage_level={coverage_level}`);
             end
         end
