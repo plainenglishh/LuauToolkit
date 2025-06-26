@@ -8,30 +8,30 @@ local t = require("../types");
     NOTE: This function intentionally does **not** check for validity. 
           Run `bytecode.chunk.validate` beforehand if this is desired.
 ]=]
-local function decode(bc: t.bstring): t.Chunk
-    local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
-    local reader = byteparse.reader(bc);
+local function decode(bytecode: t.bstring): t.Chunk
+    local bytecode = if type(bytecode) == "string" then buffer.fromstring(bytecode) else bytecode;
+    local reader = byteparse.reader(bytecode);
 
     local function read_constant(): t.Constant
-        local ktype_id = reader.read_u8();
-        local ktype = constants.constant_types[ktype_id];
+        local constant_type = reader.read_u8();
+        local constant_type_name = constants.constant_types[constant_type];
 
         local constant: t.Constant = {
-            type = ktype :: any,
+            type = constant_type_name :: any,
             value = nil,
         };
 
-        if ktype == "nil" then
+        if constant_type_name == "nil" then
             constant.value = nil;
-        elseif ktype == "boolean" then
+        elseif constant_type_name == "boolean" then
             constant.value = reader.read_bool();    
-        elseif ktype == "number" then
+        elseif constant_type_name == "number" then
             constant.value = reader.read_f64();
-        elseif ktype == "string" then
+        elseif constant_type_name == "string" then
             constant.value = reader.read_varint();
-        elseif ktype == "import" then
+        elseif constant_type_name == "import" then
             constant.value = reader.read_u32();
-        elseif ktype == "table" then
+        elseif constant_type_name == "table" then
             local length = reader.read_varint();
             local tbl = table.create(length);
 
@@ -40,9 +40,9 @@ local function decode(bc: t.bstring): t.Chunk
             end
 
             constant.value = tbl;
-        elseif ktype == "closure" then
+        elseif constant_type_name == "closure" then
             constant.value = reader.read_varint();
-        elseif ktype == "vector" then
+        elseif constant_type_name == "vector" then
             constant.value = { reader.read_f32(), reader.read_f32(), reader.read_f32(), reader.read_f32() };
         end
 
@@ -90,7 +90,6 @@ local function decode(bc: t.bstring): t.Chunk
         end
 
         local line_info = buffer.create(instruction_count * 4);
-
         for i = 0, instruction_count - 1 do
             local line = intervals[bit32.rshift(i, logspan) + 1] + deltas[i + 1];
             buffer.writeu32(line_info, i * 4, line);
@@ -98,43 +97,6 @@ local function decode(bc: t.bstring): t.Chunk
 
         return line_info;
     end
-
-    --[[local function read_line_info(instructions_count: number): buffer
-        --- Borrowed from fiu's implementation
-        local cursor_start = reader.get_cursor();
-
-        local linegaplog2 = reader.read_u8();
-
-        local intervals = bit32.rshift((instructions_count - 1), linegaplog2) + 1
-
-        local lineinfo = table.create(instructions_count)
-        local abslineinfo = table.create(intervals)
-
-        local lastoffset = 0
-        for j = 1, instructions_count do
-            lastoffset += reader.read_u8();
-            lineinfo[j] = lastoffset
-        end
-
-        local lastline = 0
-        for j = 1, intervals do
-            lastline += reader.read_u32();
-            abslineinfo[j] = lastline % (2 ^ 32)
-        end
-
-        local instructionlineinfo = table.create(instructions_count)
-
-        for i = 1, instructions_count do 
-            table.insert(instructionlineinfo, abslineinfo[bit32.rshift(i - 1, linegaplog2) + 1] + lineinfo[i])
-        end
-
-        local cursor_end = reader.get_cursor();
-
-        local out = buffer.create(cursor_end - cursor_start);
-        buffer.copy(out, 0, bc, cursor_start, cursor_end - cursor_start);
-
-        return out;
-    end]]
 
     --[=[
         Reads a bytecode proto and returns the internal table representation.
@@ -201,7 +163,7 @@ local function decode(bc: t.bstring): t.Chunk
 
         return proto;
     end
-
+    
     --[=[
         Reads a bytecode chuck and returns the internal table representation.
     ]=]

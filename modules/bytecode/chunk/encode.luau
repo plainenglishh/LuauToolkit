@@ -6,14 +6,45 @@ local t = require("../types");
     Returns a constant type id from a constant type name.
     Errors if given an invalid constant type.
 ]=]
-local function get_constant_type(const_type: t.ConstantType): number
+local function get_constant_type(constant_type: t.ConstantType): number
     for i, v in constants.constant_types do
-        if v == const_type then
+        if v == constant_type then
             return i;
         end
     end
 
-    error(`unknown constant type '{const_type}'`, 2);
+    error(`unknown constant type '{constant_type}'`, 2);
+end
+
+local function determine_span_length(lines: buffer): number
+    local span = bit32.lshift(1, 24);
+    local count = buffer.len(lines) / 4;
+
+    local offset = 0; while offset < count do
+        local next = offset;
+
+        local min = buffer.readu32(lines, offset * 4);
+        local max = min;
+    
+        while next < count and next < offset + span do
+            min = math.min(min, buffer.readu32(lines, next * 4));
+            max = math.max(max, buffer.readu32(lines, next * 4));
+
+            if max - min > 255 then
+                break;
+            end
+
+            next += 1;
+        end
+
+        if next < count and next - offset < span then
+            span = bit32.lshift(1, math.log(next - offset, 2));
+        end
+        
+        offset += span;
+    end
+
+    return span;
 end
 
 --[=[
@@ -25,52 +56,93 @@ end
 local function encode(chunk: t.Chunk): buffer
     local writer = byteparse.writer(100);
 
-    local function write_constant(const: t.Constant)
-        writer.write_u8(get_constant_type(const.type) or error("unknown constant type"));
+    local function write_constant(constant: t.Constant)
+        writer.write_u8(get_constant_type(constant.type) or error("unknown constant type"));
 
-        if const.type == "nil" then
-        elseif const.type == "boolean" then
-            writer.write_bool(const.value);    
-        elseif const.type == "number" then
-            writer.write_f64(const.value);
-        elseif const.type == "string" then
-            writer.write_varint(const.value);
-        elseif const.type == "import" then
-            writer.write_u32(const.value);
-        elseif const.type == "table" then
-            writer.write_varint(#const.value);
-            for _, v in const.value do
+        if constant.type == "nil" then
+        elseif constant.type == "boolean" then
+            writer.write_bool(constant.value);    
+        elseif constant.type == "number" then
+            writer.write_f64(constant.value);
+        elseif constant.type == "string" then
+            writer.write_varint(constant.value);
+        elseif constant.type == "import" then
+            writer.write_u32(constant.value);
+        elseif constant.type == "table" then
+            writer.write_varint(#constant.value);
+            for _, v in constant.value do
                 writer.write_varint(v);
             end
-        elseif const.type == "closure" then
-            writer.write_varint(const.value);
-        elseif const.type == "vector" then
-            for _, v in const.value do
+        elseif constant.type == "closure" then
+            writer.write_varint(constant.value);
+        elseif constant.type == "vector" then
+            for _, v in constant.value do
                 writer.write_f32(v);
             end
         end
     end
 
-    local function write_debug_info(dbg: t.ProtoDebugInfo)
-        writer.write_varint(#dbg.locals);
-        for _, l in dbg.locals do
-            writer.write_varint(l.name);
-            writer.write_varint(l.start_pc);
-            writer.write_varint(l.end_pc);
-            writer.write_u8(l.register);
+    local function write_debug_info(debug_info: t.ProtoDebugInfo)
+        writer.write_varint(#debug_info.locals);
+        for _, local_ in debug_info.locals do
+            writer.write_varint(local_.name);
+            writer.write_varint(local_.start_pc);
+            writer.write_varint(local_.end_pc);
+            writer.write_u8(local_.register);
         end
 
-        writer.write_varint(#dbg.upvalues);
-        for _, uv in dbg.upvalues do
-            writer.write_varint(uv.name);
+        writer.write_varint(#debug_info.upvalues);
+        for _, upvalue in debug_info.upvalues do
+            writer.write_varint(upvalue.name);
         end
     end
 
-    local function write_line_info(lineinfo: buffer)
-        writer.write_buffer(lineinfo);
+    local function write_line_info(lines: buffer)
+        local count = buffer.len(lines) / 4;
+        local span = determine_span_length(lines);
+
+        local baseline_size = (count - 1) // span + 1;
+        local baseline = buffer.create(baseline_size * 4);
+
+        local offset = 0; while offset < count do
+            local next = offset;
+            local min = buffer.readu32(lines, offset * 4);
+
+            while next < count and next < offset + span do
+                min = math.min(min, buffer.readu32(lines, next * 4));
+                next += 1;
+            end
+
+            buffer.writeu32(baseline, offset // span, min);
+
+            offset += span;
+        end
+
+        local logspan = math.log(span, 2);
+        writer.write_u8(logspan);
+
+        local last_offset = 0;
+        for i = 0, count - 1 do
+            local delta = buffer.readu32(lines, i * 4) - buffer.readu32(baseline, bit32.rshift(i, logspan) * 4);
+            assert(delta >= 0 and delta <= 255, "delta too large");
+            writer.write_u8(delta - last_offset);
+            last_offset = delta;
+        end
+
+        local last_line = 0;
+        for i = 0, baseline_size - 1 do
+            local n = buffer.readu32(baseline, i * 4);
+            writer.write_u32(n - last_line);
+            last_line = n;
+        end
     end
 
-    local function write_type_info(type_info: t.ProtoTypeInfo)
+    local function write_type_info(type_info: t.ProtoTypeInfo?)
+        if not type_info then
+            writer.write_varint(0);
+            return;
+        end
+
         local temp_line_info = byteparse.writer(10);    
         temp_line_info.write_varint(#type_info.func);
         temp_line_info.write_varint(#type_info.upvalues);
@@ -104,28 +176,19 @@ local function encode(chunk: t.Chunk): buffer
 
         local flags = 0;
 
-        for _, flag in proto.flags do
+        for _, flag: t.ProtoFlag in proto.flags do
             local offset = constants.proto_flag[flag :: any] or error(`unknown flag '{flag}'`);
             flags = bit32.replace(flags, 1, offset);
         end
 
         writer.write_u8(flags);
-
-        if proto.types then
-            write_type_info(proto.types);
-        else
-            writer.write_varint(0);
-        end
-    
+        write_type_info(proto.types);
         writer.write_varint(buffer.len(proto.instructions) / 4);
         writer.write_buffer(proto.instructions);
-
         writer.write_larray(proto.constants, write_constant);
         writer.write_larray(proto.child_protos, writer.write_varint);
-
         writer.write_varint(proto.line_defined);
         writer.write_varint(proto.debug_name);
-        
         writer.write_optional(proto.line_info, write_line_info);
         writer.write_optional(proto.debug_info, write_debug_info);
     end
