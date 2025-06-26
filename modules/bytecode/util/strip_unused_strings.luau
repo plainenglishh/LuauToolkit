@@ -1,7 +1,7 @@
 local t = require("../types");
 
-local function strip_unreferenced_strings(chunk: t.Chunk)
-    local function is_referenced(string_id: number)
+local function strip_unused_strings(chunk: t.Chunk)
+    local function is_referenced(string_id: number): boolean
         for _, proto in chunk.protos do
             if proto.debug_name == string_id then
                 return true;
@@ -43,4 +43,4 @@ local function strip_unreferenced_strings(chunk: t.Chunk)
     chunk.strings = new_string_table;
 end
 
-return strip_unreferenced_strings;
+return strip_unused_strings;
