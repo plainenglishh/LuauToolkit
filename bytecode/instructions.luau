@@ -19,20 +19,20 @@ end
 
 @native
 local function i16(n: number): number
-    if n < 0x8000 then
-        return n;
-    else
-        return n - 0x10000;
+    if n >= 2^(16-1) then
+        return n - 2^16;
     end
+
+    return n;
 end
 
 @native
 local function i24(n: number): number    
-    if n < 0x800000 then
-        return n;
-    else
-        return n - 0x1000000;
+    if n >= 2^(24 - 1) then
+        return n - 2^24;
     end
+
+    return n;
 end
 
 --[=[
