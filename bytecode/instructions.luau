@@ -19,7 +19,7 @@ local function reinterpret_signed(n: number, bitwidth: number): number
 end
 
 function instructions.decode(raw_instructions: buffer): {t.BytecodeInstruction}
-    local reader = byteparse.reader(raw_instructions);
+    local reader = byteparse.reader(raw_instructions); --TODO! it's probably faster to deal with the buffer manually.
 
     local function read_instruction(): t.BytecodeInstruction
         local raw = reader.read_u32();
@@ -102,6 +102,60 @@ function instructions.encode(instructions: {t.BytecodeInstruction}): buffer
     end
 
     return writer.to_buffer();
+end
+
+--[=[
+    Extracts the opcode from an instruction as a `u8`.
+]=]
+function instructions.insn_op(insn: number): number
+    return bit32.extract(insn, 0, 8);
+end
+
+--[=[
+    Extracts the `A` operand from an instruction as a `u8`.
+]=]
+function instructions.insn_a(insn: number): number
+    return bit32.extract(insn, 8, 8);
+end
+
+--[=[
+    Extracts the `B` operand from an instruction as a `u8`.
+]=]
+function instructions.insn_b(insn: number): number
+    return bit32.extract(insn, 16, 8);
+end
+
+--[=[
+    Extracts the `C` operand from an instruction as a `u8`.
+]=]
+function instructions.insn_c(insn: number): number
+    return bit32.extract(insn, 24, 8);
+end
+
+--[=[
+    Extracts the `D` operand from an instruction as an `i16`.
+]=]
+function instructions.insn_d(insn: number): number
+    local n = bit32.extract(insn, 16, 16);
+
+    if n < 0x8000 then
+        return n;
+    else
+        return n - 0x10000;
+    end
+end
+
+--[=[
+    Extracts the `E` operand from an instruction as an `i24`.
+]=]
+function instructions.insn_e(insn: number): number
+    local n = bit32.extract(insn, 8, 24);
+    
+    if n < 0x800000 then
+        return n;
+    else
+        return n - 0x1000000;
+    end
 end
 
 return instructions;

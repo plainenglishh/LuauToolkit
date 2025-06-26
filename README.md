@@ -17,6 +17,7 @@ The library is split into _mostly_ separate modules:
 | [`lexer`](./lexer/)       | **\[WIP]** Luau source code lexer.                                 |                  |
 | `parser`                  | **\[Not Started]** Luau source code parser.                        |                  |
 | `compiler`                | **\[Not Started/Unlikely]** Simple Luau compiler.                  |                  |
+| `decompiler`              |                                                                    | `bytecode`       |
 | [`misc`](./misc/)         | **\[WIP]** Miscellaneous luau related items.                       | None             |
 
 \* In Consideration = Not for a _long_ time, if ever.
