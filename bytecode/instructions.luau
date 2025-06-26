@@ -17,6 +17,7 @@ local function _reinterpret_signed(n: number, bitwidth: number): number
     end
 end
 
+@native
 local function i16(n: number): number
     if n < 0x8000 then
         return n;
@@ -25,6 +26,7 @@ local function i16(n: number): number
     end
 end
 
+@native
 local function i24(n: number): number    
     if n < 0x800000 then
         return n;
@@ -37,6 +39,7 @@ end
     Decodes a buffer containing an array of instructions into an array of 
     `BytecodeInstruction`s.
 ]=]
+@native
 function instructions.decode(insn_buffer: buffer): {t.BytecodeInstruction}
     local count = buffer.len(insn_buffer) / 4;
     local instructions = table.create(count);
@@ -89,6 +92,7 @@ end
     The first number contains the encoded instruction.
     The second contains the aux instruction, or nil if it doesn't have one.
 ]=]
+@native
 function instructions.encode_instruction(insn: t.BytecodeInstruction): (number, number?)
     local raw = insn.opcode;
     local mode: t.OperandMode, operands = insn.mode, insn.operands;
@@ -110,6 +114,7 @@ end
 --[=[
     Encodes an array of `BytecodeInstruction`s into a buffer.
 ]=]
+@native
 function instructions.encode(instructions: {t.BytecodeInstruction}): buffer
     local buf = buffer.create(#instructions * 2 * 4); -- Assume every instruction as an aux insn, trim later.
     local cursor = 0;
@@ -146,6 +151,7 @@ end
 --[=[
     Extracts the opcode from an instruction as a `u8`.
 ]=]
+@native
 function instructions.insn_op(insn: number): number
     return bit32.extract(insn, 0, 8);
 end
@@ -153,6 +159,7 @@ end
 --[=[
     Extracts the `A` operand from an instruction as a `u8`.
 ]=]
+@native
 function instructions.insn_a(insn: number): number
     return bit32.extract(insn, 8, 8);
 end
@@ -160,6 +167,7 @@ end
 --[=[
     Extracts the `B` operand from an instruction as a `u8`.
 ]=]
+@native
 function instructions.insn_b(insn: number): number
     return bit32.extract(insn, 16, 8);
 end
@@ -167,6 +175,7 @@ end
 --[=[
     Extracts the `C` operand from an instruction as a `u8`.
 ]=]
+@native
 function instructions.insn_c(insn: number): number
     return bit32.extract(insn, 24, 8);
 end
@@ -174,27 +183,17 @@ end
 --[=[
     Extracts the `D` operand from an instruction as an `i16`.
 ]=]
+@native
 function instructions.insn_d(insn: number): number
-    local n = bit32.extract(insn, 16, 16);
-
-    if n < 0x8000 then
-        return n;
-    else
-        return n - 0x10000;
-    end
+    return i16(bit32.extract(insn, 16, 16));
 end
 
 --[=[
     Extracts the `E` operand from an instruction as an `i24`.
 ]=]
+@native
 function instructions.insn_e(insn: number): number
-    local n = bit32.extract(insn, 8, 24);
-    
-    if n < 0x800000 then
-        return n;
-    else
-        return n - 0x1000000;
-    end
+    return i24(bit32.extract(insn, 8, 24));
 end
 
 return instructions;
