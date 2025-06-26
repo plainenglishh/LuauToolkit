@@ -1,5 +1,5 @@
 --[=[
-    Library containing utility `BytecodeChunk` related functions.
+    Library containing utility `Chunk` related functions.
 ]=]
 local util = {};
 

@@ -29,11 +29,11 @@ local function ValidationResult(issues: {t.ValidationIssue}): t.ValidationResult
     };
 end
 
-local function validate_proto(proto_id: number, proto: t.BytecodeProto, report_issue: ReportIssueFn)
+local function validate_proto(proto_id: number, proto: t.Proto, report_issue: ReportIssueFn)
     
 end
 
-local function validate_chunk(chunk: t.BytecodeChunk, report_issue: ReportIssueFn)
+local function validate_chunk(chunk: t.Chunk, report_issue: ReportIssueFn)
     if in_range(chunk.luau_version, luau_versions.min, luau_versions.max) then
         report_issue("error", `luau_version ({chunk.luau_version}) is outside supported range ({constants.supported_bytecode_versions.min}..{constants.supported_bytecode_versions.max})`);
     end
@@ -53,7 +53,7 @@ end
 --[=[
     Checks a given bytecode chunk for issues.
 ]=]
-local function validate(chunk: t.IntoBytecodeChunk): t.ValidationResult        
+local function validate(chunk: t.IntoChunk): t.ValidationResult        
     local issues = {};
 
     local function report_issue(severity: t.ValidationIssueSeverity, message: string, note: string?)

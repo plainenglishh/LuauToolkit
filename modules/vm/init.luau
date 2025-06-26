@@ -10,7 +10,7 @@ local vm = {};
 
 vm.partial = require("@self/partial");
 
-local function display_instruction(inst: bytecode.BytecodeInstruction)
+local function display_instruction(inst: bytecode.Instruction)
     local info = bytecode.get_opcode_info(inst.opcode);
     if not info then
         return `Invalid Instruction {inst.opcode}`;

@@ -117,8 +117,8 @@ export type ProtoFlag =
 --  Bytecode Builder Types
 ----------------------------------------------------------------------------
 
-export type BytecodeAssemblerImpl = {
-    __index: BytecodeAssemblerImpl,
+export type _BytecodeAssemblerImpl = {
+    __index: _BytecodeAssemblerImpl,
 
     new: () -> BytecodeAssembler,
     set_version: (self: BytecodeAssembler, version: number) -> (),
@@ -139,17 +139,17 @@ export type BytecodeAssemblerImpl = {
     add_instruction: (self: BytecodeAssembler, opname_or_code: OpcodeName|number, ...number) -> number,
     get_offset: (self: BytecodeAssembler) -> number,
     end_function: (self: BytecodeAssembler) -> number,
-    to_ir: (self: BytecodeAssembler) -> BytecodeChunk,
+    to_ir: (self: BytecodeAssembler) -> Chunk,
     assemble: (self: BytecodeAssembler) -> buffer,
 };
 
 export type BytecodeAssembler = typeof(setmetatable({} :: {
     _offset: number,
-    _chunk: BytecodeChunk,
-    _proto: BytecodeProto?,
+    _chunk: Chunk,
+    _proto: Proto?,
     _proto_id: number?,
-    _instructions: {BytecodeInstruction},
-}, {} :: BytecodeAssemblerImpl));
+    _instructions: {Instruction},
+}, {} :: _BytecodeAssemblerImpl));
 
 
 ----------------------------------------------------------------------------
@@ -172,38 +172,38 @@ export type StringId = number;
 --[=[
     Table representation of a bytecode chunk.
 ]=]
-export type BytecodeChunk = {
+export type Chunk = {
     luau_version: number,
     types_version: number,
     strings: {string},
     userdata_types: {number}?,
-    protos: {BytecodeProto},
+    protos: {Proto},
     main_proto: ProtoId,
 };
 
 --[=[
     Table representation of a bytecode proto.
 ]=]
-export type BytecodeProto = {
+export type Proto = {
     max_stack_size: number,
     num_params: number,
     num_upvalues: number,
     is_vararg: boolean,
     flags: {ProtoFlag},
-    types: BytecodeProtoTypeInfo?,
+    types: ProtoTypeInfo?,
     instructions: buffer,
-    constants: {BytecodeConstant},
+    constants: {Constant},
     protos: {ProtoId},
     line_defined: number,
     debug_name: StringId,
     line_info: buffer?,
-    debug_info: BytecodeProtoDebugInfo?,
+    debug_info: ProtoDebugInfo?,
 };
 
 --[=[
     Table representation of a bytecode instruction.
 ]=]
-export type BytecodeInstruction = {
+export type Instruction = {
     opcode: number,
     operands: vector,
     aux: number?,
@@ -213,7 +213,7 @@ export type BytecodeInstruction = {
 --[=[
     Table representation of a bytecode constant.
 ]=]
-export type BytecodeConstant = {
+export type Constant = {
     type: ConstantType,
     value: any,
 };
@@ -221,7 +221,7 @@ export type BytecodeConstant = {
 --[=[
     Table representation of a bytecode proto's debug information.
 ]=]
-export type BytecodeProtoDebugInfo = {
+export type ProtoDebugInfo = {
     locals: {{
         name: number,
         start_pc: number,
@@ -236,7 +236,7 @@ export type BytecodeProtoDebugInfo = {
 --[=[
     Table representation of a bytecode proto's type information.
 ]=]
-export type BytecodeProtoTypeInfo = {
+export type ProtoTypeInfo = {
     func: string,
     upvalues: {number},
     locals: {{
@@ -272,7 +272,7 @@ export type ValidationResult = {
 
 export type bstring = buffer | string;
 
-export type IntoBytecodeChunk = BytecodeChunk | bstring;
+export type IntoChunk = Chunk | bstring;
 
 ----------------------------------------------------------------------------
 --  Export

@@ -37,12 +37,12 @@ end
 
 --[=[
     Decodes a buffer containing an array of instructions into an array of 
-    `BytecodeInstruction`s.
+    `Instruction`s.
 ]=]
 @native
-function instructions.decode(insn_buffer: buffer): {t.BytecodeInstruction}
+function instructions.decode(insn_buffer: buffer): {t.Instruction}
     local count = buffer.len(insn_buffer) / 4;
-    local instructions = table.create(count);
+    local instructions = {};
 
     local skip_next = false;
 
@@ -87,13 +87,13 @@ function instructions.decode(insn_buffer: buffer): {t.BytecodeInstruction}
 end
 
 --[=[
-    Encodes a single `BytecodeInstruction` as up to two `u32`-containing numbers.
+    Encodes a single `Instruction` as up to two `u32`-containing numbers.
 
     The first number contains the encoded instruction.
     The second contains the aux instruction, or nil if it doesn't have one.
 ]=]
 @native
-function instructions.encode_instruction(insn: t.BytecodeInstruction): (number, number?)
+function instructions.encode_instruction(insn: t.Instruction): (number, number?)
     local raw = insn.opcode;
     local mode: t.OperandMode, operands = insn.mode, insn.operands;
 
@@ -112,10 +112,10 @@ function instructions.encode_instruction(insn: t.BytecodeInstruction): (number, 
 end
 
 --[=[
-    Encodes an array of `BytecodeInstruction`s into a buffer.
+    Encodes an array of `Instruction`s into a buffer.
 ]=]
 @native
-function instructions.encode(instructions: {t.BytecodeInstruction}): buffer
+function instructions.encode(instructions: {t.Instruction}): buffer
     local buf = buffer.create(#instructions * 2 * 4); -- Assume every instruction as an aux insn, trim later.
     local cursor = 0;
 

@@ -14,7 +14,7 @@ access and interact with old uncleared objects.
 
 Furthermore, the `bytecode.decode` function doesn't yet validate a given chunks
 validity. When given invalid data, it can either throw an error or return an
-invalid `BytecodeChunk` object.
+invalid `Chunk` object.
 
 ### VM Module
 

@@ -5,7 +5,7 @@ local constants = {};
 
 --[=[
     The range of supported bytecode versions. 
-    Encoded as `luau_version` in `BytecodeChunk` objects.
+    Encoded as `luau_version` in `Chunk` objects.
 ]=]
 constants.supported_bytecode_versions = { min = 4, max = 6 };
 

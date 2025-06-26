@@ -5,8 +5,8 @@ export type VMError = {
     message: string,
     pc: number,
     proto: number,
-    inst: bytecode.BytecodeInstruction,
-    chunk: bytecode.BytecodeChunk,
+    inst: bytecode.Instruction,
+    chunk: bytecode.Chunk,
 };
 
 return {};

@@ -1,2 +1,2 @@
 [tools]
-lune = "lune-org/lune@0.9.4"
+lune = "lune-org/lune@0.9.4" # For development, library is pure-luau.

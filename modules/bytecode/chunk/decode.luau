@@ -3,20 +3,20 @@ local constants = require("../constants");
 local t = require("../types");
 
 --[=[
-    Decodes a bytecode chunk into a `BytecodeChunk` object.
+    Decodes a bytecode chunk into a `Chunk` object.
 
     NOTE: This function intentionally does **not** check for validity. 
           Run `bytecode.chunk.validate` beforehand if this is desired.
 ]=]
-local function decode(bc: t.bstring): t.BytecodeChunk
+local function decode(bc: t.bstring): t.Chunk
     local bc = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bc);
 
-    local function read_constant(): t.BytecodeConstant
+    local function read_constant(): t.Constant
         local ktype_id = reader.read_u8();
         local ktype = constants.constant_types[ktype_id];
 
-        local constant: t.BytecodeConstant = {
+        local constant: t.Constant = {
             type = ktype :: any,
             value = nil,
         };
@@ -49,7 +49,7 @@ local function decode(bc: t.bstring): t.BytecodeChunk
         return constant;
     end
 
-    local function read_debug_info(): t.BytecodeProtoDebugInfo
+    local function read_debug_info(): t.ProtoDebugInfo
         local debug_info = {};
 
         debug_info.locals = {};
@@ -114,7 +114,7 @@ local function decode(bc: t.bstring): t.BytecodeChunk
     --[=[
         Reads a bytecode proto and returns the internal table representation.
     ]=]
-    local function read_proto(): t.BytecodeProto
+    local function read_proto(): t.Proto
         local proto = {};
 
         proto.max_stack_size = reader.read_u8();
@@ -133,7 +133,7 @@ local function decode(bc: t.bstring): t.BytecodeChunk
 
         local types_size = reader.read_varint();
         if types_size > 0 then
-            local types = {} :: t.BytecodeProtoTypeInfo;
+            local types = {} :: t.ProtoTypeInfo;
 
             local func_type_size = reader.read_varint();
             local upvals_type_size = reader.read_varint();
@@ -180,7 +180,7 @@ local function decode(bc: t.bstring): t.BytecodeChunk
     --[=[
         Reads a bytecode chuck and returns the internal table representation.
     ]=]
-    local function read_chunk(): t.BytecodeChunk
+    local function read_chunk(): t.Chunk
         local chunk = {};
 
         chunk.luau_version = reader.read_u8();

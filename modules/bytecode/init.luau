@@ -17,21 +17,27 @@ bytecode.util = require("@self/util");
  
 --BEGIN_REEXPORTS
 export type OperandName = t.OperandName;
-export type OperandMode = t.OperandMode;
 export type OperandType = t.OperandType;
 export type OperandInfo = t.OperandInfo;
+export type OperandMode = t.OperandMode;
 export type OpcodeInfo = t.OpcodeInfo;
 export type OpcodeName = t.OpcodeName;
 export type ConstantType = t.ConstantType;
 export type ProtoFlag = t.ProtoFlag;
-export type BytecodeAssemblerImpl = t.BytecodeAssembler;
 export type BytecodeAssembler = t.BytecodeAssembler;
-export type BytecodeChunk = t.BytecodeChunk;
-export type BytecodeProto = t.BytecodeProto;
-export type BytecodeInstruction = t.BytecodeInstruction;
-export type BytecodeConstant = t.BytecodeConstant;
-export type BytecodeProtoDebugInfo = t.BytecodeProtoDebugInfo;
-export type BytecodeProtoTypeInfo = t.BytecodeProtoTypeInfo;
+export type ProtoId = t.ProtoId;
+export type StringId = t.StringId;
+export type Chunk = t.Chunk;
+export type Proto = t.Proto;
+export type Instruction = t.Instruction;
+export type Constant = t.Constant;
+export type ProtoDebugInfo = t.ProtoDebugInfo;
+export type ProtoTypeInfo = t.ProtoTypeInfo;
+export type ValidationIssueSeverity = t.ValidationIssueSeverity;
+export type ValidationIssue = t.ValidationIssue;
+export type ValidationResult = t.ValidationResult;
+export type bstring = t.bstring;
+export type IntoChunk = t.IntoChunk;
 --END_REEXPORTS
 
 return bytecode;

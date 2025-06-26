@@ -105,7 +105,7 @@ end
 
 local partial = {};
 
-function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: LoadOptions?)
+function partial.load(chunk: buffer|string|bytecode.Chunk, options: LoadOptions?)
     common.unimplemented();
     
     local chunk = if type(chunk) ~= "table" then bytecode.decode(chunk, true) else chunk;
@@ -147,7 +147,7 @@ function partial.load(chunk: buffer|string|bytecode.BytecodeChunk, options: Load
     --[=[
         Returns a proto object from an ID.
     ]=]
-    local function get_proto(id: number): bytecode.BytecodeProto?
+    local function get_proto(id: number): bytecode.Proto?
         return chunk.protos[id + 1];
     end
 

@@ -17,15 +17,15 @@ local function get_constant_type(const_type: t.ConstantType): number
 end
 
 --[=[
-    Encodes a BytecodeChunk to a buffer.
+    Encodes a Chunk to a buffer.
 
     NOTE: This function intentionally does **not** check for validity. 
           Run `bytecode.chunk.validate` beforehand if this is desired.
 ]=]
-local function encode(chunk: t.BytecodeChunk): buffer
+local function encode(chunk: t.Chunk): buffer
     local writer = byteparse.writer(100);
 
-    local function write_constant(const: t.BytecodeConstant)
+    local function write_constant(const: t.Constant)
         writer.write_u8(get_constant_type(const.type) or error("unknown constant type"));
 
         if const.type == "nil" then
@@ -51,7 +51,7 @@ local function encode(chunk: t.BytecodeChunk): buffer
         end
     end
 
-    local function write_debug_info(dbg: t.BytecodeProtoDebugInfo)
+    local function write_debug_info(dbg: t.ProtoDebugInfo)
         writer.write_varint(#dbg.locals);
         for _, l in dbg.locals do
             writer.write_varint(l.name);
@@ -70,7 +70,7 @@ local function encode(chunk: t.BytecodeChunk): buffer
         writer.write_buffer(lineinfo);
     end
 
-    local function write_type_info(type_info: t.BytecodeProtoTypeInfo)
+    local function write_type_info(type_info: t.ProtoTypeInfo)
         local temp_line_info = byteparse.writer(10);    
         temp_line_info.write_varint(#type_info.func);
         temp_line_info.write_varint(#type_info.upvalues);
@@ -96,7 +96,7 @@ local function encode(chunk: t.BytecodeChunk): buffer
     --[=[
         writes a bytecode proto and returns the internal table representation.
     ]=]
-    local function write_proto(proto: t.BytecodeProto)
+    local function write_proto(proto: t.Proto)
         writer.write_u8(proto.max_stack_size);
         writer.write_u8(proto.num_params);
         writer.write_u8(proto.num_upvalues);
@@ -133,7 +133,7 @@ local function encode(chunk: t.BytecodeChunk): buffer
     --[=[
         writes a bytecode chuck and returns the internal table representation.
     ]=]
-    local function write_chunk(chunk: t.BytecodeChunk)
+    local function write_chunk(chunk: t.Chunk)
         writer.write_u8(chunk.luau_version);
         writer.write_u8(chunk.types_version);
         writer.write_larray(chunk.strings, writer.write_lstring);
