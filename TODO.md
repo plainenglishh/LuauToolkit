@@ -2,6 +2,9 @@
 
 ## Bytecode Module
 
+[ ] Rework BytecodeAssembler, add line/type info (use luau-org/luau bytecode
+builder for ref)
+
 ## VM Module
 
 - [ ] Rework VM

@@ -7,12 +7,10 @@
     "spellchecker.checkInterval": 0,
     "spellchecker.documentTypes": ["markdown", "latex", "plaintext"],
     "spellchecker.suggestionSeverity": "Error",
+    "spellchecker.ignoreFilenames": ["TODO.md", "LICENCE.md"],
     "spellchecker.ignoreWordsList": [
         "bytecode", "Bytecode", "tokeniser", "README", "Decompiler", "protobuf",
         "Proto", "proto", "boolean", "ProtoTypeInfo", "ProtoDebugInfo", 
-        "upvalue", "Upvalue", "ProtoLineInfo",
-
-        // LICENCE.md
-        "plainenglish", "sublicense", "MERCHANTABILITY", "NONINFRINGEMENT"
+        "upvalue", "Upvalue", "ProtoLineInfo", "BytecodeAssembler",
     ],
 }
