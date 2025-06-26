@@ -52,29 +52,54 @@ local function decode(bc: t.bstring): t.Chunk
     local function read_debug_info(): t.ProtoDebugInfo
         local debug_info = {};
 
-        debug_info.locals = {};
-        local locals_count = reader.read_varint();
-        for i = 1, locals_count do
-            debug_info.locals[i] = {
+        debug_info.locals = reader.read_larray(function()
+            return {
                 name = reader.read_varint(),
                 start_pc = reader.read_varint(),
                 end_pc = reader.read_varint(),
-                reg = reader.read_u8(),
+                register = reader.read_u8(),
             };
-        end
+        end);
 
-        debug_info.upvalues = {};
-        local upvalue_count = reader.read_varint();
-        for i = 1, upvalue_count do
-            debug_info.upvalues[i] = {
+        debug_info.upvalues = reader.read_larray(function()
+            return {
                 name = reader.read_varint(),
             };
-        end
+        end);
 
         return debug_info;
     end
 
-    local function read_line_info(instructions_count: number): buffer
+    local function read_line_info(instruction_count: number): buffer
+        local logspan = reader.read_u8();
+        local interval_count = bit32.rshift(instruction_count - 1, logspan) + 1;
+        
+        local deltas = table.create(instruction_count);
+        local intervals = table.create(interval_count);
+
+        local last_delta = 0;
+        for i = 1, instruction_count do
+            last_delta += reader.read_u8();
+            deltas[i] = last_delta;
+        end
+
+        local last_interval = 0;
+        for i = 1, interval_count do
+            last_interval += reader.read_u32();
+            intervals[i] = last_interval % (2 ^ 32);
+        end
+
+        local line_info = buffer.create(instruction_count * 4);
+
+        for i = 0, instruction_count - 1 do
+            local line = intervals[bit32.rshift(i, logspan) + 1] + deltas[i + 1];
+            buffer.writeu32(line_info, i * 4, line);
+        end
+
+        return line_info;
+    end
+
+    --[[local function read_line_info(instructions_count: number): buffer
         --- Borrowed from fiu's implementation
         local cursor_start = reader.get_cursor();
 
@@ -109,7 +134,7 @@ local function decode(bc: t.bstring): t.Chunk
         buffer.copy(out, 0, bc, cursor_start, cursor_end - cursor_start);
 
         return out;
-    end
+    end]]
 
     --[=[
         Reads a bytecode proto and returns the internal table representation.
@@ -135,15 +160,15 @@ local function decode(bc: t.bstring): t.Chunk
         if types_size > 0 then
             local types = {} :: t.ProtoTypeInfo;
 
-            local func_type_size = reader.read_varint();
-            local upvals_type_size = reader.read_varint();
-            local locals_type_size = reader.read_varint();
+            local function_length = reader.read_varint();
+            local upvalue_count = reader.read_varint();
+            local local_count = reader.read_varint();
         
-            types.func = reader.read_string(func_type_size);
+            types.func = reader.read_string(function_length);
         
             local upvalues = {};
 
-            for i = 1, upvals_type_size do
+            for i = 1, upvalue_count do
                 upvalues[i] = reader.read_u8();
             end
 
@@ -151,10 +176,10 @@ local function decode(bc: t.bstring): t.Chunk
 
             local locals = {};
 
-            for i = 1, locals_type_size do
+            for i = 1, local_count do
                 locals[i] = {
                     type = reader.read_u8(),
-                    reg = reader.read_u8(),
+                    register = reader.read_u8(),
                     start_pc = reader.read_varint(),
                     length = reader.read_varint(),
                 };
@@ -168,7 +193,7 @@ local function decode(bc: t.bstring): t.Chunk
         local instruction_count = reader.read_varint();
         proto.instructions = reader.read_buffer(instruction_count * 4);
         proto.constants = reader.read_larray(read_constant);
-        proto.protos = reader.read_larray(reader.read_varint);
+        proto.child_protos = reader.read_larray(reader.read_varint);
         proto.line_defined = reader.read_varint();
         proto.debug_name = reader.read_varint();
         proto.line_info = reader.read_optional(read_line_info, instruction_count);

@@ -57,7 +57,7 @@ local function encode(chunk: t.Chunk): buffer
             writer.write_varint(l.name);
             writer.write_varint(l.start_pc);
             writer.write_varint(l.end_pc);
-            writer.write_u8(l.reg);
+            writer.write_u8(l.register);
         end
 
         writer.write_varint(#dbg.upvalues);
@@ -84,7 +84,7 @@ local function encode(chunk: t.Chunk): buffer
 
         for i, v in type_info.locals do
             temp_line_info.write_u8(v.type);
-            temp_line_info.write_u8(v.reg);
+            temp_line_info.write_u8(v.register);
             temp_line_info.write_varint(v.start_pc);
             temp_line_info.write_varint(v.length);
         end
@@ -121,7 +121,7 @@ local function encode(chunk: t.Chunk): buffer
         writer.write_buffer(proto.instructions);
 
         writer.write_larray(proto.constants, write_constant);
-        writer.write_larray(proto.protos, writer.write_varint);
+        writer.write_larray(proto.child_protos, writer.write_varint);
 
         writer.write_varint(proto.line_defined);
         writer.write_varint(proto.debug_name);

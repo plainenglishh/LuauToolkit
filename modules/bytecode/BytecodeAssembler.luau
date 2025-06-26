@@ -51,7 +51,7 @@ function BytecodeAssembler:add_string(str: string, force: boolean?): number
     return add_to(self._chunk.strings, str, force);
 end
 
-function BytecodeAssembler:start_function()
+function BytecodeAssembler:begin_function()
     if self._proto then
         error("already in a function", 2);
     end
@@ -67,7 +67,7 @@ function BytecodeAssembler:start_function()
         max_stack_size = 0,
         constants = {},
         instructions = nil :: any, -- populated later
-        protos = {},
+        child_protos = {},
         debug_name = 0,
         line_defined = 0,
     };
@@ -81,7 +81,7 @@ function BytecodeAssembler:get_proto_id(): number
     return self._proto_id or error("not in a function", 2);
 end
     
-function BytecodeAssembler:add_import(...: string)
+function BytecodeAssembler:add_import(...: string): number
     if not self._proto then
         error("not in a function", 2);
     end
@@ -169,7 +169,7 @@ function BytecodeAssembler:add_constant(type: any, value: any, force: boolean?):
     end
 
     if type == "closure" then
-        add_to(self._proto.protos, value);
+        add_to(self._proto.child_protos, value);
     end
 
     return add_to(self._proto.constants, {

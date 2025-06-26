@@ -8,7 +8,9 @@
     "spellchecker.documentTypes": ["markdown", "latex", "plaintext"],
     "spellchecker.suggestionSeverity": "Error",
     "spellchecker.ignoreWordsList": [
-        "bytecode", "Bytecode", "tokeniser", "README", "Decompiler",
+        "bytecode", "Bytecode", "tokeniser", "README", "Decompiler", "protobuf",
+        "Proto", "proto", "boolean", "ProtoTypeInfo", "ProtoDebugInfo", 
+        "upvalue", "Upvalue", "ProtoLineInfo",
 
         // LICENCE.md
         "plainenglish", "sublicense", "MERCHANTABILITY", "NONINFRINGEMENT"
