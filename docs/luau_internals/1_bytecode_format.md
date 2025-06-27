@@ -12,9 +12,9 @@ This document refers to the following "types":
 | Name      | Description                                                                             |
 | --------- | --------------------------------------------------------------------------------------- |
 | `boolean` | A true or false value. Encoded as a `u8` where zero is false and anything else is true. |
-| `ux`      | An unsigned integer _x_ bits wide.                                                      |
-| `ix`      | An signed integer _x_ bits wide.                                                        |
-| `f?`      | An IEEE 754 floating point _?_ bits wide.                                               |
+| `uX`      | An unsigned integer _X_ bits wide. E.g. `u8`, `u32`.                                    |
+| `iX`      | An signed integer _X_ bits wide. E.g. `i8`, `i32`.                                      |
+| `fX`      | An IEEE 754 floating point _X_ bits wide. E.g. `f32`, `f64`.                            |
 | `varint`  | A protobuf variable width integer.                                                      |
 | `string`  | A `varint` length prefixed ASCII string.                                                |
 | `buffer`  | A `varint` length prefixed blob of binary data.                                         |
@@ -25,23 +25,25 @@ This document refers to the following "types":
 
 This document makes use of the following terms:
 
-| Term    | Meaning                                                                                                                        |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| proto   | The bytecode representation of a function. "Function" and "Proto" are used interchangeably throughout this document.           |
-| struct  | A data structure containing a series of fields with varying types. For the purposes of this document, a struct has no padding. |
-| upvalue | A 'variable' that belongs to a parent scope when used in a closure.                                                            |
-| closure | A function that makes use of variables from a parent scope.                                                                    |
-| module  | A bytecode chunk. Used interchangeably with 'chunk'.                                                                           |
+| Term    | Meaning                                                                                |
+| ------- | -------------------------------------------------------------------------------------- |
+| proto   | The bytecode representation of a function. Used interchangeably with 'function'.       |
+| upvalue | A variable that belongs to a parent scope.                                             |
+| closure | A function that makes use of upvalues.                                                 |
+| chunk   | A bytecode module, usually a single file. Used interchangeably with 'module'.          |
+| struct  | A data structure containing a series of fields with varying types and with no padding. |
+| enum    | A data structure representing a series of possible values, represented by an integer.  |
 
 ## 4. Chunk Structure
 
-Bytecode is wrapped in a structure, referred to herein as a 'chunk', that
-contains the metadata, function definitions, instructions and type/debug
-information.
+Bytecode is a data structure, referred to herein as a 'chunk', that contains the
+metadata, function definitions, instructions and type/debug information, created
+by a Luau compiler to be executed later by a Luau VM.
 
 ### 4.1. `Chunk`
 
-The Chunk encases the entire bytecode chunk, and has the following fields:
+The `Chunk` encodes the entire bytecode chunk, and is a struct with the
+following fields:
 
 | Field Name       | Type            | Meaning                                                                                                                                  |
 | ---------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -99,14 +101,14 @@ A `ProtoFlags` is a bitfield containing the following fields:
 ### 4.5. `StringRef`
 
 A `StringRef` is a one-indexed `varint` that points to a `string` within the
-chunk string table. `StringRef`s are one-indexed to free `0` to act as a 'null'
-variant, you should therefore decrement the `StringRef` by one when indexing a
-zero-indexed array, like the chunk string table.
+chunk string table. `StringRef`s are one-indexed to allow `0` to act as a 'null'
+variant; you should therefore decrement the `StringRef` by one when indexing a
+zero-indexed array, such as the chunk string table.
 
 ### 4.6. `ProtoTypeInfo`
 
-A `ProtoTypeInfo` encodes type information for a Proto, and begins with a header
-struct with the following fields:
+A `ProtoTypeInfo` encodes type information for a `Proto`, and begins with a
+header struct with the following fields:
 
 | Field Name        | Type     | Meaning                               |
 | ----------------- | -------- | ------------------------------------- |
@@ -156,9 +158,9 @@ The list of types are:
 
 ### 4.8. `Constant`
 
-A Constant encodes a constant value.
+A `Constant` encodes a constant value.
 
-The first byte of a constant encodes its type.
+The first byte of a constant encodes its type as an enum.
 
 Possible types are:
 
@@ -192,11 +194,13 @@ TODO:
 
 ### 4.9. `ProtoLineInfo`
 
-TODO: delta encoding w/ interval anchors
+A `ProtoLineInfo` encodes the line information of a `Proto`s instructions.
+
+This is [implementation defined](../../src/bytecode/chunk/decode.luau).
 
 ### 4.10. `ProtoDebugInfo`
 
-A ProtoDebugInfo encodes debugging information for a Proto, and contains the
+A `ProtoDebugInfo` encodes debugging information for a Proto, and contains the
 following fields:
 
 | Field Name | Type        | Meaning                         |
