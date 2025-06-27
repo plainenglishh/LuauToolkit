@@ -7,6 +7,7 @@ local process = require("@lune/process");
 local stdio = require("@lune/stdio")
 
 local GREEN = stdio.color("green");
+local YELLOW = stdio.color("yellow");
 local RED = stdio.color("red");
 local BLUE = stdio.color("blue");
 local DIM = stdio.style("dim");
@@ -84,8 +85,9 @@ end
 
 --- Lune doubles it for some reason.
 local function fix_trace(str: string)
-    local len = #str;
-    return string.sub(str, 0, len // 2);
+    return str;
+    --local len = #str;
+    --return string.sub(str, 0, len // 2);
 end
 
 local function get_tests(): {string}
@@ -112,11 +114,13 @@ local function main(): never
         local stop = os.clock() * 1000;
         local time_taken = math.round(stop - start);
 
-        if not test_res.ok then
+        if test_res.code == 0 then
+            stdio.write(`{GREEN}pass{RESET}`);
+        elseif test_res.code == 1 then
             ok = false;
             stdio.write(`{RED}fail{RESET}`);
-        else
-            stdio.write(`{GREEN}pass{RESET}`);
+        elseif test_res.code == 2 then
+            stdio.write(`{YELLOW}warn{RESET}`);
         end
 
         stdio.write(` {DIM}({time_taken}ms){RESET}\n`);
