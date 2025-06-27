@@ -1,10 +1,11 @@
 # Test Suite
 
 ```bash
-lune run tests [options]
+Usage: lune run tests [options]
 
-options:
-    --werror    Treat warnings as errors
+Options:
+    --werror        Treat warnings as errors
+    --help, -h      Display this text
 ```
 
 ## Exit Codes

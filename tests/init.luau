@@ -4,7 +4,15 @@
 
 local fs = require("@lune/fs");
 local process = require("@lune/process");
-local stdio = require("@lune/stdio")
+local stdio = require("@lune/stdio");
+
+local HELP_TEXT = [[
+Usage: lune run tests [options]
+
+Options:
+    --werror        Treat warnings as errors
+    --help, -h      Display this text
+]];
 
 local GREEN = stdio.color("green");
 local YELLOW = stdio.color("yellow");
@@ -95,7 +103,7 @@ local function get_tests(): {string}
     return tests;
 end
 
-local function main(): never
+local function main()
     local tests = get_tests();
     print(`running {BLUE}{#tests}{RESET} tests:`);
 
@@ -103,6 +111,12 @@ local function main(): never
     if table.find(process.args, "--werror") then
         warns_enabled = false;
     end
+
+    if table.find(process.args, "--help") or table.find(process.args, "-h") then
+        stdio.write(HELP_TEXT);
+        return;
+    end
+
 
     local ok = true;
     for i, path in tests do
@@ -137,10 +151,10 @@ local function main(): never
 
     if ok then
         print(`\n test suite {GREEN}passed{RESET}`);
-        return process.exit(0);
+        process.exit(0);
     else
         print(`\ntest suite {RED}failed{RESET}`);
-        return process.exit(1);
+        process.exit(1);
     end
 end
 
