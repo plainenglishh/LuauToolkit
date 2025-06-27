@@ -1,0 +1,10 @@
+{
+    "languageMode": "nonstrict",
+    "aliases": {
+        "luau_toolkit": "../modules/",
+        "testing": "./"
+    },
+    "lint": {
+        "LocalShadow": false
+    }
+}
