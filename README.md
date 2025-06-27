@@ -47,5 +47,5 @@ currently targeted version can be found in the
 You can run the test suite with:
 
 ```bash
-lune run tests`
+lune run tests
 ```
