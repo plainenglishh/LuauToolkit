@@ -4,10 +4,6 @@ local bytecode = require("@luau_toolkit/bytecode");
 local testing = require("@testing/utils");
 
 local SAMPLE_FILES = "../sample_files/";
-if not fs.isDir(SAMPLE_FILES) then
-    error("can't find sample files, are you sure pwd is the project root?");
-end
- 
 local files = fs.readDir(SAMPLE_FILES);
 
 for _, file in files do

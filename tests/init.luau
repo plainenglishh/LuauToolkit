@@ -15,6 +15,11 @@ local RESET = stdio.style("reset");
 local TESTS_PATH = "./tests/";
 local TESTS_ENDS_WITH = ".spec.luau";
 
+if not fs.isDir(TESTS_PATH) then
+    stdio.ewrite(`can't fine test directory '{TESTS_PATH}', are you sure you're running this from the project root?`);
+    process.exit(1);
+end
+
 local function read_dir_recursive(path: string): {string}
     path = string.gsub(path, "/$", "");
     local files = {};
