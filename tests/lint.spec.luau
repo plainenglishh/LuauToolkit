@@ -8,10 +8,10 @@ local function starts_with(str: string, with: string)
     return string.sub(str, 0, #with) == with;
 end
 
-local res = process.exec("luau-analyze", {"--mode=strict", "--formatter=gnu", "./modules/"});
+local res = process.exec("luau-analyze", {"--mode=strict", "--formatter=gnu", "./src/"});
 local lines = string.split(res.stderr, "\n");
 for _, line in lines do
-    if not starts_with(line, "./modules/") then
+    if not starts_with(line, "./src/") then
         continue;
     end
 

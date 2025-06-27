@@ -1,7 +1,7 @@
 {
     "languageMode": "nonstrict",
     "aliases": {
-        "luau_toolkit": "../modules/",
+        "luau_toolkit": "../src/",
         "testing": "./"
     },
     "lint": {

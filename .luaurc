@@ -2,7 +2,7 @@
     "languageMode": "strict",
     "aliases": {
         "lune": "~/.lune/.typedefs/0.9.4/",
-        "luau_toolkit": "./modules/"
+        "luau_toolkit": "./src/"
     },
     "lint": {
         "LocalShadow": false
