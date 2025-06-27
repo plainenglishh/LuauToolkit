@@ -41,7 +41,7 @@ local function read_dir_recursive(path: string): {string}
     return files;
 end
 
-local function indent(str: string, indent: string)
+local function indent(str: string, indent: string): string
     local lines = string.split(str, "\n");
     for i, v in lines do
         lines[i] = indent .. v;
@@ -73,10 +73,10 @@ local function filter<T, B...>(array: {T}, filter_fn: (T, B...) -> boolean, ...:
 end
 
 local function pretty_path(path: string): string
-    return path
+    return (path
         :gsub("%./tests/", "")
         :gsub("/", "::")
-        :gsub("%.spec%.luau", "");
+        :gsub("%.spec%.luau", ""));
 end
 
 local function trim(str: string)
@@ -85,18 +85,24 @@ end
 
 --- Lune doubles it for some reason.
 local function fix_trace(str: string)
+    -- TODO
     return str;
-    --local len = #str;
-    --return string.sub(str, 0, len // 2);
 end
 
 local function get_tests(): {string}
-    return filter(read_dir_recursive(TESTS_PATH), ends_with, TESTS_ENDS_WITH);
+    local files = read_dir_recursive(TESTS_PATH);
+    local tests = filter(files, ends_with, TESTS_ENDS_WITH) :: {string};
+    return tests;
 end
 
 local function main(): never
     local tests = get_tests();
     print(`running {BLUE}{#tests}{RESET} tests:`);
+
+    local warns_enabled = true;
+    if table.find(process.args, "--werror") then
+        warns_enabled = false;
+    end
 
     local ok = true;
     for i, path in tests do
@@ -105,22 +111,19 @@ local function main(): never
         end
             
         stdio.write(`  - {pretty_path(path)} {RESET}...{RESET} `);
-        local cwd, name = directory_of(path);
 
         local start = os.clock() * 1000;
-        local test_res = process.exec("lune", {"run", name}, {
-            cwd = cwd,
-        });
+        local test_res = process.exec("lune", {"run", path});
         local stop = os.clock() * 1000;
         local time_taken = math.round(stop - start);
 
         if test_res.code == 0 then
             stdio.write(`{GREEN}pass{RESET}`);
-        elseif test_res.code == 1 then
+        elseif warns_enabled and test_res.code == 2 then
+            stdio.write(`{YELLOW}warn{RESET}`);
+        else
             ok = false;
             stdio.write(`{RED}fail{RESET}`);
-        elseif test_res.code == 2 then
-            stdio.write(`{YELLOW}warn{RESET}`);
         end
 
         stdio.write(` {DIM}({time_taken}ms){RESET}\n`);

@@ -3,7 +3,7 @@ local luau = require("@lune/luau");
 local bytecode = require("@luau_toolkit/bytecode");
 local testing = require("@testing/utils");
 
-local SAMPLE_FILES = "../sample_files/";
+local SAMPLE_FILES = "./tests/sample_files/";
 local files = fs.readDir(SAMPLE_FILES);
 
 for _, file in files do

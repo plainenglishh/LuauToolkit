@@ -1,17 +1,16 @@
 # Test Suite
 
-Run the test suite by running...
-
 ```bash
-lune run test
-```
+lune run tests [options]
 
-from the project root.
+options:
+    --werror    Treat warnings as errors
+```
 
 ## Exit Codes
 
-| Exit Code | Meaning                       |
-| --------- | ----------------------------- |
-| `0`       | Passed                        |
-| `1`       | Failed                        |
-| `2`       | Warning (message in `stderr`) |
+| Exit Code     | Meaning                  |
+| ------------- | ------------------------ |
+| `0`           | Test passed              |
+| `2`           | Test failed as a warning |
+| Anything else | Test failed              |

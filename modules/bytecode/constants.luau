@@ -1,3 +1,5 @@
+--!nocheck
+
 --[=[
     Various bytecode related constants.
 ]=]

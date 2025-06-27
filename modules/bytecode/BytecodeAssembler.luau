@@ -1,7 +1,6 @@
 local encode = require("./chunk/encode");
 local import_id = require("./import_id");
 local instructions = require("./instructions");
-local misc = require("./misc");
 local t = require("./types");
 
 local function add_to<T>(tbl: {T}, value: T, force: boolean?): number
@@ -184,7 +183,7 @@ function BytecodeAssembler:add_instruction(opname_or_code: number|any, ...: numb
     end
     
     local offset = self._offset;
-    local info = misc.get_opcode_info(opname_or_code) or error("unknown opcode", 2);
+    local info = instructions.get_info(opname_or_code) or error("unknown opcode", 2);
     local mode: t.OperandMode = info.mode;
 
     local raw_operands = { ... };

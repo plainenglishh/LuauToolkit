@@ -1,4 +1,3 @@
-local misc = require("@self/misc");
 local t = require("@self/types");
 
 --[=[
@@ -10,7 +9,6 @@ bytecode.chunk = require("@self/chunk");
 bytecode.instructions = require("@self/instructions");
 bytecode.constants = require("@self/constants");
 bytecode.import_id = require("@self/import_id");
-bytecode.get_opcode_info = misc.get_opcode_info;
 bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");
 bytecode.opcodes = require("@self/opcodes");
 bytecode.util = require("@self/util");
