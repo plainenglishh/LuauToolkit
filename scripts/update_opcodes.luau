@@ -194,7 +194,7 @@ local function generate(bytecode_h: string): string
         Writes the OpcodeName type from an array of opcodes.
     ]=]
     local function write_opcode_name_type(opcodes: {Opcode})
-        write("--[[\nuse for types.luau:\n\nexport type OpcodeName =\n   ");
+        write("--[[\nuse for types.luau:\n\nexport type InstructionName =\n   ");
         for i,  opcode in opcodes do
             write(" | %-22s", '"'..opcode.name..'"');
             if i % 3 == 0 then
@@ -209,7 +209,7 @@ local function generate(bytecode_h: string): string
     ]=]
     local function write_opcodes(opcodes: {Opcode})
         write(DOC_COMMENT);
-        write("local opcodes: {[number]: t.OpcodeInfo} = {\n");
+        write("local instructions: {[number]: t.InstructionMetadata} = {\n");
         for i, opcode in opcodes do
             local has_aux = false;
             local operands = "";
@@ -266,7 +266,7 @@ local function generate(bytecode_h: string): string
     local opcodes = extract_opcodes(bytecode_h);
     write_opcodes(opcodes)
     write_opcode_name_type(opcodes);
-    write("return opcodes;\n");
+    write("return instructions;\n");
 
     --[[local opcode_grammar = "Paste the following line in lasm.tmLanguage.json:\n\n\\\\b(";
     for i, op in opcodes do
@@ -288,4 +288,4 @@ end
 
 local bytecode_h =  bytecode_h_res.body;
 
-fs.writeFile("./bytecode/opcodes.luau", generate(bytecode_h));
+fs.writeFile("./src/bytecode/instruction_metadata.luau", generate(bytecode_h));

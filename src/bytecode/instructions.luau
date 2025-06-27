@@ -1,4 +1,4 @@
-local opcodes = require("./opcodes");
+local metadata = require("./instruction_metadata");
 local t = require("./types");
 
 @native
@@ -52,7 +52,7 @@ end
 @native
 local function encode_instruction(insn: t.Instruction): (number, number?)
     local raw = insn.opcode;
-    local mode: t.OperandMode, operands = insn.mode, insn.operands;
+    local mode: t.InstructionOperandMode, operands = insn.mode, insn.operands;
 
     if mode == "abc" then
         raw = bit32.replace(raw, operands.x or 0, 8, 8);
@@ -74,8 +74,8 @@ local function decode_instruction(insn: number, next_insn: number?): t.Instructi
     local operands = vector.zero;
     local aux;
     
-    local info = opcodes[opcode] or error(`unknown opcode {opcode}`);
-    local mode: t.OperandMode = info.mode;
+    local info = metadata[opcode] or error(`unknown opcode {opcode}`);
+    local mode: t.InstructionOperandMode = info.mode;
 
     if mode == "abc" then
         operands = vector.create(bit32.extract(insn, 8, 8), bit32.extract(insn, 16, 8), bit32.extract(insn, 24, 8));
@@ -102,17 +102,26 @@ end
 ]=]
 local instructions = {};
 
-function instructions.get_info(opcode: number|string|t.Instruction): t.OpcodeInfo?
-    if type(opcode) == "number" then
-        return opcodes[opcode];
-    elseif type(opcode) == "string" then
-        for _, v in opcodes do
-            if v.name == opcode then
+--[=[
+    Returns information about an instruction.
+
+    The `instruction` parameter can be:
+      - an opcode number;
+      - an instruction name; or
+      - an `Instruction` object.
+]=]
+function instructions.get_metadata(instruction: number|string|t.Instruction): t.InstructionMetadata?
+    if type(instruction) == "number" then
+        return metadata[instruction];
+    elseif type(instruction) == "string" then
+        instruction = string.upper(instruction);
+        for _, v in metadata do
+            if v.name == instruction then
                 return v;
             end
         end
-    elseif type(opcode) == "table" then
-        return opcodes[opcode.opcode];
+    elseif type(instruction) == "table" then
+        return metadata[instruction.opcode];
     end
 
     return;
@@ -123,7 +132,7 @@ end
 ]=]
 function instructions.display(insn: number, next_insn: number?): string
     local instruction = decode_instruction(insn, next_insn);
-    local info = instructions.get_info(instruction) or error("");
+    local info = instructions.get_metadata(instruction) or error("");
 
     local out = {info.name};
 

@@ -10,16 +10,15 @@ bytecode.instructions = require("@self/instructions");
 bytecode.constants = require("@self/constants");
 bytecode.import_id = require("@self/import_id");
 bytecode.BytecodeAssembler = require("@self/BytecodeAssembler");
-bytecode.opcodes = require("@self/opcodes");
 bytecode.util = require("@self/util");
  
 --BEGIN_REEXPORTS
 export type OperandName = t.OperandName;
 export type OperandType = t.OperandType;
-export type OperandInfo = t.OperandInfo;
-export type OperandMode = t.OperandMode;
-export type OpcodeInfo = t.OpcodeInfo;
-export type OpcodeName = t.OpcodeName;
+export type OperandMetadata = t.OperandMetadata;
+export type InstructionOperandMode = t.InstructionOperandMode;
+export type InstructionMetadata = t.InstructionMetadata;
+export type InstructionName = t.InstructionName;
 export type ConstantType = t.ConstantType;
 export type ProtoFlag = t.ProtoFlag;
 export type BytecodeAssembler = t.BytecodeAssembler;

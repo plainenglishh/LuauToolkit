@@ -4,7 +4,7 @@ local t = require("./types");
 --[=[
     Array of information about Luau opcodes.
 ]=]
-local opcodes: {[number]: t.OpcodeInfo} = {
+local instructions: {[number]: t.InstructionMetadata} = {
     --[=[
         NOP: noop
     ]=]
@@ -1726,7 +1726,7 @@ local opcodes: {[number]: t.OpcodeInfo} = {
 --[[
 use for types.luau:
 
-export type OpcodeName =
+export type InstructionName =
     | "NOP"                  | "BREAK"                | "LOADNIL"             
     | "LOADB"                | "LOADN"                | "LOADK"               
     | "MOVE"                 | "GETGLOBAL"            | "SETGLOBAL"           
@@ -1757,4 +1757,4 @@ export type OpcodeName =
     | "IDIV"                 | "IDIVK"                ;
 ]]
 
-return opcodes;
+return instructions;

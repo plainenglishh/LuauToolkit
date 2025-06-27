@@ -14,7 +14,7 @@ export type OperandType = "register" | "jump_offset" | "constant" | "proto" | "n
 --[=[
     Metadata about an instruction operand.
 ]=]
-export type OperandInfo = {
+export type OperandMetadata = {
     --[=[
         The name of the operand.
     ]=]
@@ -34,12 +34,12 @@ export type OperandInfo = {
 --[=[
     How the operands are encoded for an opcode.
 ]=]
-export type OperandMode = "abc" | "ad" | "e" | "none";
+export type InstructionOperandMode = "abc" | "ad" | "e" | "none";
 
 --[=[
     Metadata about a bytecode instruction.
 ]=]
-export type OpcodeInfo = {
+export type InstructionMetadata = {
     --[=[
         The name of the opcode.
     ]=]
@@ -53,7 +53,7 @@ export type OpcodeInfo = {
     --[=[
         The opcode's operand encoding mode.
     ]=]
-    mode: OperandMode,
+    mode: InstructionOperandMode,
 
     --[=[
         Whether the opcode has an auxillary instruction.
@@ -68,7 +68,7 @@ export type OpcodeInfo = {
     --[=[
         An array of operands used by the instruction.
     ]=]
-    operands: {OperandInfo},
+    operands: {OperandMetadata},
 
     --[=[
         How many `u32`s the opcode takes up. (`if aux then 2 else 1`)
@@ -76,7 +76,7 @@ export type OpcodeInfo = {
     size: number,
 };
 
-export type OpcodeName =
+export type InstructionName =
     | "NOP"                  | "BREAK"                | "LOADNIL"             
     | "LOADB"                | "LOADN"                | "LOADK"               
     | "MOVE"                 | "GETGLOBAL"            | "SETGLOBAL"           
@@ -136,7 +136,7 @@ export type _BytecodeAssemblerImpl = {
     set_main: (self: BytecodeAssembler, proto: number?) -> (),
     set_flag: (self: BytecodeAssembler, flag: ProtoFlag, value: boolean) -> (),
     add_constant: (self: BytecodeAssembler, type: ConstantType, value: any, force: boolean?) -> number,
-    add_instruction: (self: BytecodeAssembler, opname_or_code: OpcodeName|number, ...number) -> number,
+    add_instruction: (self: BytecodeAssembler, opname_or_code: InstructionName|number, ...number) -> number,
     get_offset: (self: BytecodeAssembler) -> number,
     end_function: (self: BytecodeAssembler) -> number,
     to_ir: (self: BytecodeAssembler) -> Chunk,
@@ -207,7 +207,7 @@ export type Instruction = {
     opcode: number,
     operands: vector,
     aux: number?,
-    mode: OperandMode,
+    mode: InstructionOperandMode,
 };
 
 --[=[

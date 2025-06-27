@@ -183,8 +183,8 @@ function BytecodeAssembler:add_instruction(opname_or_code: number|any, ...: numb
     end
     
     local offset = self._offset;
-    local info = instructions.get_info(opname_or_code) or error("unknown opcode", 2);
-    local mode: t.OperandMode = info.mode;
+    local info = instructions.get_metadata(opname_or_code) or error("unknown opcode", 2);
+    local mode: t.InstructionOperandMode = info.mode;
 
     local raw_operands = { ... };
     local operands = vector.zero;
