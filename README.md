@@ -31,9 +31,9 @@ Optionally create an `@luau_toolkit` alias in your `.luaurc`:
 
 The library is split into _mostly_ separate modules:
 
-| Name       | Description                                                        | Dependencies\*\* |                                                             |
-| ---------- | ------------------------------------------------------------------ | ---------------- | ----------------------------------------------------------- |
-| `bytecode` | **\[WIP]** Functions and constants for working with Luau bytecode. | None             | [`[ docs ]`](./docs/bytecode/) [`[ src ]`](./src/bytecode/) |
+| Name       | Description                                                        | Dependencies\*\* |                                                                 |
+| ---------- | ------------------------------------------------------------------ | ---------------- | --------------------------------------------------------------- |
+| `bytecode` | **\[WIP]** Functions and constants for working with Luau bytecode. | None             | [`[ docs ]`](./docs/bytecode/)<br/>[`[ src ]`](./src/bytecode/) |
 
 <!--| [`vm`](./src/vm/)             | **\[WIP]** Luau virtual machine/interpreter implementations.       | `bytecode`       |-->
 <!--| [`lexer`](./src/lexer/)       | **\[WIP]** Luau source code lexer.                                 |                  |-->
