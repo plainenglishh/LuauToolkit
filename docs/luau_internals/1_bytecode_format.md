@@ -12,8 +12,8 @@ This document refers to the following "types":
 | Name      | Description                                                                             |
 | --------- | --------------------------------------------------------------------------------------- |
 | `boolean` | A true or false value. Encoded as a `u8` where zero is false and anything else is true. |
-| `u_`      | An unsigned integer \_ bits wide.                                                       |
-| `i_`      | An signed integer \_ bits wide.                                                         |
+| `ux`      | An unsigned integer _x_ bits wide.                                                      |
+| `ix`      | An signed integer _x_ bits wide.                                                        |
 | `f?`      | An IEEE 754 floating point _?_ bits wide.                                               |
 | `varint`  | A protobuf variable width integer.                                                      |
 | `string`  | A `varint` length prefixed ASCII string.                                                |
