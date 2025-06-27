@@ -13,5 +13,4 @@
         "Proto", "proto", "boolean", "ProtoTypeInfo", "ProtoDebugInfo", 
         "upvalue", "Upvalue", "ProtoLineInfo", "BytecodeAssembler", "plainenglish"
     ],
-    "rust-analyzer.cargo.targetDir": "./test/target"
 }
