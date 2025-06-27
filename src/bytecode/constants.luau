@@ -29,9 +29,9 @@ constants.constant_types = {
     Proto bitfield flags.
 ]=]
 constants.proto_flag = {
-    native_module = bit32.lshift(1, 0),
-    native_cold = bit32.lshift(1, 1), 
-    native_function = bit32.lshift(1, 2),
+    native_module = 0,
+    native_cold = 1, 
+    native_function = 2,
 };
 
 --[=[

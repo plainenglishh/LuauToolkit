@@ -11,6 +11,19 @@
     "spellchecker.ignoreWordsList": [
         "bytecode", "Bytecode", "tokeniser", "README", "Decompiler", "protobuf",
         "Proto", "proto", "boolean", "ProtoTypeInfo", "ProtoDebugInfo", 
-        "upvalue", "Upvalue", "ProtoLineInfo", "BytecodeAssembler", "plainenglish"
+        "upvalue", "Upvalue", "ProtoLineInfo", "BytecodeAssembler", 
+        "plainenglish", "userdata", "struct", "upvalues", "Bitfield", "varadic",
+        "decrement", "bitfield", "protos", "enum", "TableShape"
     ],
+    "[markdown]": {
+        "editor.unicodeHighlight.ambiguousCharacters": false,
+        "editor.unicodeHighlight.invisibleCharacters": false,
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.wordWrap": "off",
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "strings": "off",
+            "other": "off"
+        }
+    }
 }
