@@ -52,7 +52,7 @@ end
 @native
 local function encode_instruction(insn: t.Instruction): (number, number?)
     local raw = insn.opcode;
-    local mode: t.InstructionOperandMode, operands = insn.mode, insn.operands;
+    local mode: t.OperandEncodingMode, operands = insn.mode, insn.operands;
 
     if mode == "abc" then
         raw = bit32.replace(raw, operands.x or 0, 8, 8);
@@ -75,7 +75,7 @@ local function decode_instruction(insn: number, next_insn: number?): t.Instructi
     local aux;
     
     local info = metadata[opcode] or error(`unknown opcode {opcode}`);
-    local mode: t.InstructionOperandMode = info.mode;
+    local mode: t.OperandEncodingMode = info.mode;
 
     if mode == "abc" then
         operands = vector.create(bit32.extract(insn, 8, 8), bit32.extract(insn, 16, 8), bit32.extract(insn, 24, 8));

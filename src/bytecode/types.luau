@@ -34,34 +34,34 @@ export type OperandMetadata = {
 --[=[
     How the operands are encoded for an opcode.
 ]=]
-export type InstructionOperandMode = "abc" | "ad" | "e" | "none";
+export type OperandEncodingMode = "abc" | "ad" | "e" | "none";
 
 --[=[
     Metadata about a bytecode instruction.
 ]=]
 export type InstructionMetadata = {
     --[=[
-        The name of the opcode.
+        The name of the instruction.
     ]=]
     name: string,
 
     --[=[
-        The opcode number.
+        The instruction opcode number.
     ]=]
     opcode: number,
 
     --[=[
-        The opcode's operand encoding mode.
+        The instructions's operand encoding mode.
     ]=]
-    mode: InstructionOperandMode,
+    mode: OperandEncodingMode,
 
     --[=[
-        Whether the opcode has an auxillary instruction.
+        Whether the instruction expects an auxillary instruction.
     ]=]
     aux: boolean,
 
     --[=[
-        A description of what the opcode does.
+        A description of what the instruction does.
     ]=]
     description: string,
 
@@ -71,7 +71,7 @@ export type InstructionMetadata = {
     operands: {OperandMetadata},
 
     --[=[
-        How many `u32`s the opcode takes up. (`if aux then 2 else 1`)
+        How large in 32-bit words the instruction is.
     ]=]
     size: number,
 };
@@ -207,7 +207,7 @@ export type Instruction = {
     opcode: number,
     operands: vector,
     aux: number?,
-    mode: InstructionOperandMode,
+    mode: OperandEncodingMode,
 };
 
 --[=[
