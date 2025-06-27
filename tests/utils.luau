@@ -1,5 +1,5 @@
 --[=[
-    Common testing utils
+    Shared testing utility functions.
 ]=]
 local testing = {};
 

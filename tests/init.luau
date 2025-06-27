@@ -83,49 +83,55 @@ local function fix_trace(str: string)
     return string.sub(str, 0, len // 2);
 end
 
-local tests = filter(read_dir_recursive(TESTS_PATH), ends_with, TESTS_ENDS_WITH);
-local test_count = #tests;
+local function get_tests(): {string}
+    return filter(read_dir_recursive(TESTS_PATH), ends_with, TESTS_ENDS_WITH);
+end
 
-print(`running {BLUE}{test_count}{RESET} tests:`);
+local function main(): never
+    local tests = get_tests();
+    print(`running {BLUE}{#tests}{RESET} tests:`);
 
-local ok = true;
-for i, path in tests do
-    if not ends_with(path, TESTS_ENDS_WITH) then
-        continue;
+    local ok = true;
+    for i, path in tests do
+        if not ends_with(path, TESTS_ENDS_WITH) then
+            continue;
+        end
+            
+        stdio.write(`  - {pretty_path(path)} {RESET}...{RESET} `);
+        local cwd, name = directory_of(path);
+
+        local start = os.clock() * 1000;
+        local test_res = process.exec("lune", {"run", name}, {
+            cwd = cwd,
+        });
+        local stop = os.clock() * 1000;
+        local time_taken = math.round(stop - start);
+
+        if not test_res.ok then
+            ok = false;
+            stdio.write(`{RED}fail{RESET}`);
+        else
+            stdio.write(`{GREEN}pass{RESET}`);
+        end
+
+        stdio.write(` {DIM}({time_taken}ms){RESET}\n`);
+
+        if not test_res.ok then
+            stdio.write(DIM);
+            print(indent(trim(fix_trace(test_res.stderr)), "    | "));
+            stdio.write(RESET);
+        end
     end
-        
-    stdio.write(`  - {pretty_path(path)} {RESET}...{RESET} `);
-    local cwd, name = directory_of(path);
 
-    local start = os.clock() * 1000;
-    local test_res = process.exec("lune", {"run", name}, {
-        cwd = cwd,
-    });
-    local stop = os.clock() * 1000;
-    local time_taken = math.round(stop - start);
-
-    if not test_res.ok then
-        ok = false;
-        stdio.write(`{RED}fail{RESET}`);
+    if ok then
+        print(`\n test suite {GREEN}passed{RESET}`);
+        return process.exit(0);
     else
-        stdio.write(`{GREEN}pass{RESET}`);
-    end
-
-    stdio.write(` {DIM}({time_taken}ms){RESET}\n`);
-
-    if not test_res.ok then
-        stdio.write(DIM);
-        print(indent(trim(fix_trace(test_res.stderr)), "    | "));
-        stdio.write(RESET);
+        print(`\ntest suite {RED}failed{RESET}`);
+        return process.exit(1);
     end
 end
 
-if ok then
-    print(`\n test suite {GREEN}passed{RESET}`);
-    process.exit(0);
-else
-    print(`\ntest suite {RED}failed{RESET}`);
-    process.exit(1);
-end
+main();
 
 -- Don't return to prevent it from being mistakenly required instead of `api.luau`
