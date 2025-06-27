@@ -10,9 +10,9 @@ A library for working with luau, within luau.
 
 The library is split into _mostly_ separate modules:
 
-| Name                      | Description                                                        | Dependencies\*\* |
-| ------------------------- | ------------------------------------------------------------------ | ---------------- |
-| [`bytecode`](./bytecode/) | **\[WIP]** Functions and constants for working with Luau bytecode. | None             |
+| Name                              | Description                                                        | Dependencies\*\* |
+| --------------------------------- | ------------------------------------------------------------------ | ---------------- |
+| [`bytecode`](./modules/bytecode/) | **\[WIP]** Functions and constants for working with Luau bytecode. | None             |
 
 <!--| [`vm`](./vm/)             | **\[WIP]** Luau virtual machine/interpreter implementations.       | `bytecode`       |-->
 <!--| [`lexer`](./lexer/)       | **\[WIP]** Luau source code lexer.                                 |                  |-->
