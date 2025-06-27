@@ -6,8 +6,6 @@
 
 A library for working with luau, within luau.
 
-## About
-
 ## Usage
 
 ### Installation
@@ -50,6 +48,23 @@ Each version of the library is designed to target a specific luau version. The
 currently targeted version can be found in the
 [`.luau_version`](./.luau_version) file.
 
+## Documentation
+
+Documentation can be found [here](./docs/index.md).
+
+## Examples
+
+A series of examples can be found under the `examples/` directory.
+
+You can run an example with:
+
+```bash
+lune run examples/<path_to_example> [args]
+
+# eg:
+lune run examples/bytecode/strip chunk.luauc stripped.luauc
+```
+
 ## Testing
 
 You can run the test suite with:
@@ -57,3 +72,5 @@ You can run the test suite with:
 ```bash
 lune run tests
 ```
+
+Optionally specify `--werror` to treat "warnings" as failed tests.
