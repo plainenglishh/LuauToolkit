@@ -41,3 +41,11 @@ local bytecode = require("@luau_toolkit/bytecode");
 Each version of the library is designed to target a specific luau version. The
 currently targeted version can be found in the
 [`.luau_version`](./.luau_version) file.
+
+## Testing
+
+You can run the test suite with:
+
+```bash
+lune run tests`
+```

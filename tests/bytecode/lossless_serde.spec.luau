@@ -1,7 +1,7 @@
 local fs = require("@lune/fs");
 local luau = require("@lune/luau");
 local bytecode = require("@luau_toolkit/bytecode");
-local testing = require("@testing/");
+local testing = require("@testing/utils");
 
 local SAMPLE_FILES = "../sample_files/";
 if not fs.isDir(SAMPLE_FILES) then
