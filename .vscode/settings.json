@@ -11,6 +11,7 @@
     "spellchecker.ignoreWordsList": [
         "bytecode", "Bytecode", "tokeniser", "README", "Decompiler", "protobuf",
         "Proto", "proto", "boolean", "ProtoTypeInfo", "ProtoDebugInfo", 
-        "upvalue", "Upvalue", "ProtoLineInfo", "BytecodeAssembler",
+        "upvalue", "Upvalue", "ProtoLineInfo", "BytecodeAssembler", "plainenglish"
     ],
+    "rust-analyzer.cargo.targetDir": "./test/target"
 }
