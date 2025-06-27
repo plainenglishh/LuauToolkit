@@ -1,10 +1,10 @@
 # Luau-Toolkit
 
-> [!WARNING]
-> This library is work in progress. Many features aren't implemented yet and the
-> API structure is subject to change.
-
 A library for working with luau, within luau.
+
+> [!WARNING]
+> This library is work in progress. Many features aren't implemented and the API
+> structure is subject to change.
 
 ## Usage
 
