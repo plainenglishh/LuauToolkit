@@ -102,6 +102,8 @@ end
 ]=]
 local instructions = {};
 
+instructions.metadata = metadata;
+
 --[=[
     Returns information about an instruction.
 

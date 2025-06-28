@@ -29,7 +29,7 @@ local function ValidationResult(issues: {t.ValidationIssue}): t.ValidationResult
     };
 end
 
-local function validate_proto(proto_id: number, proto: t.Proto, report_issue: ReportIssueFn)
+local function validate_proto(chunk: t.Chunk, proto_id: number, proto: t.Proto, report_issue: ReportIssueFn)
     
 end
 
@@ -46,7 +46,7 @@ local function validate_chunk(chunk: t.Chunk, report_issue: ReportIssueFn)
     end
 
     for proto_id, proto in chunk.protos do
-        validate_proto(proto_id - 1, proto, report_issue);
+        validate_proto(chunk, proto_id - 1, proto, report_issue);
     end
 end
 

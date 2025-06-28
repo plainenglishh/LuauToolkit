@@ -1,0 +1,38 @@
+--[[
+    This file contains the Luau standard library as a dictionary.
+]]
+
+return {
+    assert = assert,
+    error = error,
+    gcinfo = gcinfo,
+    getfenv = getfenv,
+    getmetatable = getmetatable,
+    next = next,    
+    newproxy = newproxy,
+    print = print,
+    rawequal = rawequal,
+    rawget = rawget,
+    select = select,
+    setfenv = setfenv,
+    setmetatable = setmetatable,
+    tonumber = tonumber,
+    tostring = tostring,
+    type = type,
+    typeof = typeof,
+    ipairs = ipairs,
+    pairs = pairs,
+    pcall = pcall,
+    xpcall = xpcall,
+    unpack = unpack,
+    math = math,
+    table = table,
+    string = string,
+    coroutine = coroutine,
+    bit32 = bit32,
+    utf8 = utf8,
+    os = os,
+    debug = debug,
+    buffer = buffer,
+    vector = vector,
+};

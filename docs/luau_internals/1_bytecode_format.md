@@ -54,7 +54,7 @@ following fields:
 | `protos`         | `{Proto}`       | The proto table. Encodes function definitions.                                                                                           |
 | `main_proto`     | `ProtoRef`      | Indicates which function is the main function.                                                                                           |
 
-## 4.2. `UserdataTypes`
+### 4.2. `UserdataTypes`
 
 The `UserdataTypes` encodes tagged userdata type names, and is encoded as a
 null-terminated array of pairs.
@@ -222,3 +222,27 @@ and `Upvalue` is:
 | Field Name | Type        | Meaning                  |
 | ---------- | ----------- | ------------------------ |
 | `name`     | `StringRef` | The name of the upvalue. |
+
+## 5. Instructions Structure
+
+An instruction buffer encodes instructions as a series of 32-bit words.
+
+### 5.1. Instruction Word Structure
+
+The first byte of an instruction contains the opcode.
+
+The rest of the instruction contains its operands, which can be encoded in one
+of the following modes:
+
+| Mode  | Encoding                      |
+| ----- | ----------------------------- |
+| `abc` | Three `u8`s.                  |
+| `ad`  | One `u8` followed by an `i16` |
+| `e`   | One `i24`                     |
+
+Some instructions have additional arguments encoded in a follow up 'auxiliary'
+instruction.
+
+## 5.2. List of Instructions
+
+TODO!
