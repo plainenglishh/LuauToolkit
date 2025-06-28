@@ -13,7 +13,7 @@
         "Proto", "proto", "boolean", "ProtoTypeInfo", "ProtoDebugInfo", 
         "upvalue", "Upvalue", "ProtoLineInfo", "BytecodeAssembler", 
         "plainenglish", "userdata", "struct", "upvalues", "Bitfield", "varadic",
-        "decrement", "bitfield", "protos", "enum", "TableShape"
+        "decrement", "bitfield", "protos", "enum", "TableShape", "Loadstring",
     ],
     "[markdown]": {
         "editor.unicodeHighlight.ambiguousCharacters": false,
