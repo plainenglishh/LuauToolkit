@@ -12,6 +12,11 @@
 - [ ] Move `instructions.luau` to `instructions/init.luau` and move
       `instruction_metadata` to `instructions/metadata` (waiting for lune to fix
       requires). **INVOLVES FIXING UPDATE_OPCODES SCRIPT**
+- [ ] Rework constant types + add table shapes
+
+## Loadstring Module
+
+- [ ] Make use of constant tables
 
 ## VM Module
 
