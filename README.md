@@ -30,10 +30,10 @@ library accessible with `require("@luau_toolkit/<module>")`:
 
 The library is split into the following modules:
 
-| Module       | Contents                                                       | Dependencies |                                                                                                                            |
-| ------------ | -------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `bytecode`   | \[WIP] Functions and constants for working with Luau bytecode. | None         | [`[ docs ]`](./docs/modules/bytecode.md)<br/>[`[ src ]`](./src/bytecode/)<br/>[`[ examples ]`](./examples/bytecode/)       |
-| `loadstring` | \[WIP] Loadstring implementation. Note: Only accepts bytecode. | None         | [`[ docs ]`](./docs/modules/loadstring.md)<br/>[`[ src ]`](./src/loadstring/)<br/>[`[ examples ]`](./examples/loadstring/) |
+| Module       | Contents                                                       | Dependencies |                                                                                                                      |
+| ------------ | -------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `bytecode`   | \[WIP] Functions and constants for working with Luau bytecode. | None         | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./src/bytecode/)<br/>[`[examples]`](./examples/bytecode/)       |
+| `loadstring` | \[WIP] Loadstring implementation. Note: Only accepts bytecode. | None         | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./src/loadstring/)<br/>[`[examples]`](./examples/loadstring/) |
 
 <!--| [`vm`](./src/vm/)             | **\[WIP]** Luau virtual machine/interpreter implementations.       | `bytecode`       |-->
 <!--| [`lexer`](./src/lexer/)       | **\[WIP]** Luau source code lexer.                                 |                  |-->
