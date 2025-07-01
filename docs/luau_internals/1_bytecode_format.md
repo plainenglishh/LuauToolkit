@@ -196,7 +196,7 @@ TODO:
 
 A `ProtoLineInfo` encodes the line information of a `Proto`s instructions.
 
-This is [implementation defined](../../src/bytecode/chunk/decode.luau).
+This is [implementation defined](../../lib/bytecode/chunk/decode.luau).
 
 ### 4.10. `ProtoDebugInfo`
 

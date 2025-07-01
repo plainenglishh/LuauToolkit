@@ -288,4 +288,4 @@ end
 
 local bytecode_h =  bytecode_h_res.body;
 
-fs.writeFile("./src/bytecode/instruction_metadata.luau", generate(bytecode_h));
+fs.writeFile("./lib/bytecode/instruction_metadata.luau", generate(bytecode_h));

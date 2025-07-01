@@ -38,5 +38,6 @@ function common.unimplemented()
 end
  
 common.stdlib = require("@self/stdlib");
+common.collect = require("@self/collect");
 
 return common;

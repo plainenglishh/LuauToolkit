@@ -136,7 +136,7 @@ export type _BytecodeAssemblerImpl = {
     set_main: (self: BytecodeAssembler, proto: number?) -> (),
     set_flag: (self: BytecodeAssembler, flag: ProtoFlag, value: boolean) -> (),
     add_constant: (self: BytecodeAssembler, type: ConstantType, value: any, force: boolean?) -> number,
-    add_instruction: (self: BytecodeAssembler, opname_or_code: InstructionName|number, ...number) -> number,
+    emit_instruction: (self: BytecodeAssembler, opname_or_code: InstructionName|number, ...number) -> number,
     get_offset: (self: BytecodeAssembler) -> number,
     end_function: (self: BytecodeAssembler) -> number,
     to_ir: (self: BytecodeAssembler) -> Chunk,

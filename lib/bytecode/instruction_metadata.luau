@@ -1295,14 +1295,14 @@ local instructions: {[number]: t.InstructionMetadata} = {
 
     --[=[
         NATIVECALL: start executing new function in native code
-        this is a pseudo-instruction that is never emitted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch
+        this is a pseudo-instruction that is never emit_instructionted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch
     ]=]
     [62] = {
         name = "NATIVECALL",
         opcode = 62,
         mode = "none",
         aux = false,
-        description = "start executing new function in native code\nthis is a pseudo-instruction that is never emitted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch",
+        description = "start executing new function in native code\nthis is a pseudo-instruction that is never emit_instructionted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch",
         operands = {},
         size = 1,
     },

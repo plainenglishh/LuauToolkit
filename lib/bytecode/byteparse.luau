@@ -609,7 +609,7 @@ function byteparse.writer(start_size: number, expansion_rate: number?)
         Writes a null terminated array.
 
         Assumes the writer_callback function advances the cursor. The writer_callback function
-        can freely emit null bytes **after** the first byte, provided it advances the cursor properly.
+        can freely emit_instruction null bytes **after** the first byte, provided it advances the cursor properly.
 
         @param ... B... -- Additional parameters to pass to the writer_callback.
     ]=]

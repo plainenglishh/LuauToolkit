@@ -12,4 +12,13 @@ function misc.display_chunk_name(chunk_name: string): string
     return `[string "{chunk_name}"]`;
 end
 
+function misc.strip_error_prefix(str: string): string
+    local prefix, message = string.match(str, "^(.-):%d+: (.+)$");
+    if not prefix or not message then
+        return str;
+    end
+
+    return message;
+end
+
 return misc;

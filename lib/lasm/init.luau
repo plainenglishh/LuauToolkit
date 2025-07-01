@@ -1,0 +1,3 @@
+local lasm = {};
+
+return lasm;

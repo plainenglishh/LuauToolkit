@@ -3,16 +3,34 @@
 ]=]
 local testing = {};
 
-function testing.assert_eq(a: any, b: any, message: string?)
-    assert(type(a) == type(b), message);
+local function eq(a: any, b: any): boolean
+    if type(a) ~= type(b) then 
+        return false;
+    end
 
     if type(a) == "buffer" then
-        assert(buffer.tostring(a) == buffer.tostring(b), message);
+        return buffer.tostring(a) == buffer.tostring(b);
     elseif type(a) == "table" then
-        error("todo");
+        for k, v in a do
+            if not eq(v, b[k]) then
+                return false
+            end
+        end
+        
+        for k, _ in b do
+            if a[k] == nil then
+                return false
+            end
+        end
+        
+        return true;
     else
-        assert(a == b, message);
+        return a == b;
     end
+end
+
+function testing.assert_eq(a: any, b: any, message: string?)
+    assert(eq(a, b), message);
 end
 
 return testing;
