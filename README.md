@@ -30,11 +30,11 @@ library accessible with `require("@luau_toolkit/<module>")`:
 
 The library is split into the following modules:
 
-| Module       | Contents                                                       | Dependencies |                                                                                                                  |
-| ------------ | -------------------------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `bytecode`   | \[WIP] Functions and constants for working with Luau bytecode. | None         | [`[docs]`](./docs/modules/bytecode.md) [`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/)       |
-| `loadstring` | \[WIP] Loadstring implementation. Note: Only accepts bytecode. | None         | [`[docs]`](./docs/modules/loadstring.md) [`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/) |
-| `lasm`       | \[WIP] Luau Bytecode Assembler.                                | None         | [`[docs]`](./docs/modules/lasm.md) [`[src]`](./lib/lasm/)<br/>[`[examples]`](./examples/lasm/)                   |
+| Module       | Contents                                                       | Dependencies |                                                                                                                      |
+| ------------ | -------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `bytecode`   | \[WIP] Functions and constants for working with Luau bytecode. | None         | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/)       |
+| `loadstring` | \[WIP] Loadstring implementation. Note: Only accepts bytecode. | None         | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/) |
+| `lasm`       | \[WIP] Luau Bytecode Assembler.                                | None         | [`[docs]`](./docs/modules/lasm.md)<br/>[`[src]`](./lib/lasm/)<br/>[`[examples]`](./examples/lasm/)                   |
 
 <!--| [`vm`](./lib/vm/)             | **\[WIP]** Luau virtual machine/interpreter implementations.       | `bytecode`       |-->
 <!--| [`lexer`](./lib/lexer/)       | **\[WIP]** Luau source code lexer.                                 |                  |-->
