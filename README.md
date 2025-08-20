@@ -1,38 +1,18 @@
 # Luau-Toolkit
 
-A library for working with luau, within luau.
+A library for working with Luau, from within Luau.
 
 > [!WARNING]
 > This library is work in progress. Many features aren't implemented and the API
 > structure is subject to change.
 
-## Usage
-
-### Installation
-
-To install `luau_toolkit`, copy the [`lib/`](./src) directory to wherever you'd
-like to install the library and rename it to `luau_toolkit`.
-
-Optionally, create an `@luau_toolkit` alias in your `.luaurc` file to make the
-library accessible with `require("@luau_toolkit/<module>")`:
-
-```jsonc
-{
-    //...
-    "aliases": {
-        "luau_toolkit": "./path/to/library"
-    }
-    //...
-}
-```
-
-### Modules
+## Modules
 
 The library is split into the following modules:
 
-| Module           | Contents                                                       |                                                                                                                                  |
-| ---------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `bytecode`       | Working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/)                   |
+| Module     | Contents                    |                                                                                                                |
+| ---------- | --------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `bytecode` | Working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/) |
 
 <!--
 | `loadstring`     | \[WIP] Lightweight loadstring implementation.                  | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/)             |
@@ -49,24 +29,7 @@ The library is split into the following modules:
 | `decompiler`     |                                                         |                                                                                                                                  |
 | `debugger`       |                                                         |                                                                                                                                  |
 -->
-<!-- Only advertise modules when they're in a ready state. -->
-
-This is so you can choose to pull in the minimum amount of modules you need. As
-such, there is no central `init.luau` file for the library. You should instead
-access each module individually:
-
-```luau
-local bytecode = require("@luau_toolkit/bytecode");
-local lexer = require("@luau_toolkit/lexer");
-...
-```
-
-Some modules may depend on others, as described in the 'Dependencies' column, so
-be careful to not remove any modules you indirectly depend on.
-
-Modules that depend on other modules access them with relative paths (e.g.
-`../bytecode`), so make sure they stay within the same directory. Use the
-installation steps described above to ensure this.
+<!-- Only advertise modules when they're in a 'ready' state. -->
 
 <!--
 #### 'Loadstring' or 'VM'?
@@ -81,18 +44,28 @@ for `loadstring`. If you're looking for a more involved, debuggable and
 sandboxable interpreter, opt for `vm`.
 -->
 
-### Binaries
+## Installation
 
-Some modules also have command line applications, found under the
+To install `luau_toolkit`, copy the [`lib/`](./lib) directory to wherever you'd
+like to install the library, and rename it to `luau_toolkit`.
+
+Optionally, create an `@luau_toolkit` alias in your `.luaurc` file to make the
+library accessible with `require("@luau_toolkit/<module>")`:
+
+```jsonc
+{
+    //...
+    "aliases": {
+        "luau_toolkit": "./path/to/library"
+    }
+    //...
+}
+```
+
+## Binaries
+
+Some modules also have command line applications, accessible under the
 [`bin/`](./bin/) directory.
-
-## Luau Version
-
-Every version of the library is tagged to specific luau version. The library
-should be able to run under and work with the tagged version.
-
-The currently targeted version can be found in the
-[`.luau_version`](./.luau_version) file.
 
 ## Documentation
 
@@ -120,6 +93,12 @@ You can run the test suite with:
 
 ```bash
 lune run tests
+```
+
+You can also run individual tests:
+
+```bash
+lune run tests/loadstring/vm_conformance.spec.luau
 ```
 
 Optionally specify `--werror` to treat "warnings" as failed tests.
