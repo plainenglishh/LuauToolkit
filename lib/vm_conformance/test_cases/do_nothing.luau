@@ -1,11 +1,11 @@
-local BytecodeAssembler = require("@luau_toolkit/bytecode").BytecodeAssembler;
+local BytecodeAssembler = require("@luau_toolkit/bytecode").BytecodeBuilder;
 local t = require("../types");
 
 local chunk = BytecodeAssembler.new();
 chunk:begin_function();
 chunk:set_main();
 chunk:end_function();
-local bc = chunk:assemble();
+local bc = chunk:to_bytecode();
 
 local test: t.TestCase = {
     name = "do_nothing",

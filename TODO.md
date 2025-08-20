@@ -27,11 +27,9 @@
 
 ## Loadstring Module
 
-- [ ] hook `coroutine.running` to pretend generalised iter is on the correct
-      thread (? if thats a good idea in the first place ?)
-- [ ] Make use of constant tables
-- [ ] Comprehensive Testing using `luau_toolkit/vm_conformance`
-- [ ] consider dispatch table at proto (accessing state via upvalues) or global level (accessing state via params)
+- [ ] use of constant tables
+- [ ] testing using `luau_toolkit/vm_conformance`
+- [ ] consider dispatch table rather than long if chain
 
 ## LASM Module
 
@@ -41,17 +39,16 @@
 
 ## VM Module
 
-- [ ] Rework VM
-- [ ] VM Tests
+not started
 
 ## Lexer Module
 
-- [ ] Needs starting (use Lexer.cpp as reference)
+not started
 
 ## Parser Module
 
-- [ ] random luau program generator example (funny)
+not started
 
 ## Decompiler Module
 
-- [ ] Needs starting
+- [ ]

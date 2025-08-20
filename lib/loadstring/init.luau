@@ -317,7 +317,16 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
             end
 
             local function internal_panic(message: string, ...)
-                return error(`interpreter error @ pc={pc}: {string.format(message :: any, ...)}`, 2);
+                local pc = pc - 1;
+                local insn = buffer.readu32(code, (pc - 1) * 4);
+                local next_insn;
+
+                if pc < codesize then
+                    next_insn = buffer.readu32(code, (pc + 1) * 4);
+                end
+
+                local display = bytecode.instructions.display(insn, next_insn);
+                return error(`interpreter error @ pc={pc} [{display}]: {string.format(message :: any, ...)}`, 2);
             end
 
             --[=[

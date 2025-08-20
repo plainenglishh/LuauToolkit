@@ -1,21 +1,21 @@
-local BytecodeAssembler = require("@luau_toolkit/bytecode").BytecodeAssembler;
+local BytecodeAssembler = require("@luau_toolkit/bytecode").BytecodeBuilder;
 local t = require("../types");
 
 local chunk = BytecodeAssembler.new();
 chunk:begin_function();
 chunk:set_main();
 
-local a_key = chunk:add_constant("string", chunk:add_string("a"));
+local a_key = chunk:add_constant_string("a");
 
-chunk:emit_instruction("NEWTABLE", 0, 0, 0, 0);
-chunk:emit_instruction("GETGLOBAL", 1, 0, 0, a_key);
-chunk:emit_instruction("SETTABLEN", 1, 0, 0);
+chunk:emit_abc("NEWTABLE", 0, 0, 0, 0);
+chunk:emit_abc("GETGLOBAL", 1, 0, 0, a_key);
+chunk:emit_abc("SETTABLEN", 1, 0, 0);
 
-chunk:emit_instruction("GETIMPORT", 1, chunk:add_constant("import", chunk:add_import("b")), chunk:add_import("b"));
-chunk:emit_instruction("SETGLOBAL", 1, 0, a_key)
+chunk:emit_ad("GETIMPORT", 1, chunk:add_constant_import({"b"}));
+chunk:emit_abc("SETGLOBAL", 1, 0, a_key)
 
 chunk:end_function();
-local bc = chunk:assemble();
+local bc = chunk:to_bytecode();
 
 local test: t.TestCase = {
     name = "table_instructions",

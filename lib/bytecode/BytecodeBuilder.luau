@@ -7,6 +7,15 @@ local t = require("./types");
 
 local ERR_UNSTARTED_FUNCTION = "this method can only be called when constructing a function";
 
+@native
+local function reinterpret_unsigned(n: number, bitwidth: number): number
+    if n < 0 then
+        return n + 2^bitwidth;
+    end
+
+    return n;
+end
+
 export type BytecodeBuilder = setmetatable<BytecodeBuilderState, BytecodeBuilderMt>;
 
 type WorkingProto = {
@@ -255,6 +264,19 @@ function BytecodeBuilder.emit_abc(self: BytecodeBuilder, op: number | t.Instruct
     end
 
     local op = if type(op) == "number" then op else (instructions.get_metadata(op) or error(`unknown instruction {op}`)).opcode;
+    
+    local meta = instructions.metadata[op];
+    if meta then
+        if aux == nil and meta.aux then
+            aux = 0;
+        elseif aux ~= nil and not meta.aux then
+            error(`{meta.name} doesn't accept an aux instruction`, 2);
+        end
+
+        if meta.mode ~= "abc" then
+            error(`{meta.name} uses argument mode e`, 2);
+        end
+    end
 
     local raw = op;
     raw = bit32.replace(raw, a or 0, 8, 8);
@@ -264,17 +286,8 @@ function BytecodeBuilder.emit_abc(self: BytecodeBuilder, op: number | t.Instruct
     self._working_proto.instructions.write_u32(raw);
     self._working_proto.line_info.write_u32(self._working_proto.current_line);
 
-    local meta = instructions.metadata[op];
-    if meta then
-        if aux == nil and meta.aux then
-            aux = 0;
-        elseif aux ~= nil and not meta.aux then
-            error(`{meta.name} doesn't accept an aux instruction`, 2);
-        end
-    end
-
     if aux then
-        self._working_proto.instructions.write_u32(raw);
+        self._working_proto.instructions.write_u32(aux);
         self._working_proto.line_info.write_u32(self._working_proto.current_line);
     end
 end
@@ -286,13 +299,6 @@ function BytecodeBuilder.emit_ad(self: BytecodeBuilder, op: number | t.Instructi
 
     local op = if type(op) == "number" then op else (instructions.get_metadata(op) or error(`unknown instruction {op}`)).opcode;
 
-    local raw = op;
-    raw = bit32.replace(raw, a or 0, 8, 8);
-    raw = bit32.replace(raw, d or 0, 16, 16);
-
-    self._working_proto.instructions.write_u32(raw);
-    self._working_proto.line_info.write_u32(self._working_proto.current_line);
-    
     local meta = instructions.metadata[op];
     if meta then
         if aux == nil and meta.aux then
@@ -300,10 +306,21 @@ function BytecodeBuilder.emit_ad(self: BytecodeBuilder, op: number | t.Instructi
         elseif aux ~= nil and not meta.aux then
             error(`{meta.name} doesn't accept an aux instruction`, 2);
         end
+
+        if meta.mode ~= "ad" then
+            error(`{meta.name} uses argument mode e`, 2);
+        end
     end
 
+    local raw = op;
+    raw = bit32.replace(raw, a or 0, 8, 8);
+    raw = bit32.replace(raw, reinterpret_unsigned(d or 0, 16), 16, 16);
+
+    self._working_proto.instructions.write_u32(raw);
+    self._working_proto.line_info.write_u32(self._working_proto.current_line);
+    
     if aux then
-        self._working_proto.instructions.write_u32(raw);
+        self._working_proto.instructions.write_u32(aux);
         self._working_proto.line_info.write_u32(self._working_proto.current_line);
     end
 end
@@ -315,12 +332,6 @@ function BytecodeBuilder.emit_e(self: BytecodeBuilder, op: number | t.Instructio
     
     local op = if type(op) == "number" then op else (instructions.get_metadata(op) or error(`unknown instruction {op}`)).opcode;
 
-    local raw = op;
-    raw = bit32.replace(raw, e or 0, 8, 24);
-
-    self._working_proto.instructions.write_u32(raw);
-    self._working_proto.line_info.write_u32(self._working_proto.current_line);
-
     local meta = instructions.metadata[op];
     if meta then
         if aux == nil and meta.aux then
@@ -328,10 +339,20 @@ function BytecodeBuilder.emit_e(self: BytecodeBuilder, op: number | t.Instructio
         elseif aux ~= nil and not meta.aux then
             error(`{meta.name} doesn't accept an aux instruction`, 2);
         end
+
+        if meta.mode ~= "e" then
+            error(`{meta.name} uses argument mode e`, 2);
+        end
     end
 
+    local raw = op;
+    raw = bit32.replace(raw, reinterpret_unsigned(e or 0, 24), 8, 24);
+
+    self._working_proto.instructions.write_u32(raw);
+    self._working_proto.line_info.write_u32(self._working_proto.current_line);
+
     if aux then
-        self._working_proto.instructions.write_u32(raw);
+        self._working_proto.instructions.write_u32(aux);
         self._working_proto.line_info.write_u32(self._working_proto.current_line);
     end
 end

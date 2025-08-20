@@ -2,18 +2,18 @@ local metadata = require("./instruction_metadata");
 local t = require("./types");
 
 @native
-local function i16(n: number): number
-    if n >= 2^(16-1) then
-        return n - 2^16;
+local function reinterpret_signed(n: number, bitwidth: number): number
+    if n >= 2^(bitwidth-1) then
+        return n - 2^bitwidth;
     end
 
     return n;
 end
 
 @native
-local function i24(n: number): number    
-    if n >= 2^(24 - 1) then
-        return n - 2^24;
+local function reinterpret_unsigned(n: number, bitwidth: number): number
+    if n < 0 then
+        return n + 2^bitwidth;
     end
 
     return n;
@@ -41,12 +41,12 @@ end
 
 @native
 function INSN_D(insn: number): number
-    return i16(bit32.extract(insn, 16, 16));
+    return reinterpret_signed(bit32.extract(insn, 16, 16), 16);
 end
 
 @native
 function INSN_E(insn: number): number
-    return i24(bit32.extract(insn, 8, 24));
+    return reinterpret_signed(bit32.extract(insn, 8, 24), 24);
 end
 
 @native
@@ -60,9 +60,9 @@ local function encode_instruction(insn: t.Instruction): (number, number?)
         raw = bit32.replace(raw, operands.z or 0, 24, 8);
     elseif mode == "ad" then
         raw = bit32.replace(raw, operands.x or 0, 8, 8);
-        raw = bit32.replace(raw, operands.y or 0, 16, 16);
+        raw = bit32.replace(raw, reinterpret_unsigned(operands.y or 0, 16), 16, 16);
     elseif mode == "e" then
-        raw = bit32.replace(raw, operands.x or 0, 8, 24);
+        raw = bit32.replace(raw, reinterpret_unsigned(operands.x or 0, 24), 8, 24);
     end 
 
     return raw, insn.aux;
@@ -80,9 +80,9 @@ local function decode_instruction(insn: number, next_insn: number?): t.Instructi
     if mode == "abc" then
         operands = vector.create(bit32.extract(insn, 8, 8), bit32.extract(insn, 16, 8), bit32.extract(insn, 24, 8));
     elseif mode == "ad" then
-        operands = vector.create(bit32.extract(insn, 8, 8), i16(bit32.extract(insn, 16, 16)), 0);
+        operands = vector.create(bit32.extract(insn, 8, 8), reinterpret_signed(bit32.extract(insn, 16, 16), 16), 0);
     elseif mode == "e" then
-        operands = vector.create(i24(bit32.extract(insn, 8, 24)), 0, 0);
+        operands = vector.create(reinterpret_signed(bit32.extract(insn, 8, 24), 24), 0, 0);
     end
 
     if info.aux then
@@ -139,15 +139,15 @@ function instructions.display(insn: number, next_insn: number?): string
     local out = {info.name};
 
     if info.mode == "abc" then
-        out[2] = `({instruction.operands.x}, {instruction.operands.y}, {instruction.operands.z}`;
+        out[2] = `(a={instruction.operands.x}, b={instruction.operands.y}, c={instruction.operands.z}`;
     elseif info.mode == "ad" then
-        out[2] = `({instruction.operands.x}, {instruction.operands.y}`;
+        out[2] = `(a={instruction.operands.x}, d={instruction.operands.y}`;
     elseif info.mode == "e" then
-        out[2] = `({instruction.operands.x}`;
+        out[2] = `(e={instruction.operands.x}`;
     end
 
     if info.aux then
-        out[3] = `, {next_insn})`;
+        out[3] = `, aux={next_insn})`;
     else
         out[3] = ")";
     end
