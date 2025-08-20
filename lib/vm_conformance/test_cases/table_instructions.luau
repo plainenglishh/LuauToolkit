@@ -12,7 +12,7 @@ chunk:emit_abc("GETGLOBAL", 1, 0, 0, a_key);
 chunk:emit_abc("SETTABLEN", 1, 0, 0);
 
 chunk:emit_ad("GETIMPORT", 1, chunk:add_constant_import({"b"}));
-chunk:emit_abc("SETGLOBAL", 1, 0, a_key)
+chunk:emit_abc("SETGLOBAL", 1, 0, a_key);
 
 chunk:end_function();
 local bc = chunk:to_bytecode();

@@ -1,6 +1,6 @@
 # Luau-Toolkit
 
-A library for working with Luau, from within Luau.
+A library for working with Luau from within Luau.
 
 > [!WARNING]
 > This library is work in progress. Many features aren't implemented and the API
