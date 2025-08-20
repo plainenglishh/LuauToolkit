@@ -41,7 +41,7 @@ type Opcode = {
     operands: {{
         name: string,
         desc: string,
-        type: {string},
+        type: string,
     }},
     desc: string,
 };
@@ -211,6 +211,7 @@ local function generate(bytecode_h: string): string
         write(DOC_COMMENT);
         write("local instructions: {[number]: t.InstructionMetadata} = {\n");
         for i, opcode in opcodes do
+            local has_jump = false;
             local has_aux = false;
             local operands = "";
             local mode = "none";
@@ -236,6 +237,10 @@ local function generate(bytecode_h: string): string
                 if op_num ~= #opcode.operands then
                     operands ..= "\n";
                 end
+
+                if string.match(v.type, "jump_offset") then
+                    has_jump = true;
+                end
             end
         
             if #opcode.operands > 0 then
@@ -253,6 +258,7 @@ local function generate(bytecode_h: string): string
             write_line(`description = "{escape_for_strlit(opcode.desc)}",`, 2);
             write_line(`operands = \{{operands}},`, 2);
             write_line(`size = {if has_aux then 2 else 1},`, 2);
+            write_line(`has_jump = {has_jump},`, 2);
             write_line("},", 1);
         
             if i ~= #opcodes then

@@ -2,6 +2,15 @@ local constants = require("../constants");
 local decode = require("./decode");
 local t = require("../types");
 
+--[[
+    Validations to do:
+    - Check jump offsets point to a valid instruction (that is, not an aux or out of bounds)
+    - Versions/metadata are valid
+    - References point to existing objects (strings, protos, constants)
+    - Protos have return instructions
+    - Instruction arguments
+]]
+
 local luau_versions = constants.supported_bytecode_versions;
 
 type ReportIssueFn = (severity: t.ValidationIssueSeverity, message: string, note: string?) -> ();
@@ -52,6 +61,11 @@ end
 
 --[=[
     Checks a given bytecode chunk for issues.
+
+    ### Safety
+
+    This function does not ensure a bytecode chunk is _safe_, it just checks for
+    common issues.
 ]=]
 local function validate(chunk: t.IntoChunk): t.ValidationResult        
     local issues = {};
@@ -64,7 +78,7 @@ local function validate(chunk: t.IntoChunk): t.ValidationResult
         });
     end
    
-    report_issue("warn", "`bytecode.validate` is incomplete", "do not take a lack of issues to mean a bytecode chunk is safe."); --common.unimplemented();
+    report_issue("warn", "`bytecode.validate` is incomplete", "do not take a lack of issues to mean a bytecode chunk is safe"); --common.unimplemented();
 
     local maybechunk = chunk;
     local chunk;

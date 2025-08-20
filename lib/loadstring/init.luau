@@ -1,8 +1,8 @@
+--!native
+
 local bytecode = require("@luau_toolkit/bytecode"); -- TODO! Make relative when lune fixes requires
 local common = require("@luau_toolkit/common"); -- TODO! Make relative when lune fixes requires
-local misc = require("@luau_toolkit/misc");
 
-@native
 local function from_i16(n: number): number
     if n >= 2^(16-1) then
         return n - 2^16;
@@ -11,7 +11,6 @@ local function from_i16(n: number): number
     return n;
 end
 
-@native
 local function from_i24(n: number): number    
     if n >= 2^(24 - 1) then
         return n - 2^24;
@@ -20,7 +19,6 @@ local function from_i24(n: number): number
     return n;
 end
 
-@native
 local function to_i24(n: number): number    
     if n < 0 then
         return n + 2^24;
@@ -29,37 +27,30 @@ local function to_i24(n: number): number
     return n;
 end
 
-@native
 function INSN_OP(insn: number): number
     return bit32.extract(insn, 0, 8);
 end
 
-@native
 function INSN_A(insn: number): number
     return bit32.extract(insn, 8, 8);
 end
 
-@native
 function INSN_B(insn: number): number
     return bit32.extract(insn, 16, 8);
 end
 
-@native
 function INSN_C(insn: number): number
     return bit32.extract(insn, 24, 8);
 end
 
-@native
 function INSN_D(insn: number): number
     return from_i16(bit32.extract(insn, 16, 16));
 end
 
-@native
 function INSN_E(insn: number): number
     return from_i24(bit32.extract(insn, 8, 24));
 end
 
-@native
 local function PATCH_INSN_E(insn: number, e: number?): number
     local raw = insn;
     raw = bit32.replace(raw, to_i24(e or 0), 8, 24);
@@ -157,7 +148,7 @@ export type LoadstringOptions = {
 
         Used to extract `pc`/`stack` info for tests.
     ]=]
-    main_return_callback: ((pc: number, stack: Stack) -> ())?,
+    main_exit_callback: ((pc: number, stack: Stack) -> ())?,
 };
 
 type UpvalueType = "VAL" | "REF" | "UPVAL";
@@ -241,7 +232,7 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
     local options = options or {} :: LoadstringOptions;
     local chunk_name = options.chunk_name or "=loadstring";
     local environment: Environment = options.environment or {};
-    local globals: Environment = options.globals or common.stdlib;
+    local globals: Environment = options.globals or common.stdlib :: Environment;
     local timeout = options.timeout;
     local debug_level = options.debug_level or 0;
 
@@ -322,11 +313,11 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
             end
 
             local function external_panic(message: string, ...): never
-                return error(string.format(message, ...), get_closure_level());
+                return error(string.format(message :: any, ...), get_closure_level());
             end
 
             local function internal_panic(message: string, ...)
-                return error(`interpreter error @ pc={pc}: {string.format(message, ...)}`, 2);
+                return error(`interpreter error @ pc={pc}: {string.format(message :: any, ...)}`, 2);
             end
 
             --[=[
@@ -450,7 +441,8 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
             end
 
             --[=[
-                Closes upvalues.
+                Closes upvalues. This isn't strictly necessary but it allows the
+                stack table to be GCed.
             ]=]
             local function close_upvalues(from_register: number)
                 local new_open_upvalues: {Upvalue} = {};
@@ -566,7 +558,7 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
             local interrupt_callback = options.interrupt_callback;
             local step_callback = options.step_callback;
             local break_callback = options.break_callback;
-            local main_return_callback = options.main_return_callback;
+            local main_exit_callback = options.main_exit_callback;
 
             local function try_interrupt()
                 if interrupt_callback then
@@ -576,7 +568,7 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
 
             while pc < codesize do
                 if is_main and timeout then
-                    if os.clock() - exec_start >= timeout then
+                    if os.clock() - exec_start >= timeout :: number then
                         external_panic("script timeout");
                     end
                 end
@@ -714,8 +706,8 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
                     local results = { target(unpack(args)) };
                     set_registers(ra, result_count, results);
                 elseif opcode == 22 then -- RETURN
-                    if is_main and main_return_callback then
-                        main_return_callback(pc, registers);
+                    if is_main and main_exit_callback then
+                        main_exit_callback(pc, registers);
                     end
 
                     local start = INSN_A(insn);
@@ -930,7 +922,7 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
                 elseif opcode == 61 then -- FORGPREP_NEXT
                     error("unimplemented");
                 elseif opcode == 62 then -- NATIVECALL
-                    -- Skip
+                    error("how did this get here?");
                 elseif opcode == 63 then -- GETVARARGS
                     error("unimplemented");
                 elseif opcode == 64 then -- DUPCLOSURE
@@ -978,19 +970,23 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
                 end
             end
 
+            if is_main and main_exit_callback then
+                main_exit_callback(pc, registers);
+            end
+
             return; --interpreter_error("no return");
         end
 
         local closure: LoadedFunction;
         if debug_level >= 1 then
             closure = function(...: any): ...any
-                local results: {any} = { pcall(inner_closure, ...) };
+                local results: {any} = { pcall(inner_closure :: any, ...) };
                 local ok = table.remove(results, 1);
 
                 if not ok then
                     local err = tostring(results[1] or "unknown error");
-                    err = misc.strip_error_prefix(err);
-                    error(`{misc.display_chunk_name(chunk_name)}:{get_line(debug_pc - 1)}: {err}`, 2);
+                    err = common.strip_error_prefix(err);
+                    error(`{common.display_chunk_name(chunk_name)}:{get_line(debug_pc - 1)}: {err}`, 2);
                 end
 
                 return unpack(results);

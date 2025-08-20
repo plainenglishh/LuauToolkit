@@ -16,6 +16,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
         description = "noop",
         operands = {},
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -29,6 +30,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
         description = "debugger break",
         operands = {},
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -45,6 +47,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "a", type = {"register"}, description = "target register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -67,6 +70,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"jump_offset"}, description = "jump offset" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -86,6 +90,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"number"}, description = "value (-32768..32767)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -105,6 +110,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"constant"}, description = "constant table index (0..32767)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -124,6 +130,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"register"}, description = "source register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -146,6 +153,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -168,6 +176,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -187,6 +196,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"number"}, description = "upvalue index" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -206,6 +216,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"number"}, description = "upvalue index" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -222,6 +233,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "a", type = {"register"}, description = "target register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -244,6 +256,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "3 10-bit indices of constant strings that, combined, constitute an import path; length of the path is set by the top 2 bits (1,2,3)" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -266,6 +279,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "index register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -288,6 +302,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "index register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -313,6 +328,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -338,6 +354,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -360,6 +377,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"number"}, description = "index-1 (index is 1..256)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -382,6 +400,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"number"}, description = "index-1 (index is 1..256)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -401,6 +420,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"proto"}, description = "child proto index (0..32767)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -428,6 +448,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -450,6 +471,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"number"}, description = "result count + 1, or 0 to preserve all values and adjust top (MULTRET)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -469,6 +491,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"number"}, description = "number of returned values + 1, or 0 to return all values up to top (MULTRET)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -485,6 +508,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767; 0 means \"next instruction\" aka \"don't jump\")" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -501,6 +525,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767; 0 means \"next instruction\" aka \"don't jump\")" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -520,6 +545,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767; 0 means \"next instruction\" aka \"don't jump\")" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -539,6 +565,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767; 0 means \"next instruction\" aka \"don't jump\")" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -561,6 +588,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 2" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -583,6 +611,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 2" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -605,6 +634,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 2" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -627,6 +657,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 2" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -649,6 +680,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 2" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -671,6 +703,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 2" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -693,6 +726,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -715,6 +749,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -737,6 +772,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -759,6 +795,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -781,6 +818,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -803,6 +841,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -825,6 +864,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255); must refer to a number" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -847,6 +887,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255); must refer to a number" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -869,6 +910,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255); must refer to a number" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -891,6 +933,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255); must refer to a number" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -913,6 +956,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255); must refer to a number" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -935,6 +979,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255); must refer to a number" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -957,6 +1002,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -979,6 +1025,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1001,6 +1048,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1023,6 +1071,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1045,6 +1094,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register end" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1064,6 +1114,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"register"}, description = "source register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1083,6 +1134,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"register"}, description = "source register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1102,6 +1154,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"register"}, description = "source register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1124,6 +1177,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"number"}, description = "array size" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -1143,6 +1197,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"constant"}, description = "constant table index (0..32767)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1168,6 +1223,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"number"}, description = "table index to start from" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -1188,6 +1244,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767)" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -1207,6 +1264,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767)" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -1231,6 +1289,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"number"}, description = "variable count (1..255) in the low 8 bits, high bit indicates whether to use ipairs-style traversal in the fast path" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1247,6 +1306,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "a", type = {"register"}, description = "target register (see FORGLOOP for register layout)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1275,6 +1335,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 3 in second least-significant byte" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1291,20 +1352,22 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "a", type = {"register"}, description = "target register (see FORGLOOP for register layout)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
         NATIVECALL: start executing new function in native code
-        this is a pseudo-instruction that is never emit_instructionted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch
+        this is a pseudo-instruction that is never emitted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch
     ]=]
     [62] = {
         name = "NATIVECALL",
         opcode = 62,
         mode = "none",
         aux = false,
-        description = "start executing new function in native code\nthis is a pseudo-instruction that is never emit_instructionted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch",
+        description = "start executing new function in native code\nthis is a pseudo-instruction that is never emitted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch",
         operands = {},
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1324,6 +1387,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"number"}, description = "variable count + 1, or 0 to copy all variables and adjust top (MULTRET)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1343,6 +1407,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"constant"}, description = "constant table index (0..32767)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1359,6 +1424,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "a", type = {"number"}, description = "number of fixed arguments" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1378,6 +1444,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index" },
         },
         size = 2,
+        has_jump = false,
     },
 
     --[=[
@@ -1394,6 +1461,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "e", type = {"jump_offset"}, description = "jump offset (-2^23..2^23; 0 means \"next instruction\" aka \"don't jump\")" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -1417,6 +1485,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"jump_offset"}, description = "jump offset to get to following CALL" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -1434,6 +1503,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "e", type = {"number"}, description = "hit count for the instruction (0..2^23-1)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1453,6 +1523,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "b", type = {"number","register",}, description = "source register (for VAL/REF) or upvalue index (for UPVAL/UPREF)" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1475,6 +1546,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1497,6 +1569,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1519,6 +1592,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"jump_offset"}, description = "jump offset to get to following CALL" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -1544,6 +1618,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"register"}, description = "source register 2 in least-significant byte" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1569,6 +1644,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant index" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1588,6 +1664,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767)" },
         },
         size = 1,
+        has_jump = true,
     },
 
     --[=[
@@ -1610,6 +1687,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant value (for boolean) in low bit, NOT flag (that flips comparison result) in high bit" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1632,6 +1710,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant value (for boolean) in low bit, NOT flag (that flips comparison result) in high bit" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1654,6 +1733,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index in low 24 bits, NOT flag (that flips comparison result) in high bit" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1676,6 +1756,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "aux", type = {"constant"}, description = "constant table index in low 24 bits, NOT flag (that flips comparison result) in high bit" },
         },
         size = 2,
+        has_jump = true,
     },
 
     --[=[
@@ -1698,6 +1779,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"register"}, description = "source register 2" },
         },
         size = 1,
+        has_jump = false,
     },
 
     --[=[
@@ -1720,6 +1802,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
             { name = "c", type = {"constant"}, description = "constant table index (0..255)" },
         },
         size = 1,
+        has_jump = false,
     },
 };
 

@@ -126,7 +126,7 @@ function instructions.get_metadata(instruction: number|string|t.Instruction): t.
         return metadata[instruction.opcode];
     end
 
-    return;
+    return nil;
 end
 
 --[=[

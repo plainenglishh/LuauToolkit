@@ -30,18 +30,25 @@ library accessible with `require("@luau_toolkit/<module>")`:
 
 The library is split into the following modules:
 
-| Module       | Contents                                                       | Dependencies |                                                                                                                      |
-| ------------ | -------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `bytecode`   | \[WIP] Functions and constants for working with Luau bytecode. | None         | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/)       |
-| `loadstring` | \[WIP] Loadstring implementation. Note: Only accepts bytecode. | `bytecode`   | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/) |
-| `lasm`       | \[WIP] Luau Bytecode Assembler.                                | `bytecode`   | [`[docs]`](./docs/modules/lasm.md)<br/>[`[src]`](./lib/lasm/)<br/>[`[examples]`](./examples/lasm/)                   |
+| Module           | Contents                                                       |                                                                                                                                  |
+| ---------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `bytecode`       | \[WIP] Functions and constants for working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/)                   |
+| `loadstring`     | \[WIP] Lightweight loadstring implementation.                  | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/)             |
+| `vm_conformance` | \[WIP] Luau VM conformance test cases.                         | [`[docs]`](./docs/modules/vm_conformance.md)<br/>[`[src]`](./lib/vm_conformance/)<br/>[`[examples]`](./examples/vm_conformance/) |
 
-<!--| [`vm`](./lib/vm/)             | **\[WIP]** Luau virtual machine/interpreter implementations.       | `bytecode`       |-->
-<!--| [`lexer`](./lib/lexer/)       | **\[WIP]** Luau source code lexer.                                 |                  |-->
-<!--| [`misc`](./lib/misc/)         | **\[WIP]** Miscellaneous luau related items.                       | None             |-->
-<!--| `parser`                  | **\[Not Started]** Luau source code parser.                        |                  |-->
-<!--| `compiler`                | **\[Not Started/Unlikely]** Simple Luau compiler.                  |                  |-->
-<!--| `decompiler`              |                                                                    | `bytecode`       |-->
+<!--
+| `lasm`           | Luau Bytecode Assembler.                                | [`[docs]`](./docs/modules/lasm.md)<br/>[`[src]`](./lib/lasm/)<br/>[`[examples]`](./examples/lasm/)                               |
+| `decompiler`     | Luau Bytecode Decompiler.                               | [`[docs]`](./docs/modules/decompiler.md)<br/>[`[src]`](./lib/decompiler/)<br/>[`[examples]`](./examples/decompiler/)             |
+| `sourcegen`      | Source Code Generation Utilities.                       | [`[docs]`](./docs/modules/sourcegen.md)<br/>[`[src]`](./lib/sourcegen/)<br/>[`[examples]`](./examples/sourcegen/)                |
+| `vm`             | Luau virtual machine/interpreter implementations.       |                                                                                                                                  |
+| `lexer`          | Luau source code lexer.                                 |                                                                                                                                  |
+| `common`         | Miscellaneous luau related items.                       |                                                                                                                                  |
+| `parser`         | Luau source code parser.                                |                                                                                                                                  |
+| `compiler`       | Simple Luau compiler.                                   |                                                                                                                                  |
+| `decompiler`     |                                                         |                                                                                                                                  |
+| `debugger`       |                                                         |                                                                                                                                  |
+-->
+<!-- Only advertise modules when they're in a ready state. -->
 
 This is so you can choose to pull in the minimum amount of modules you need. As
 such, there is no central `init.luau` file for the library. You should instead
@@ -59,6 +66,19 @@ be careful to not remove any modules you indirectly depend on.
 Modules that depend on other modules access them with relative paths (e.g.
 `../bytecode`), so make sure they stay within the same directory. Use the
 installation steps described above to ensure this.
+
+<!--
+#### 'Loadstring' or 'VM'?
+
+While the `loadstring` and `vm` modules both run bytecode, they differ in a few
+key ways. Firstly, `loadstring` implements a lightweight 5.3 [load]() style
+function for loading and running bytecode within the _current_ vm, whereas `vm`
+implements a more heavyweight isolated Luau virtual machine.
+
+If you're looking for a simple, fast and lightweight way to run bytecode, opt
+for `loadstring`. If you're looking for a more involved, debuggable and
+sandboxable interpreter, opt for `vm`.
+-->
 
 ### Binaries
 

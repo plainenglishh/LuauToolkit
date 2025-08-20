@@ -61,6 +61,11 @@ export type InstructionMetadata = {
     aux: boolean,
 
     --[=[
+        Whether the instruction has a jump offset.
+    ]=]
+    has_jump: boolean,
+
+    --[=[
         A description of what the instruction does.
     ]=]
     description: string,
@@ -117,7 +122,7 @@ export type ProtoFlag =
 --  Bytecode Builder Types
 ----------------------------------------------------------------------------
 
-export type _BytecodeAssemblerImpl = {
+--[[export type _BytecodeAssemblerImpl = {
     __index: _BytecodeAssemblerImpl,
 
     new: () -> BytecodeAssembler,
@@ -143,13 +148,13 @@ export type _BytecodeAssemblerImpl = {
     assemble: (self: BytecodeAssembler) -> buffer,
 };
 
-export type BytecodeAssembler = typeof(setmetatable({} :: {
+export type BytecodeAssembler = setmetatable<{
     _offset: number,
     _chunk: Chunk,
-    _proto: Proto?,
+    _proto: {Proto}?,
     _proto_id: number?,
     _instructions: {Instruction},
-}, {} :: _BytecodeAssemblerImpl));
+}, _BytecodeAssemblerImpl>;]]
 
 
 ----------------------------------------------------------------------------
@@ -157,17 +162,21 @@ export type BytecodeAssembler = typeof(setmetatable({} :: {
 ----------------------------------------------------------------------------
 
 --[=[
-    Zero-indexed number referring to a proto.
-    
-    Remember to add 1 when indexing Luau's one-indexed arrays.
-]=]
-export type ProtoId = number;
-
---[=[
     One-indexed number referring to a string table entry.
     A StringId of zero usually refers to an absent value.
 ]=]
-export type StringId = number;
+export type StringRef = number;
+
+
+--[=[
+    Zero-indexed number referring to a proto.
+]=]
+export type ProtoRef = number;
+
+--[=[
+    Zero-indexed number referring to a constant.
+]=]
+export type ConstantRef = number;
 
 --[=[
     Table representation of a bytecode chunk.
@@ -178,7 +187,7 @@ export type Chunk = {
     strings: {string},
     userdata_types: {number}?,
     protos: {Proto},
-    main_proto: ProtoId,
+    main_proto: ProtoRef,
 };
 
 --[=[
@@ -193,9 +202,9 @@ export type Proto = {
     types: ProtoTypeInfo?,
     instructions: buffer,
     constants: {Constant},
-    child_protos: {ProtoId},
+    child_protos: {ProtoRef},
     line_defined: number,
-    debug_name: StringId,
+    debug_name: StringRef,
     line_info: buffer?,
     debug_info: ProtoDebugInfo?,
 };
@@ -271,7 +280,6 @@ export type ValidationResult = {
 ----------------------------------------------------------------------------
 
 export type bstring = buffer | string;
-
 export type IntoChunk = Chunk | bstring;
 
 ----------------------------------------------------------------------------

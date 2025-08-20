@@ -1,6 +1,10 @@
-local byteparse = require("../byteparse");
+--!native
+
+local common = require("@luau_toolkit/common");
 local constants = require("../constants");
 local t = require("../types");
+
+local byteparse = common.byteparse;
 
 --[=[
     Decodes a bytecode chunk into a `Chunk` object.
@@ -8,8 +12,8 @@ local t = require("../types");
     NOTE: This function intentionally does **not** check for validity. 
           Run `bytecode.chunk.validate` beforehand if this is desired.
 ]=]
-local function decode(bytecode: t.bstring): t.Chunk
-    local bytecode = if type(bytecode) == "string" then buffer.fromstring(bytecode) else bytecode;
+local function decode(bc: t.bstring): t.Chunk
+    local bytecode = if type(bc) == "string" then buffer.fromstring(bc) else bc;
     local reader = byteparse.reader(bytecode);
 
     local function read_constant(): t.Constant
@@ -33,7 +37,7 @@ local function decode(bytecode: t.bstring): t.Chunk
             constant.value = reader.read_u32();
         elseif constant_type_name == "table" then
             local length = reader.read_varint();
-            local tbl = table.create(length);
+            local tbl = table.create(length, 0);
 
             for i = 1, length do
                 tbl[i] = reader.read_varint();
@@ -50,9 +54,7 @@ local function decode(bytecode: t.bstring): t.Chunk
     end
 
     local function read_debug_info(): t.ProtoDebugInfo
-        local debug_info = {};
-
-        debug_info.locals = reader.read_larray(function()
+        local locals = reader.read_larray(function()
             return {
                 name = reader.read_varint(),
                 start_pc = reader.read_varint(),
@@ -61,21 +63,24 @@ local function decode(bytecode: t.bstring): t.Chunk
             };
         end);
 
-        debug_info.upvalues = reader.read_larray(function()
+        local upvalues = reader.read_larray(function()
             return {
                 name = reader.read_varint(),
             };
         end);
 
-        return debug_info;
+        return {
+            locals = locals,
+            upvalues = upvalues,
+        };
     end
 
     local function read_line_info(instruction_count: number): buffer
         local logspan = reader.read_u8();
         local interval_count = bit32.rshift(instruction_count - 1, logspan) + 1;
         
-        local deltas = table.create(instruction_count);
-        local intervals = table.create(interval_count);
+        local deltas = table.create(instruction_count, 0);
+        local intervals = table.create(interval_count, 0);
 
         local last_delta = 0;
         for i = 1, instruction_count do
@@ -102,25 +107,24 @@ local function decode(bytecode: t.bstring): t.Chunk
         Reads a bytecode proto and returns the internal table representation.
     ]=]
     local function read_proto(): t.Proto
-        local proto = {};
-
-        proto.max_stack_size = reader.read_u8();
-        proto.num_params = reader.read_u8();
-        proto.num_upvalues = reader.read_u8();
-        proto.is_vararg = reader.read_bool();
-        proto.flags = {} :: any;
+        local max_stack_size = reader.read_u8();
+        local num_params = reader.read_u8();
+        local num_upvalues = reader.read_u8();
+        local is_vararg = reader.read_bool();
+        local flags = {};
 
         local raw_flags = reader.read_u8();
 
-        for flag, offset: unknown in constants.proto_flag do
-            if bit32.extract(raw_flags, offset :: number) == 1 then
-                table.insert(proto.flags, flag);
+        for flag, offset in constants.proto_flag :: {[string]: number} do
+            if bit32.extract(raw_flags, offset) == 1 then
+                table.insert(flags, flag);
             end
         end
 
         local types_size = reader.read_varint();
+        local types;
         if types_size > 0 then
-            local types = {} :: t.ProtoTypeInfo;
+            types = {};
 
             local function_length = reader.read_varint();
             local upvalue_count = reader.read_varint();
@@ -148,38 +152,49 @@ local function decode(bytecode: t.bstring): t.Chunk
             end
 
             types.locals = locals;
-
-            proto.types = types;
         end
 
-        local instruction_count = reader.read_varint();
-        proto.instructions = reader.read_buffer(instruction_count * 4);
-        proto.constants = reader.read_larray(read_constant);
-        proto.child_protos = reader.read_larray(reader.read_varint);
-        proto.line_defined = reader.read_varint();
-        proto.debug_name = reader.read_varint();
-        proto.line_info = reader.read_optional(read_line_info, instruction_count);
-        proto.debug_info = reader.read_optional(read_debug_info);
+        local instruction_count: number = reader.read_varint();
+        local instructions = reader.read_buffer(instruction_count * 4);
+        local constants = reader.read_larray(read_constant);
+        local child_protos = reader.read_larray(reader.read_varint);
+        local line_defined: number = reader.read_varint();
+        local debug_name: number = reader.read_varint();
+        local line_info: buffer? = reader.read_optional(read_line_info, instruction_count) :: buffer?;
+        local debug_info = reader.read_optional(read_debug_info);
 
-        return proto;
+        return {
+            max_stack_size = max_stack_size,
+            num_params = num_params,
+            num_upvalues = num_upvalues,
+            is_vararg = is_vararg,
+            flags = flags,
+            types = types,
+            instructions = instructions,
+            constants = constants,
+            child_protos = child_protos,
+            line_defined = line_defined,
+            debug_name = debug_name,
+            line_info = line_info,
+            debug_info = debug_info,
+        };
     end
 
     --[=[
         Reads a bytecode chuck and returns the internal table representation.
     ]=]
     local function read_chunk(): t.Chunk
-        local chunk = {};
-
-        chunk.luau_version = reader.read_u8();
-        if chunk.luau_version == 0 then
+        local luau_version = reader.read_u8();
+        if luau_version == 0 then
             error("provided bytecode chunk is invalid");
         end
 
-        chunk.types_version = reader.read_u8();
-        chunk.strings = reader.read_larray(reader.read_lstring);
+        local types_version = reader.read_u8();
+        local strings = reader.read_larray(reader.read_lstring);
         
-        if chunk.types_version == 3 then
-            chunk.userdata_types = {};
+        local userdata_types;
+        if types_version == 3 then
+            userdata_types = {};
             while true do
                 local i = reader.read_u8();
                 if i == 0 then
@@ -187,14 +202,21 @@ local function decode(bytecode: t.bstring): t.Chunk
                 end
                 
                 local name_ref = reader.read_varint();
-                chunk.userdata_types[i] = name_ref;
+                userdata_types[i] = name_ref;
             end
         end
-        
-        chunk.protos = reader.read_larray(read_proto);
-        chunk.main_proto = reader.read_varint();
 
-        return chunk;
+        local protos = reader.read_larray(read_proto);
+        local main_proto = reader.read_varint();
+
+        return {
+            luau_version = luau_version,
+            types_version = types_version,
+            strings = strings,
+            userdata_types = userdata_types,
+            protos = protos,
+            main_proto = main_proto,
+        };
     end
 
     return read_chunk();

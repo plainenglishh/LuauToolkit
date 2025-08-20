@@ -1,7 +1,7 @@
 # Test Suite
 
 ```bash
-Usage: lune run tests [options]
+Usage: lune run tests [benchmark] [options]
 
 Options:
     --werror        Treat warnings as errors

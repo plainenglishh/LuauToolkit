@@ -1,4 +1,6 @@
 /test.luau
+/test.lasm
+/out.luau
 /old/
 /dist/
 *.luauc

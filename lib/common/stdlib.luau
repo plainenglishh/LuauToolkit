@@ -1,7 +1,3 @@
---[[
-    This file contains the Luau standard library as a dictionary.
-]]
-
 return {
     assert = assert,
     error = error,

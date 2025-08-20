@@ -6,6 +6,7 @@ local fs = require("@lune/fs");
 
 local paths = {
     "./lib/bytecode",
+    "./lib/lasm",
     --"./lib/vm",
 };
 

@@ -1,8 +1,7 @@
-local fs = require("@lune/fs");
 local process = require("@lune/process");
 local stdio = require("@lune/stdio");
 
---stdio.ewrite("temporarily disabled"); process.exit(2); -- Undo after new solver transition
+stdio.ewrite("temporarily disabled"); process.exit(2); -- Undo after new solver transition
 
 local function starts_with(str: string, with: string)
     return string.sub(str, 0, #with) == with;

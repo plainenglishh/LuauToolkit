@@ -24,8 +24,8 @@ for _, file in files do
                     proto.instructions = bytecode.instructions.encode(bytecode.instructions.decode(proto.instructions));
                 end
 
-                local ltk_reencoded_bc = bytecode.chunk.encode(chunk);
-                testing.assert_eq(real_bc, ltk_reencoded_bc, `not equal! file="{file}", optimisation_level={optimisation_level}, debug_level={debug_level}, coverage_level={coverage_level}`);
+                local reencoded = bytecode.chunk.encode(chunk);
+                testing.assert_eq(real_bc, reencoded, `not equal! file="{file}", optimisation_level={optimisation_level}, debug_level={debug_level}, coverage_level={coverage_level}`);
             end
         end
     end

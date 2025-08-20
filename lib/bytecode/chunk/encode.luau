@@ -1,6 +1,11 @@
-local byteparse = require("../byteparse");
+--!native
+
+local common = require("@luau_toolkit/common");
+
 local constants = require("../constants");
 local t = require("../types");
+
+local byteparse = common.byteparse;
 
 --[=[
     Returns a constant type id from a constant type name.
@@ -180,7 +185,7 @@ local function encode(chunk: t.Chunk): buffer
         local flags = 0;
 
         for _, flag: t.ProtoFlag in proto.flags do
-            local offset = constants.proto_flag[flag :: any] or error(`unknown flag '{flag}'`);
+            local offset = (constants.proto_flag :: {[string]: number})[flag] or error(`unknown flag '{flag}'`);
             flags = bit32.replace(flags, 1, offset);
         end
 
@@ -202,7 +207,7 @@ local function encode(chunk: t.Chunk): buffer
     local function write_chunk(chunk: t.Chunk)
         writer.write_u8(chunk.luau_version);
         writer.write_u8(chunk.types_version);
-        writer.write_larray(chunk.strings, writer.write_lstring);
+        writer.write_larray(chunk.strings, writer.write_lstring, nil);
 
         if chunk.types_version == 3 then
             for i, t in chunk.userdata_types or ({} :: any) do
