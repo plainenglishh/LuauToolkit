@@ -10,9 +10,9 @@ A library for working with Luau, from within Luau.
 
 The library is split into the following modules:
 
-| Module     | Contents                    |                                                                                                                |
-| ---------- | --------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `bytecode` | Working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/) |
+| Module     | Description                            |                                                                                                                |
+| ---------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `bytecode` | Module for working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/) |
 
 <!--
 | `loadstring`     | \[WIP] Lightweight loadstring implementation.                  | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/)             |
