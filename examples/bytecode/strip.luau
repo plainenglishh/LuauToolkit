@@ -7,7 +7,7 @@
 local process = require("@lune/process");
 local stdio = require("@lune/stdio");
 local bytecode = require("@luau_toolkit/bytecode");
-local fs = require("@lune/fs")
+local fs = require("@lune/fs");
 
 local CLI_ERROR_PREFIX = `{stdio.color("red")}error: {stdio.color("reset")}`;
 

@@ -32,11 +32,12 @@ The library is split into the following modules:
 
 | Module           | Contents                                                       |                                                                                                                                  |
 | ---------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `bytecode`       | \[WIP] Functions and constants for working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/)                   |
+| `bytecode`       | Working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/)                   |
+
+<!--
 | `loadstring`     | \[WIP] Lightweight loadstring implementation.                  | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/)             |
 | `vm_conformance` | \[WIP] Luau VM conformance test cases.                         | [`[docs]`](./docs/modules/vm_conformance.md)<br/>[`[src]`](./lib/vm_conformance/)<br/>[`[examples]`](./examples/vm_conformance/) |
 
-<!--
 | `lasm`           | Luau Bytecode Assembler.                                | [`[docs]`](./docs/modules/lasm.md)<br/>[`[src]`](./lib/lasm/)<br/>[`[examples]`](./examples/lasm/)                               |
 | `decompiler`     | Luau Bytecode Decompiler.                               | [`[docs]`](./docs/modules/decompiler.md)<br/>[`[src]`](./lib/decompiler/)<br/>[`[examples]`](./examples/decompiler/)             |
 | `sourcegen`      | Source Code Generation Utilities.                       | [`[docs]`](./docs/modules/sourcegen.md)<br/>[`[src]`](./lib/sourcegen/)<br/>[`[examples]`](./examples/sourcegen/)                |
