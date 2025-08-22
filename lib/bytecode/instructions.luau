@@ -134,7 +134,10 @@ end
 ]=]
 function instructions.display(insn: number, next_insn: number?): string
     local instruction = decode_instruction(insn, next_insn);
-    local info = instructions.get_metadata(instruction) or error("");
+    local info = instructions.get_metadata(instruction);
+    if not info then
+        return "?";
+    end
 
     local out = {info.name};
 

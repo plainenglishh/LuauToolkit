@@ -1,4 +1,4 @@
-return {
+return table.freeze({
     assert = assert,
     error = error,
     gcinfo = gcinfo,
@@ -31,4 +31,4 @@ return {
     debug = debug,
     buffer = buffer,
     vector = vector,
-};
+});

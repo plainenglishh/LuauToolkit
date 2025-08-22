@@ -11,7 +11,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
     [0] = {
         name = "NOP",
         opcode = 0,
-        mode = "none",
+        mode = "abc",
         aux = false,
         description = "noop",
         operands = {},
@@ -25,7 +25,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
     [1] = {
         name = "BREAK",
         opcode = 1,
-        mode = "none",
+        mode = "abc",
         aux = false,
         description = "debugger break",
         operands = {},
@@ -1298,15 +1298,18 @@ local instructions: {[number]: t.InstructionMetadata} = {
     [59] = {
         name = "FORGPREP_INEXT",
         opcode = 59,
-        mode = "abc",
+        mode = "ad",
         aux = false,
         description = "prepare FORGLOOP with 2 output variables (no AUX encoding), assuming generator is luaB_inext, and jump to FORGLOOP",
         operands = {
             --- A: target register (see FORGLOOP for register layout)
             { name = "a", type = {"register"}, description = "target register (see FORGLOOP for register layout)" },
+
+            --- D: jump offset (-32768..32767)
+            { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767)" },
         },
         size = 1,
-        has_jump = false,
+        has_jump = true,
     },
 
     --[=[
@@ -1344,15 +1347,18 @@ local instructions: {[number]: t.InstructionMetadata} = {
     [61] = {
         name = "FORGPREP_NEXT",
         opcode = 61,
-        mode = "abc",
+        mode = "ad",
         aux = false,
         description = "prepare FORGLOOP with 2 output variables (no AUX encoding), assuming generator is luaB_next, and jump to FORGLOOP",
         operands = {
             --- A: target register (see FORGLOOP for register layout)
             { name = "a", type = {"register"}, description = "target register (see FORGLOOP for register layout)" },
+
+            --- D: jump offset (-32768..32767)
+            { name = "d", type = {"jump_offset"}, description = "jump offset (-32768..32767)" },
         },
         size = 1,
-        has_jump = false,
+        has_jump = true,
     },
 
     --[=[
@@ -1362,7 +1368,7 @@ local instructions: {[number]: t.InstructionMetadata} = {
     [62] = {
         name = "NATIVECALL",
         opcode = 62,
-        mode = "none",
+        mode = "abc",
         aux = false,
         description = "start executing new function in native code\nthis is a pseudo-instruction that is never emitted by bytecode compiler, but can be constructed at runtime to accelerate native code dispatch",
         operands = {},

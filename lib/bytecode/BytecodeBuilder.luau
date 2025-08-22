@@ -274,7 +274,7 @@ function BytecodeBuilder.emit_abc(self: BytecodeBuilder, op: number | t.Instruct
         end
 
         if meta.mode ~= "abc" then
-            error(`{meta.name} uses argument mode e`, 2);
+            error(`{meta.name} uses argument mode {meta.mode}`, 2);
         end
     end
 
@@ -308,7 +308,7 @@ function BytecodeBuilder.emit_ad(self: BytecodeBuilder, op: number | t.Instructi
         end
 
         if meta.mode ~= "ad" then
-            error(`{meta.name} uses argument mode e`, 2);
+            error(`{meta.name} uses argument mode {meta.mode}`, 2);
         end
     end
 
@@ -341,7 +341,7 @@ function BytecodeBuilder.emit_e(self: BytecodeBuilder, op: number | t.Instructio
         end
 
         if meta.mode ~= "e" then
-            error(`{meta.name} uses argument mode e`, 2);
+            error(`{meta.name} uses argument mode {meta.mode}`, 2);
         end
     end
 

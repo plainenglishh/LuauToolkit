@@ -39,10 +39,10 @@ function common.display_chunk_name(chunk_name: string): string
         return string.sub(chunk_name, 2);
     end
 
-    return `[string "{chunk_name}"]`;
+    return string.format("[string %q]", chunk_name);
 end
 
-function common.strip_error_prefix(str: string): string
+function common.strip_where(str: string): string
     local prefix, message = string.match(str, "^(.-):%d+: (.+)$");
     if not prefix or not message then
         return str;
@@ -51,7 +51,7 @@ function common.strip_error_prefix(str: string): string
     return message;
 end
 
-function common.unimplemented()
+function common.unimplemented(): never
     error("unimplemented", 2);
 end
 

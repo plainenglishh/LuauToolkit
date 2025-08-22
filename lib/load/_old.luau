@@ -994,7 +994,7 @@ local function loadstring(bc: bstring, options: LoadstringOptions?): LoadedFunct
 
                 if not ok then
                     local err = tostring(results[1] or "unknown error");
-                    err = common.strip_error_prefix(err);
+                    err = common.strip_where(err);
                     error(`{common.display_chunk_name(chunk_name)}:{get_line(debug_pc - 1)}: {err}`, 2);
                 end
 

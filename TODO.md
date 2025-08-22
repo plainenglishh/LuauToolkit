@@ -23,10 +23,12 @@
 
 ## Loadstring Module
 
-- [ ] use constant tables
-- [ ] inline fastcalls?
-- [ ] test with `luau_toolkit/vm_conformance`
+- [ ] resolve constant table at load time
+- [ ] inline fastcalls
 - [ ] consider dispatch table rather than long if chain
+- [ ] use num_upvalues instead of checking following opcodes, and reuse constant
+      closures
+- [ ] test with `luau_toolkit/vm_conformance`
 
 ## LASM Module
 
