@@ -1,7 +1,5 @@
-/test.luau
-/test.lasm
-/out.luau
-/old/
-/dist/
-*.luauc
-/target
+/*.luau
+/*.lasm
+/*.luauc
+/old
+/dist

@@ -214,7 +214,7 @@ local function generate(bytecode_h: string): string
             local has_jump = false;
             local has_aux = false;
             local operands = "";
-            local mode = "none";
+            local mode = "abc";
         
             for op_num, v in opcode.operands do
                 if v.name == "AUX" then

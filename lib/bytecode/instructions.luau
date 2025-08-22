@@ -150,7 +150,7 @@ function instructions.display(insn: number, next_insn: number?): string
     end
 
     if info.aux then
-        out[3] = `, aux={next_insn})`;
+        out[3] = `, aux={next_insn or "?"})`;
     else
         out[3] = ")";
     end

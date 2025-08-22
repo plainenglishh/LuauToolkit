@@ -157,15 +157,15 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
             local code_size = buffer.len(code);
 
             local function vm_error(fmt: string, ...: any): never
-                local insn = buffer.readu32(code, dbg_pc);
-                local next_insn = if dbg_pc == code_size then nil else buffer.readu32(code, dbg_pc + 1);
+                local insn = buffer.readu32(code, dbg_pc * 4);
+                local next_insn = if dbg_pc == code_size then nil else buffer.readu32(code, (dbg_pc + 1)  * 4);
                 local prefix = string.format("vm_error(pc=%i, insn=0x%.8X, op=%i, dbg=%q): ", dbg_pc, insn, INSN_OP(insn), bytecode.instructions.display(insn, next_insn));
                 local body = (string.format :: any)(fmt, ...);
                 error(prefix..body, 2);
             end
 
             local function read_insn(): number
-                local insn = buffer.readu32(code, pc);
+                local insn = buffer.readu32(code, pc * 4);
                 pc += 1;
                 return insn;
             end
@@ -248,7 +248,7 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
 
             local line = "";
             if proto.line_info then
-                line = `:{buffer.readu32(proto.line_info, dbg_pc)}`;
+                line = `:{buffer.readu32(proto.line_info, dbg_pc * 4)}`;
             end
 
             error(`{common.display_chunk_name(debug_name)}{line}: {stripped_message}`, 0);
