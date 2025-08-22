@@ -149,11 +149,11 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
             local top = 0;
 
             local code = proto.instructions;
-            local code_size = buffer.len(code);
+            local code_size = buffer.len(code) / 4;
 
             local function vm_error(fmt: string, ...: any): never
                 local insn = buffer.readu32(code, dbg_pc * 4);
-                local next_insn = if dbg_pc == code_size then nil else buffer.readu32(code, (dbg_pc + 1)  * 4);
+                local next_insn = if dbg_pc + 1 == code_size then nil else buffer.readu32(code, (dbg_pc + 1)  * 4);
                 local prefix = string.format("vm_error(pc=%i, insn=0x%.8X, op=%i, dbg=%q): ", dbg_pc, insn, INSN_OP(insn), bytecode.instructions.display(insn, next_insn));
                 local body = (string.format :: any)(fmt, ...);
                 error(prefix..body, 2);
@@ -217,7 +217,7 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
 
             while pc < code_size do 
                 dbg_pc = pc;
-
+                
                 local insn = read_insn();
                 local op = INSN_OP(insn);
 
@@ -226,6 +226,8 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
                     vm_error("illegal instruction");
                 end
             end
+
+            vm_error("implicit return");
         end
 
         return function(...: any): ...any
@@ -243,6 +245,7 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
 
             local line = "";
             if proto.line_info then
+                print(dbg_pc)
                 line = `:{buffer.readu32(proto.line_info, dbg_pc * 4)}`;
             end
 
