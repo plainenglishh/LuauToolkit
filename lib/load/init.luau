@@ -47,11 +47,6 @@ local function PATCH_INSN_E(insn: number, e: number): number
     return raw;
 end
 
-local VM_ERROR = {
-    INVALID_MAIN = "invalid main proto",
-    NONEXISTENT_CONSTANT = "nonexistent constant",
-};
-
 export type LoadedClosure = (...any) -> (...any)
 type Env = {[any]: any};
 
@@ -59,20 +54,6 @@ type CreateVector4 = (number, number, number, number) -> vector;
 local create_vector_4 = vector.create :: CreateVector4;
 
 local default_env: Env = table.freeze(table.clone(common.stdlib :: {[any]: any})); -- This can be reused across scripts.
-
-local function get_import(env: Env, constants: {any}, id: number): any
-    local current: any = env;
-    
-    for i, v in bytecode.import_id.decode(id) do
-        local idx: string = constants[v + 1] or error(VM_ERROR.NONEXISTENT_CONSTANT);
-        current = current[idx];
-        if current == nil then
-            return nil;    
-        end
-    end
-
-    return current;
-end
 
 type Upvalue = {
     type: "VAL",
@@ -123,6 +104,20 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
 
         local constants = table.create(#proto.constants, nil :: any);
 
+        local function get_import(id: number): any
+            local current: any = env;
+            
+            for i, v in bytecode.import_id.decode(id) do
+                local idx: string = constants[v + 1] or load_error("attempt to get nonexistent constant when getting import");
+                current = current[idx];
+                if current == nil then
+                    return nil;    
+                end
+            end
+
+            return current;
+        end
+
         for i, const in proto.constants do
             if const.type == "nil" then
             elseif const.type == "boolean" or const.type == "number" then
@@ -138,7 +133,7 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
             elseif const.type == "table" then
                 -- no point
             elseif const.type == "import" then
-                constants[i] = get_import(env, constants, const.value);
+                constants[i] = get_import(const.value);
             elseif const.type == "closure" then
                 -- do nothing, treat dupclosure as newclosure for now
             end
@@ -149,7 +144,7 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
         local dbg_pc = 0;
 
         local function loaded_closure(...: any): ...any
-            local registers = table.create(255, nil :: any);
+            local registers = table.create(256, nil :: any);
             local pc = 0;
             local top = 0;
 
@@ -191,7 +186,7 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
             end
 
             local function get_constant(id: number): any
-                return constants[id + 1] or vm_error(`attept to get nonexistent constant {id}`);
+                return constants[id + 1] or vm_error(`attempt to get nonexistent constant {id}`);
             end
 
             local function get_upvalue(id: number): any
@@ -255,7 +250,7 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
         end;
     end
 
-    local main_proto = chunk.protos[chunk.main_proto + 1] or error(VM_ERROR.INVALID_MAIN);
+    local main_proto = chunk.protos[chunk.main_proto + 1] or load_error("attempt to get nonexistent main proto");
 
     return new_closure(main_proto, {});
 end
