@@ -245,7 +245,6 @@ local function load(bc: buffer | string, debug_name: string?, env: Env?): Loaded
 
             local line = "";
             if proto.line_info then
-                print(dbg_pc)
                 line = `:{buffer.readu32(proto.line_info, dbg_pc * 4)}`;
             end
 
