@@ -5,7 +5,7 @@ src = "docs/"
 language = "en"
 
 [build]
-build-dir = "docs/dist"
+build-dir = "dist/docs"
 create-missing = false
-use-default-preprocessors = true
-extra-watch-dirs = []
+
+[preprocessor.alerts]
