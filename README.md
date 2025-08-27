@@ -6,7 +6,9 @@ A library for working with Luau from within Luau.
 > This library is work in progress. Many features aren't implemented and the API
 > structure is subject to change.
 
-## Modules
+## Contents
+
+### Modules
 
 The library is split into the following modules:
 
@@ -44,6 +46,29 @@ for `loadstring`. If you're looking for a more involved, debuggable and
 sandboxable interpreter, opt for `vm`.
 -->
 
+### Binaries
+
+Some modules also have command line applications, accessible under the
+[`bin/`](./bin/) directory.
+
+### Examples
+
+A series of examples can be found under the [`examples/`](./examples/)
+directory.
+
+You can run an example with:
+
+```bash
+lune run examples/<path_to_example> [args]
+
+# eg:
+lune run examples/bytecode/strip chunk.luauc stripped.luauc
+```
+
+## Documentation
+
+Documentation can be found [here](./docs/index.md).
+
 ## Installation
 
 To install `luau_toolkit`, copy the [`lib/`](./lib) directory to wherever you'd
@@ -60,29 +85,6 @@ library accessible with `require("@luau_toolkit/<module>")`:
     }
     //...
 }
-```
-
-## Binaries
-
-Some modules also have command line applications, accessible under the
-[`bin/`](./bin/) directory.
-
-## Documentation
-
-Documentation can be found [here](./docs/index.md).
-
-## Examples
-
-A series of examples can be found under the [`examples/`](./examples/)
-directory.
-
-You can run an example with:
-
-```bash
-lune run examples/<path_to_example> [args]
-
-# eg:
-lune run examples/bytecode/strip chunk.luauc stripped.luauc
 ```
 
 ## Testing
