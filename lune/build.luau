@@ -52,10 +52,5 @@ local function build_bin()
     fs.removeFile("./dist/bin/darklua.json");
 end
 
-local function build_docs()
-    process.exec("mdbook", {"build"}, {stdio="forward"});
-end
-
 build_lib();
 build_bin();
-build_docs();
