@@ -42,14 +42,7 @@ function common.display_chunk_name(chunk_name: string): string
     return string.format("[string %q]", chunk_name);
 end
 
-function common.strip_where(str: string): string
-    local prefix, message = string.match(str, "^(.-):%d+: (.+)$");
-    if not prefix or not message then
-        return str;
-    end
-
-    return message;
-end
+common.strip_where = require("@self/strip_where");
 
 function common.unimplemented(): never
     error("unimplemented", 2);
