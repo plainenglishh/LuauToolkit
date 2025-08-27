@@ -1,0 +1,11 @@
+[book]
+title = "LuauToolkit Documentation"
+authors = ["plainenglish"]
+src = "docs/"
+language = "en"
+
+[build]
+build-dir = "dist/docs"
+create-missing = false
+use-default-preprocessors = true
+extra-watch-dirs = []

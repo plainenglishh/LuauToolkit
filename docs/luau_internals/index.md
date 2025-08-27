@@ -1,4 +1,4 @@
-# Luau Internals
+# Part 2: Luau Internals
 
 This section contains information about the Luau language internals.
 
