@@ -6,7 +6,6 @@ language = "en"
 
 [build]
 create-missing = false
-
 #[preprocessor.alerts]
 #[preprocessor.inline-highlighting]
 #default-language = "none"
