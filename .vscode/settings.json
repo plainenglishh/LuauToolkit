@@ -24,7 +24,8 @@
         "whitespace", "Whitespace", "Userdata", "metatables", "runtime",
         "metatable", "userdatums", "userdatum", "coroutines", "binary64",
         "binary32", "UpperCamelCase", "luacase", "NEWTABLE", "lexing", 
-        "parsers", "Associativity", "sandboxed", "untrusted"
+        "parsers", "Associativity", "sandboxed", "untrusted", "ImportId",
+        "LuauToolkit", ""
     ],
     "[markdown]": {
         "editor.unicodeHighlight.ambiguousCharacters": false,
