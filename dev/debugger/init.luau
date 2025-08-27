@@ -87,6 +87,7 @@ local function handle_input()
         print("quitting debugger...");
         process.exit(0);
     elseif cmd:lower() == "s" or cmd == "" then
+        print(`stepping`);
         step();
     elseif string.sub(cmd:lower(), 1, 1) == "r" then
         local raw = string.sub(cmd, 2, -1);
@@ -97,6 +98,8 @@ local function handle_input()
         end
 
         print(tostring(frame.registers[n + 1]));
+    else
+        print(`unknown command '{cmd}'`);
     end
 end
 
@@ -133,7 +136,7 @@ local function update()
 
         local metadata = bytecode.instructions.metadata[info.opcode];
 
-        table.insert(bytecode_lines, string.format("%s%i: %s", if i == frame.pc then ">" else " ", i, metadata.name));
+        table.insert(bytecode_lines, string.format("%s%i: %s", if i == frame.pc then ">" else " ", i, bytecode.instructions.display(insn, next_insn)));
     end
 
     for line, text in src do 
