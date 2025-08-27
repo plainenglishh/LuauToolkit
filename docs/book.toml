@@ -1,0 +1,13 @@
+[book]
+title = "LuauToolkit Documentation"
+authors = ["plainenglish"]
+src = "src/"
+language = "en"
+
+[build]
+create-missing = false
+
+#[preprocessor.alerts]
+#[preprocessor.inline-highlighting]
+#default-language = "none"
+#[preprocessor.cmdrun]
