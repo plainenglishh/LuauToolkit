@@ -12,9 +12,9 @@ A library for working with Luau from within Luau.
 
 The library is split into the following modules:
 
-| Module     | Description                            |                                                                                                                |
-| ---------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `bytecode` | Module for working with Luau bytecode. | [`[docs]`](./docs/modules/bytecode.md)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/) |
+| Module     | Description                            |                                                                                                                                                        |
+| ---------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `bytecode` | Module for working with Luau bytecode. | [`[docs]`](https://luau-toolkit.plainenglish.xyz/modules/bytecode_module.html)<br/>[`[src]`](./lib/bytecode/)<br/>[`[examples]`](./examples/bytecode/) |
 
 <!--
 | `loadstring`     | \[WIP] Lightweight loadstring implementation.                  | [`[docs]`](./docs/modules/loadstring.md)<br/>[`[src]`](./lib/loadstring/)<br/>[`[examples]`](./examples/loadstring/)             |
@@ -32,19 +32,6 @@ The library is split into the following modules:
 | `debugger`       |                                                         |                                                                                                                                  |
 -->
 <!-- Only advertise modules when they're in a 'ready' state. -->
-
-<!--
-#### 'Loadstring' or 'VM'?
-
-While the `loadstring` and `vm` modules both run bytecode, they differ in a few
-key ways. Firstly, `loadstring` implements a lightweight 5.3 [load]() style
-function for loading and running bytecode within the _current_ vm, whereas `vm`
-implements a more heavyweight isolated Luau virtual machine.
-
-If you're looking for a simple, fast and lightweight way to run bytecode, opt
-for `loadstring`. If you're looking for a more involved, debuggable and
-sandboxable interpreter, opt for `vm`.
--->
 
 ### Binaries
 

@@ -2,4 +2,4 @@
 
 ## Parts
 
-- [Chapter 1: Bytecode Module](./1_bytecode.md)
+- [Chapter 1: Bytecode Module](./bytecode_module.md)

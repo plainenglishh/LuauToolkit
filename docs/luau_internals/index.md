@@ -4,4 +4,4 @@ This section contains information about the Luau language internals.
 
 ## Parts
 
-- [Chapter 1: Bytecode Format](./1_bytecode_format.md)
+- [Chapter 1: Bytecode Format](./bytecode_format.md)
