@@ -21,7 +21,7 @@ local BLUE = stdio.color("blue");
 local DIM = stdio.style("dim");
 local RESET = stdio.style("reset");
 
-local TESTS_PATH = "./tests/";
+local TESTS_PATH = `./tests/{process.args[1] or ""}`;
 local TESTS_ENDS_WITH = ".spec.luau";
 
 if not fs.isDir(TESTS_PATH) then
