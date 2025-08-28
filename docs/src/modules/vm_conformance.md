@@ -1,4 +1,4 @@
-# VM Conformance Modul
+# VM Conformance Module
 
 ## About
 
