@@ -30,7 +30,7 @@ export type Chapter = {
     name: string,
     content: string,
     number: {number}?,
-    sub_items: {Chapter},
+    sub_items: {{Chapter: Chapter}},
     path: string,
     source_path: string,
     parent_names: {string},
@@ -58,8 +58,8 @@ local function supports(renderers: {string}?)
     end
 end
 
-export type BookProcessor = (ctx: Context, book: Book) -> Book;
-export type ChapterProcessor = (ctx: Context, chapter: Chapter, book: Book) -> Book;
+export type BookProcessor = (ctx: Context, book: Book) -> ();
+export type ChapterProcessor = (ctx: Context, chapter: Chapter, book: Book) -> ();
 
 export type Preprocessor = setmetatable<{
     _supports: {string}?,
@@ -71,7 +71,7 @@ export type Preprocessor = setmetatable<{
     new: () -> Preprocessor,
     supports: (self: Preprocessor, renderers: {string}) -> Preprocessor,
     process_book: (self: Preprocessor, processor: BookProcessor) -> Preprocessor,
-    --process_chapter: (self: Preprocessor, processor: ChapterProcessor) -> Preprocessor,
+    process_chapter: (self: Preprocessor, processor: ChapterProcessor) -> Preprocessor,
     run: (self: Preprocessor) -> (),
 }>;
 
@@ -96,10 +96,10 @@ function Preprocessor.process_book(self: Preprocessor, processor: BookProcessor)
     return self;
 end
 
---[[function Preprocessor.process_chapter(self: Preprocessor, processor: ChapterProcessor): Preprocessor
+function Preprocessor.process_chapter(self: Preprocessor, processor: ChapterProcessor): Preprocessor
     table.insert(self._chapter_steps, processor);
     return self;
-end]]
+end
 
 function Preprocessor.run(self: Preprocessor)
     supports(self._supports);
@@ -108,15 +108,22 @@ function Preprocessor.run(self: Preprocessor)
     local ctx: Context, book: Book = unpack(serde.decode("json", raw));
 
     for _, processor in self._book_steps do
-        book = processor(ctx, book);
+        processor(ctx, book);
     end
 
-    --[[for _, processor in self._chapter_steps do
-        local chapters = list_chapters();
-        for _, chapter in chapters do
-            book = processor(ctx, chapter, book);
+    local function process_chapter(chapter: Chapter)
+        for _, processor in self._chapter_steps do
+            processor(ctx, chapter, book);
         end
-    end]]
+
+        for _, sub_chapter in chapter.sub_items do
+            process_chapter(sub_chapter.Chapter);
+        end
+    end
+
+    for _, section in book.sections do
+        process_chapter(section.Chapter);
+    end
 
     (book :: any)["__non_exhaustive"] = "null";
     local encoded = serde.encode("json", book, true);
