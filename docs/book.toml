@@ -8,7 +8,7 @@ language = "en"
 create-missing = false
 
 [preprocessor.alerts]
-command = "lune run preprocessors/alerts"
+command = "lune run preprocessor"
 #[preprocessor.alerts]
 #[preprocessor.inline-highlighting]
 #default-language = "none"

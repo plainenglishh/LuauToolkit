@@ -1,7 +1,4 @@
-local Preprocessor = require("./preprocessor");
-local preprocessor = Preprocessor.new();
-
-local INJECT: string; do INJECT = [=[
+return [=[
 <style>
     .mdbook-alerts {
         padding: 8px 16px;
@@ -68,32 +65,4 @@ local INJECT: string; do INJECT = [=[
         --mdbook-alerts-icon: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cpath fill="currentColor" d="M12 17q.425 0 .713-.288T13 16q0-.425-.288-.712T12 15q-.425 0-.712.288T11 16q0 .425.288.713T12 17m0-4q.425 0 .713-.288T13 12V8q0-.425-.288-.712T12 7q-.425 0-.712.288T11 8v4q0 .425.288.713T12 13m-3.35 7H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12q0-.375.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5q.375 0 .738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737q0 .375-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5q-.375 0-.737-.15t-.663-.425zm.85-2l2.5 2.5l2.5-2.5H18v-3.5l2.5-2.5L18 9.5V6h-3.5L12 3.5L9.5 6H6v3.5L3.5 12L6 14.5V18zm2.5-6"%2F%3E%3C%2Fsvg%3E');
     }
 </style>
-]=] end;
-
-local commands: {[string]: (args: string) -> string} = {};
-
-function commands.alert(args: string): string
-    local parts = string.split(args, " ");
-    local mode = string.lower(table.remove(parts, 1) or error("scott de wozzler"));
-    local body = table.concat(parts, " ");
-
-    return string.format(
-        "<div class=\"mdbook-alerts mdbook-alerts-%s\"><p class=\"mdbook-alerts-title\"><span class=\"mdbook-alerts-icon\"></span>%s</p>%s</div>", 
-        mode, 
-        mode, 
-        body
-    );
-end
-
-preprocessor:process_chapter(function(ctx: Preprocessor.Context, chapter: Preprocessor.Chapter, book: Preprocessor.Book)
-    chapter.content = INJECT .. string.gsub(chapter.content,  "{{#(%w*)%s*(.-)}}", function(name: string, args: string): string
-        local command = commands[name];
-        if not command then
-            return nil :: any;
-        end
-
-        return command(args);
-    end :: any);
-end);
-
-preprocessor:run();
+]=];
