@@ -56,11 +56,11 @@ local StringBuilder = require("@self/StringBuilder");
 export type StringBuilder = StringBuilder.StringBuilder;
 common.StringBuilder = StringBuilder;
 
---common.hash = require("@self/hash");
 common.VECTOR_SIZE = require("@self/vector_size").vector_size;
 
 --// Vendored Dependencies
-common.int64 = require("@self/int64");
-common.byteparse = require("@self/byteparse");
+common.int64 = require("@self/vendor/int64");
+common.byteparse = require("@self/vendor/byteparse");
+common.json = require("@self/vendor/json");
 
 return common;
