@@ -9,7 +9,3 @@ create-missing = false
 
 [preprocessor.alerts]
 command = "lune run preprocessor"
-#[preprocessor.alerts]
-#[preprocessor.inline-highlighting]
-#default-language = "none"
-#[preprocessor.cmdrun]
