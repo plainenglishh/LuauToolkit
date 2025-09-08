@@ -22,7 +22,7 @@ jobs:
       - name: "Prepare: Install Rokit"
         uses: CompeyDev/setup-rokit@v0.1.2
       - name: Report mdbook version
-        run: mdbook --version
+        run: echo "ffffffffff"
       - name: Build Book
         run: |
           cd docs
