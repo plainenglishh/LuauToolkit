@@ -1,4 +1,4 @@
 [tools]
 lune = "lune-org/lune@0.9.4"
 darklua = "seaofvoices/darklua@0.17.1"
-mdbook = "rust-lang/mdbook@0.4.52"
+#mdbook = "rust-lang/mdbook@0.4.52"
