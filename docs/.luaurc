@@ -1,0 +1,9 @@
+{
+    "languageMode": "strict",
+    "aliases": {
+        "mdbook.luau": "./preprocessor/mdbook.luau/src"
+    },
+    "lint": {
+        "LocalShadow": false
+    }
+}

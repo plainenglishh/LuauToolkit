@@ -1,6 +1,6 @@
-# Chapter 1.1: Bytecode Module
+# Bytecode Module
 
-## 1. Introduction
+## Introduction
 
 The `bytecode` module provides functionality for generating and manipulating
 Luau bytecode.

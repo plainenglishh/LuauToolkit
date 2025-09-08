@@ -4,12 +4,17 @@
 
 ---
 
-- [Modules](./modules/index.md)
-  - [Bytecode Module](./modules/bytecode_module.md)
+# Library
 
-- [Luau Internals](./luau_internals/index.md)
-  - [Bytecode Format](./luau_internals/bytecode_format.md)
+- [Modules](./library/modules/index.md)
+  - [Bytecode Module](./library/modules/bytecode_module.md)
+
+- [Test Suite](./library/test_suite.md)
+- [Dependencies](./library/dependencies.md)
 
 ---
 
-[Dependencies](dependencies.md)
+# Miscellaneous
+
+- [Luau Internals](./misc/luau_internals/index.md)
+  - [Bytecode Format](./misc/luau_internals/bytecode_format.md)

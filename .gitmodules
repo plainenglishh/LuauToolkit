@@ -1,0 +1,3 @@
+[submodule "docs/preprocessor/mdbook.luau"]
+	path = docs/preprocessor/mdbook.luau
+	url = https://github.com/plainenglishh/mdbook.luau.git

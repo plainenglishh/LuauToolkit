@@ -1,7 +1,7 @@
-# Part 2: Luau Internals
+# Luau Internals
 
 This section contains information about the Luau language internals.
 
 ## Parts
 
-- [Chapter 1: Bytecode Format](./bytecode_format.md)
+- [Bytecode Format](./bytecode_format.md)

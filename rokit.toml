@@ -1,3 +1,4 @@
 [tools]
-lune = "lune-org/lune@0.10.1" # For development, library is pure-luau.
+lune = "lune-org/lune@0.9.4"
 darklua = "seaofvoices/darklua@0.17.1"
+mdbook = "rust-lang/mdbook@0.4.52"

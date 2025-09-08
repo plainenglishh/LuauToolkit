@@ -7,3 +7,5 @@
 1. [`plainenglishh/byteparse`](https://github.com/plainenglishh/byteparse)
 
 ## Development Dependencies
+
+1. [`plainenglishh/mdbook.luau`](https://github.com/plainenglishh/mdbook.luau)

@@ -1,4 +1,4 @@
-# Chapter 2.1: Bytecode Format
+# Bytecode Format
 
 ## 1. Introduction
 
