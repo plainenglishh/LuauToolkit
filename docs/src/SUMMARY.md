@@ -9,8 +9,8 @@
 - [Modules](./library/modules/index.md)
   - [Bytecode Module](./library/modules/bytecode_module.md)
 
-- [Test Suite](./library/test_suite.md)
-- [Dependencies](./library/dependencies.md)
+- [Testing](./library/testing.md)
+- [Dependencies and Tools](./library/dependencies.md)
 
 ---
 
