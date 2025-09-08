@@ -22,8 +22,7 @@ jobs:
       - name: "Prepare: Install Rokit"
         uses: CompeyDev/setup-rokit@v0.1.2
       - name: Report mdbook version
-        run: |
-          mdbook --version
+        run: mdbook --version
       - name: Build Book
         run: |
           cd docs
