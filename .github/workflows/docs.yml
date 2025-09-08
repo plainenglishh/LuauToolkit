@@ -21,10 +21,12 @@ jobs:
           fetch-depth: 0
       - name: "Prepare: Install Rokit"
         uses: CompeyDev/setup-rokit@v0.1.2
+      - name: Report mdbook version
+        run: |
+          mdbook --version
       - name: Build Book
         run: |
           cd docs
-          mdbook --version
           mdbook build
       - name: Setup Pages
         uses: actions/configure-pages@v4
