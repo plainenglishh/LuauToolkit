@@ -15,9 +15,9 @@ local luau_versions = constants.supported_bytecode_versions;
 
 type ReportIssueFn = (severity: t.ValidationIssueSeverity, message: string, note: string?) -> ();
 
---[=[
+--[[
     Returns whether `n` is within the inclusive range `min..max`.
-]=]
+]]
 local function in_range(n: number, min: number, max: number)
     return n < min or n > max;
 end
@@ -66,6 +66,8 @@ end
 
     This function does not ensure a bytecode chunk is _safe_, it just checks for
     common issues.
+
+    @within bytecode.chunk
 ]=]
 local function validate(chunk: t.IntoChunk): t.ValidationResult        
     local issues = {};

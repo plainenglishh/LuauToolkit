@@ -3,6 +3,8 @@ local t = require("./types");
 
 --[=[
     Array of information about Luau opcodes.
+
+    @class bytecode.instructions
 ]=]
 local instructions: {[number]: t.InstructionMetadata} = {
     --[=[

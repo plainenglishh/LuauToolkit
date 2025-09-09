@@ -1,5 +1,7 @@
 --[=[
     Library containing utility `Chunk` related functions.
+
+    @class bytecode.util
 ]=]
 local util = {};
 

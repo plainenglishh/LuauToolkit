@@ -16,6 +16,8 @@ local t = require("./types");
 local DOC_COMMENT = [==[
 --[=[
     Array of information about Luau opcodes.
+
+    @class bytecode.instructions
 ]=]
 ]==];
 

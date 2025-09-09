@@ -11,6 +11,8 @@ local byteparse = common.byteparse;
 
     NOTE: This function intentionally does **not** check for validity. 
           Run `bytecode.chunk.validate` beforehand if this is desired.
+
+    @within bytecode.chunk
 ]=]
 local function decode(bc: t.bstring): t.Chunk
     local bytecode = if type(bc) == "string" then buffer.fromstring(bc) else bc;
@@ -103,9 +105,9 @@ local function decode(bc: t.bstring): t.Chunk
         return line_info;
     end
 
-    --[=[
+    --[[
         Reads a bytecode proto and returns the internal table representation.
-    ]=]
+    ]]
     local function read_proto(): t.Proto
         local max_stack_size = reader.read_u8();
         local num_params = reader.read_u8();
@@ -180,9 +182,9 @@ local function decode(bc: t.bstring): t.Chunk
         };
     end
 
-    --[=[
+    --[[
         Reads a bytecode chuck and returns the internal table representation.
-    ]=]
+    ]]
     local function read_chunk(): t.Chunk
         local luau_version = reader.read_u8();
         if luau_version == 0 then

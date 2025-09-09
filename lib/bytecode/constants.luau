@@ -2,12 +2,17 @@
 
 --[=[
     Various bytecode related constants.
+
+    @class bytecode.constants
 ]=]
 local constants = {};
 
 --[=[
     The range of supported bytecode versions. 
     Encoded as `luau_version` in `Chunk` objects.
+
+    @interface supported_bytecode_versions
+    @within bytecode.constants
 ]=]
 constants.supported_bytecode_versions = { 
     min = 4, 
@@ -17,6 +22,9 @@ constants.supported_bytecode_versions = {
 
 --[=[
     Map of bytecode constant types.
+
+    @interface constant_types
+    @within bytecode.constants
 ]=]
 constants.constant_types = {
     [0] = "nil",
@@ -31,6 +39,9 @@ constants.constant_types = {
 
 --[=[ 
     Proto bitfield flags.
+
+    @interface proto_flag
+    @within bytecode.constants
 ]=]
 constants.proto_flag = {
     native_module = 0,
@@ -40,6 +51,9 @@ constants.proto_flag = {
 
 --[=[
     Map of builtin fastcall functions.
+
+    @interface builtins
+    @within bytecode.constants
 ]=]
 local builtins: {(...any) -> ...any} = {
     assert,
@@ -226,6 +240,13 @@ local builtin_names = {
     "vector.max",
     "math.lerp",
 };
+
+--[=[
+    Names of builtin functions.
+
+    @interface builtin_names
+    @within bytecode.constants
+]=]
 constants.builtin_names = builtin_names;
 
 return constants;

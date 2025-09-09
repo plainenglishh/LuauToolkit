@@ -1,5 +1,7 @@
 --[=[
     Library for encoding, decoding and validating Luau bytecode chunks.
+
+    @class bytecode.chunk
 ]=]
 local chunk = {};
 

@@ -2,6 +2,8 @@ local t = require("@self/types");
 
 --[=[
     Library for working with Luau bytecode.
+
+    @class bytecode
 ]=]
 local bytecode = {};
 

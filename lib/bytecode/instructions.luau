@@ -99,9 +99,17 @@ end
 
 --[=[
     Library for encoding and decoding Luau bytecode instructions.
+
+    @class bytecode.instructions
 ]=]
 local instructions = {};
 
+--[=[
+    Instruction Metadata
+
+    @within bytecode.instructions
+    @prop metadata any
+]=]
 instructions.metadata = metadata;
 
 --[=[
@@ -111,6 +119,8 @@ instructions.metadata = metadata;
       - an opcode number;
       - an instruction name; or
       - an `Instruction` object.
+
+    @within bytecode.instructions
 ]=]
 function instructions.get_metadata(instruction: number|string|t.Instruction): t.InstructionMetadata?
     if type(instruction) == "number" then
@@ -131,6 +141,8 @@ end
 
 --[=[
     Returns a text representation of an instruction.
+
+    @within bytecode.instructions
 ]=]
 function instructions.display(insn: number, next_insn: number?): string
     local instruction = decode_instruction(insn, next_insn);
@@ -158,6 +170,9 @@ function instructions.display(insn: number, next_insn: number?): string
     return table.concat(out);
 end
 
+--[=[
+    @within bytecode.instructions
+]=]
 --native
 function instructions.decode_instruction(insn: number, next_insn: number?): t.Instruction
     return decode_instruction(insn, next_insn);
@@ -166,6 +181,8 @@ end
 --[=[
     Decodes a buffer containing an array of instructions into an array of 
     `Instruction`s.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.decode(insn_buffer: buffer): {t.Instruction}
@@ -199,6 +216,8 @@ end
 
     The first number contains the encoded instruction.
     The second contains the aux instruction, or nil if it doesn't have one.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.encode_instruction(insn: t.Instruction): (number, number?)
@@ -207,6 +226,8 @@ end
 
 --[=[
     Encodes an array of `Instruction`s into a buffer.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.encode(instructions: {t.Instruction}): buffer
@@ -229,6 +250,8 @@ end
 
 --[=[
     Extracts the opcode from an instruction as a `u8`.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.insn_op(insn: number): number
@@ -237,6 +260,8 @@ end
 
 --[=[
     Extracts the `A` operand from an instruction as a `u8`.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.insn_a(insn: number): number
@@ -245,6 +270,8 @@ end
 
 --[=[
     Extracts the `B` operand from an instruction as a `u8`.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.insn_b(insn: number): number
@@ -253,6 +280,8 @@ end
 
 --[=[
     Extracts the `C` operand from an instruction as a `u8`.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.insn_c(insn: number): number
@@ -261,6 +290,8 @@ end
 
 --[=[
     Extracts the `D` operand from an instruction as an `i16`.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.insn_d(insn: number): number
@@ -269,6 +300,8 @@ end
 
 --[=[
     Extracts the `E` operand from an instruction as an `i24`.
+
+    @within bytecode.instructions
 ]=]
 --native
 function instructions.insn_e(insn: number): number

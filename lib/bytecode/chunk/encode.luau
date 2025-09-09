@@ -7,10 +7,10 @@ local t = require("../types");
 
 local byteparse = common.byteparse;
 
---[=[
+--[[
     Returns a constant type id from a constant type name.
     Errors if given an invalid constant type.
-]=]
+]]
 local function get_constant_type(constant_type: t.ConstantType): number
     for i, v in constants.constant_types do
         if v == constant_type then
@@ -57,6 +57,8 @@ end
 
     NOTE: This function intentionally does **not** check for validity. 
           Run `bytecode.chunk.validate` beforehand if this is desired.
+
+    @within bytecode.chunk
 ]=]
 local function encode(chunk: t.Chunk): buffer
     local writer = byteparse.writer(100);
@@ -173,9 +175,9 @@ local function encode(chunk: t.Chunk): buffer
         writer.write_buffer(temp_line_info.to_buffer());
     end
 
-    --[=[
+    --[[
         writes a bytecode proto and returns the internal table representation.
-    ]=]
+    ]]
     local function write_proto(proto: t.Proto)
         writer.write_u8(proto.max_stack_size);
         writer.write_u8(proto.num_params);
@@ -201,9 +203,9 @@ local function encode(chunk: t.Chunk): buffer
         writer.write_optional(proto.debug_info, write_debug_info);
     end
 
-    --[=[
+    --[[
         writes a bytecode chuck and returns the internal table representation.
-    ]=]
+    ]]
     local function write_chunk(chunk: t.Chunk)
         writer.write_u8(chunk.luau_version);
         writer.write_u8(chunk.types_version);

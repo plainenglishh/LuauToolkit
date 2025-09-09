@@ -1,10 +1,14 @@
 --[=[
     Library for encoding and decoding bytecode import IDs.
+
+    @class bytecode.import_id
 ]=]
 local import_id = {};
 
 --[=[
     Encodes an import_id from an array of up to three string_id path members.
+
+    @within bytecode.import_id
 ]=]
 function import_id.encode(path: {number}): number
     local count = #path;
@@ -25,6 +29,8 @@ end
 
 --[=[
     Decodes an import_id into an array of up to three string_id path members.
+
+    @within bytecode.import_id
 ]=]
 function import_id.decode(id: number): {number}
     local count = bit32.rshift(id, 30);
