@@ -1,7 +1,7 @@
 --[[
     Lune example demonstrating the `bytecode` module.
 
-    This script accepts a `.luauc` and strips all unnecessary from the chunk.  
+    This script accepts a `.luauc` and strips unnecessary data from the chunk.  
 ]]
 
 local process = require("@lune/process");
