@@ -1,7 +1,7 @@
 local metadata = require("./instruction_metadata");
 local t = require("./types");
 
-@native
+--native
 local function reinterpret_signed(n: number, bitwidth: number): number
     if n >= 2^(bitwidth-1) then
         return n - 2^bitwidth;
@@ -10,7 +10,7 @@ local function reinterpret_signed(n: number, bitwidth: number): number
     return n;
 end
 
-@native
+--native
 local function reinterpret_unsigned(n: number, bitwidth: number): number
     if n < 0 then
         return n + 2^bitwidth;
@@ -19,37 +19,37 @@ local function reinterpret_unsigned(n: number, bitwidth: number): number
     return n;
 end
 
-@native
+--native
 function INSN_OP(insn: number): number
     return bit32.extract(insn, 0, 8);
 end
 
-@native
+--native
 function INSN_A(insn: number): number
     return bit32.extract(insn, 8, 8);
 end
 
-@native
+--native
 function INSN_B(insn: number): number
     return bit32.extract(insn, 16, 8);
 end
 
-@native
+--native
 function INSN_C(insn: number): number
     return bit32.extract(insn, 24, 8);
 end
 
-@native
+--native
 function INSN_D(insn: number): number
     return reinterpret_signed(bit32.extract(insn, 16, 16), 16);
 end
 
-@native
+--native
 function INSN_E(insn: number): number
     return reinterpret_signed(bit32.extract(insn, 8, 24), 24);
 end
 
-@native
+--native
 local function encode_instruction(insn: t.Instruction): (number, number?)
     local raw = insn.opcode;
     local mode: t.OperandEncodingMode, operands = insn.mode, insn.operands;
@@ -68,7 +68,7 @@ local function encode_instruction(insn: t.Instruction): (number, number?)
     return raw, insn.aux;
 end
 
-@native
+--native
 local function decode_instruction(insn: number, next_insn: number?): t.Instruction
     local opcode = INSN_OP(insn);
     local operands = vector.zero;
@@ -158,7 +158,7 @@ function instructions.display(insn: number, next_insn: number?): string
     return table.concat(out);
 end
 
-@native
+--native
 function instructions.decode_instruction(insn: number, next_insn: number?): t.Instruction
     return decode_instruction(insn, next_insn);
 end
@@ -167,7 +167,7 @@ end
     Decodes a buffer containing an array of instructions into an array of 
     `Instruction`s.
 ]=]
-@native
+--native
 function instructions.decode(insn_buffer: buffer): {t.Instruction}
     local size = buffer.len(insn_buffer);
     local count = size / 4;
@@ -200,7 +200,7 @@ end
     The first number contains the encoded instruction.
     The second contains the aux instruction, or nil if it doesn't have one.
 ]=]
-@native
+--native
 function instructions.encode_instruction(insn: t.Instruction): (number, number?)
     return encode_instruction(insn)
 end
@@ -208,7 +208,7 @@ end
 --[=[
     Encodes an array of `Instruction`s into a buffer.
 ]=]
-@native
+--native
 function instructions.encode(instructions: {t.Instruction}): buffer
     local buf = buffer.create(#instructions * 2 * 4); -- Assume every instruction as an aux insn, trim later.
     local cursor = 0;
@@ -230,7 +230,7 @@ end
 --[=[
     Extracts the opcode from an instruction as a `u8`.
 ]=]
-@native
+--native
 function instructions.insn_op(insn: number): number
     return INSN_OP(insn);
 end
@@ -238,7 +238,7 @@ end
 --[=[
     Extracts the `A` operand from an instruction as a `u8`.
 ]=]
-@native
+--native
 function instructions.insn_a(insn: number): number
     return INSN_A(insn);
 end
@@ -246,7 +246,7 @@ end
 --[=[
     Extracts the `B` operand from an instruction as a `u8`.
 ]=]
-@native
+--native
 function instructions.insn_b(insn: number): number
     return INSN_B(insn);
 end
@@ -254,7 +254,7 @@ end
 --[=[
     Extracts the `C` operand from an instruction as a `u8`.
 ]=]
-@native
+--native
 function instructions.insn_c(insn: number): number
     return INSN_C(insn);
 end
@@ -262,7 +262,7 @@ end
 --[=[
     Extracts the `D` operand from an instruction as an `i16`.
 ]=]
-@native
+--native
 function instructions.insn_d(insn: number): number
     return INSN_D(insn);
 end
@@ -270,7 +270,7 @@ end
 --[=[
     Extracts the `E` operand from an instruction as an `i24`.
 ]=]
-@native
+--native
 function instructions.insn_e(insn: number): number
     return INSN_E(insn);
 end

@@ -131,6 +131,7 @@ local builtins: {(...any) -> ...any} = {
     vector.min,
     vector.max,
     math.lerp,
+    vector.lerp,
 };
 constants.builtins = builtins;
 

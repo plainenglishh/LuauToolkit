@@ -1,6 +1,6 @@
 --!native
 
-local common = require("@luau_toolkit/common");
+local common = require("../../common");
 
 local constants = require("../constants");
 local t = require("../types");

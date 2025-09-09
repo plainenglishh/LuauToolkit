@@ -1,13 +1,14 @@
-local byteparse = require("../common/byteparse");
+local common = require("../common");
 local encode = require("./chunk/encode");
 local constants = require("./constants");
 local import_id = require("./import_id");
 local instructions = require("./instructions");
 local t = require("./types");
 
+local byteparse = common.byteparse;
+
 local ERR_UNSTARTED_FUNCTION = "this method can only be called when constructing a function";
 
-@native
 local function reinterpret_unsigned(n: number, bitwidth: number): number
     if n < 0 then
         return n + 2^bitwidth;
