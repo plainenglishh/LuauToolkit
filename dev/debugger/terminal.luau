@@ -8,11 +8,6 @@ local PLUS = string.byte("+");
 local BAR = string.byte("|");
 local X = string.byte("X");
 
-local function strip_ansi(str: string): string
-    local a = str:gsub("\x1b%[[0-9;]*[A-Za-z]", "");
-    return a;
-end
-
 local terminal = {};
 
 --[=[
@@ -194,7 +189,6 @@ function terminal.create_tui(width: number, height: number): Tui
             offset += 1;
         end
 
-        -- map grid over raw frame contents (just trim x and y).
         -- TODO: consider text alignment and padding, assume no padding and top-left align for now.
 
         tui.raw_frame({
@@ -210,9 +204,9 @@ function terminal.create_tui(width: number, height: number): Tui
     buffer.fill(fb, 0, SPACE);
 
     function tui.generate(): buffer
-        table.sort(entities, function(a: Entity, b: Entity): boolean
+        --[[table.sort(entities, function(a: Entity, b: Entity): boolean
             return a.z_offset > b.z_offset;
-        end);
+        end);]]
     
         for _, entity in entities do
             for row = 0, entity.size.y - 1 do
