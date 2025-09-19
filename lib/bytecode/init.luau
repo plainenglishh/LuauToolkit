@@ -1,5 +1,12 @@
 local t = require("@self/types");
 
+local chunk = require("@self/chunk");
+local instructions = require("@self/instructions");
+local constants = require("@self/constants");
+local import_id = require("@self/import_id");
+local ops = require("@self/ops");
+local BytecodeBuilder = require("@self/BytecodeBuilder");
+
 --[=[
     Library for working with Luau bytecode.
 
@@ -7,16 +14,16 @@ local t = require("@self/types");
 ]=]
 local bytecode = {};
 
-bytecode.chunk = require("@self/chunk");
-bytecode.instructions = require("@self/instructions");
-bytecode.constants = require("@self/constants");
-bytecode.import_id = require("@self/import_id");
-bytecode.util = require("@self/util");
-
-local BytecodeBuilder = require("@self/BytecodeBuilder");
+bytecode.encode = chunk.encode;
+bytecode.decode = chunk.decode;
+bytecode.validate = chunk.validate;
+bytecode.instructions = instructions;
+bytecode.constants = constants;
+bytecode.import_id = import_id;
+bytecode.ops = ops;
 bytecode.BytecodeBuilder = BytecodeBuilder;
-export type BytecodeBuilder = BytecodeBuilder.BytecodeBuilder;
 
+export type BytecodeBuilder = BytecodeBuilder.BytecodeBuilder;
 --BEGIN_REEXPORTS
 export type OperandName = t.OperandName;
 export type OperandType = t.OperandType;

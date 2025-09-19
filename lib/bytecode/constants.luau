@@ -14,7 +14,7 @@ local constants = {};
     @interface supported_bytecode_versions
     @within bytecode.constants
 ]=]
-constants.supported_bytecode_versions = { 
+constants.SUPPORTED_VERSIONS = { 
     min = 4, 
     max = 6, 
     target = 6 
@@ -26,7 +26,7 @@ constants.supported_bytecode_versions = {
     @interface constant_types
     @within bytecode.constants
 ]=]
-constants.constant_types = {
+constants.CONSTANT_TYPES = {
     [0] = "nil",
     [1] = "boolean",
     [2] = "number",
@@ -43,7 +43,7 @@ constants.constant_types = {
     @interface proto_flag
     @within bytecode.constants
 ]=]
-constants.proto_flag = {
+constants.PROTO_FLAGS = {
     native_module = 0,
     native_cold = 1, 
     native_function = 2,
@@ -55,7 +55,7 @@ constants.proto_flag = {
     @interface builtins
     @within bytecode.constants
 ]=]
-local builtins: {(...any) -> ...any} = {
+local BUILTINS: {(...any) -> ...any} = {
     assert,
     math.abs,
     math.acos,
@@ -147,9 +147,9 @@ local builtins: {(...any) -> ...any} = {
     math.lerp,
     vector.lerp,
 };
-constants.builtins = builtins;
+constants.BUILTINS = BUILTINS;
 
-local builtin_names = {
+local BUILTIN_NAMES = {
     "assert",
     "math.abs",
     "math.acos",
@@ -247,6 +247,6 @@ local builtin_names = {
     @interface builtin_names
     @within bytecode.constants
 ]=]
-constants.builtin_names = builtin_names;
+constants.BUILTIN_NAMES = BUILTIN_NAMES;
 
 return constants;

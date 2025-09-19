@@ -1,5 +1,5 @@
 local common = require("../common");
-local encode = require("./chunk/encode");
+local chunk = require("./chunk");
 local constants = require("./constants");
 local import_id = require("./import_id");
 local instructions = require("./instructions");
@@ -107,7 +107,7 @@ type BytecodeBuilderImpl = {
     add_constant_number: (self: BytecodeBuilder, value: number, force: boolean?) -> number,
     add_constant_string: (self: BytecodeBuilder, value: string | number, force: boolean?) -> number,
     add_constant_import: (self: BytecodeBuilder, value: {string}, force: boolean?) -> (number, number),
-    add_constant_table: (self: BytecodeBuilder, value: any, force: boolean?) -> number,
+    add_constant_table: (self: BytecodeBuilder, value: {number}, force: boolean?) -> number,
     add_constant_closure: (self: BytecodeBuilder, value: number, force: boolean?) -> number,
     add_constant_vector: (self: BytecodeBuilder, value: {number}, force: boolean?) -> number,
 
@@ -139,7 +139,7 @@ BytecodeBuilderMt.__index = BytecodeBuilder;
 
 function BytecodeBuilder.new(): BytecodeBuilder
     return setmetatable({
-        _luau_version = constants.supported_bytecode_versions.target,
+        _luau_version = constants.SUPPORTED_VERSIONS.target,
         _types_version = 1,
         _strings = {},
         _userdata_types = {},
@@ -442,7 +442,7 @@ function BytecodeBuilder.add_constant_import(self: BytecodeBuilder, value: {stri
     }, force), import_id;
 end
 
-function BytecodeBuilder.add_constant_table(self: BytecodeBuilder, value: any, force: boolean?): number
+function BytecodeBuilder.add_constant_table(self: BytecodeBuilder, value: {number}, force: boolean?): number
     return self:add_constant({
         type = "table",
         value = value,
@@ -626,7 +626,7 @@ function BytecodeBuilder.to_chunk(self: BytecodeBuilder): t.Chunk
 end
 
 function BytecodeBuilder.to_bytecode(self: BytecodeBuilder): buffer
-    return encode(self:to_chunk());
+    return chunk.encode(self:to_chunk());
 end
 
 return BytecodeBuilder;

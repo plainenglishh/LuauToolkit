@@ -4,7 +4,7 @@ local t = require("../types");
     Adds a string to a `Chunk`s string table, checking if it already exists, and
     returns the StringId.
 
-    @within bytecode.util
+    @within bytecode.ops
 ]=]
 local function add_string(chunk: t.Chunk, str: string): t.StringRef
     for i, v in chunk.strings do

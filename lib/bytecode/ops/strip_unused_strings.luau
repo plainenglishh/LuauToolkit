@@ -3,7 +3,7 @@ local t = require("../types");
 --[=[
     Removes unused strings from a Chunk.
 
-    @within bytecode.util
+    @within bytecode.ops
 ]=]
 local function strip_unused_strings(chunk: t.Chunk)
     local function is_referenced(string_id: number): boolean

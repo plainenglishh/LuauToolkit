@@ -1,4 +1,4 @@
-local metadata = require("./instruction_metadata");
+local metadata = require("@self/metadata");
 local t = require("./types");
 
 --native
