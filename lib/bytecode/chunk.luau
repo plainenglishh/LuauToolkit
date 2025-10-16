@@ -275,7 +275,7 @@ end
     Encodes a Chunk to a buffer.
 
     NOTE: This function intentionally does **not** check for validity. 
-          Run `bytecode.chunk.validate` beforehand if this is desired.
+          Run `bytecode.validate` beforehand if this is desired.
 
     @within bytecode.chunk
 ]=]
@@ -457,8 +457,6 @@ end
     - Instruction arguments
 ]]
 
-local luau_versions = constants.SUPPORTED_VERSIONS;
-
 type ReportIssueFn = (severity: t.ValidationIssueSeverity, message: string, note: string?) -> ();
 
 --[[
@@ -489,7 +487,7 @@ local function validate_proto(chunk: t.Chunk, proto_id: number, proto: t.Proto, 
 end
 
 local function validate_chunk(chunk: t.Chunk, report_issue: ReportIssueFn)
-    if in_range(chunk.luau_version, luau_versions.min, luau_versions.max) then
+    if in_range(chunk.luau_version, constants.SUPPORTED_VERSIONS.min, constants.SUPPORTED_VERSIONS.max) then
         report_issue("error", `luau_version ({chunk.luau_version}) is outside supported range ({constants.SUPPORTED_VERSIONS.min}..{constants.SUPPORTED_VERSIONS.max})`);
     end
 

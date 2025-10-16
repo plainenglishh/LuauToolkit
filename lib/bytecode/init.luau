@@ -17,6 +17,7 @@ local bytecode = {};
 bytecode.encode = chunk.encode;
 bytecode.decode = chunk.decode;
 bytecode.validate = chunk.validate;
+bytecode.disassemble = require("@self/disassemble");
 bytecode.instructions = instructions;
 bytecode.constants = constants;
 bytecode.import_id = import_id;
