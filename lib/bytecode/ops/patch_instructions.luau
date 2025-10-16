@@ -18,7 +18,7 @@ end
 
     @within bytecode.ops
 ]=]
-local function patch_instructions(proto: t.Proto, pc: number, inserted: buffer|{t.Instruction})
+local function patch_instructions(proto: t.Proto, pc: number, inserted: buffer | {t.Instruction})
     local inserted = if type(inserted) == "buffer" then inserted else instructions.encode(inserted);
     proto.instructions = buffer_insert(proto.instructions, inserted, pc * 4);
 

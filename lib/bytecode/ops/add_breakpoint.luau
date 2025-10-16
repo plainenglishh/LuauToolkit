@@ -37,7 +37,7 @@ local function get_pc_for_line(proto: t.Proto, line: number): number
 end
 
 --[=[
-    Inserts a breakpoint to a line.
+    Inserts a breakpoint on a given line.
 
     @within bytecode.ops
 ]=]
