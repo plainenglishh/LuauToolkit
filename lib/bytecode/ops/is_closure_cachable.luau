@@ -3,6 +3,9 @@ local get_closure_instantiation = require("./get_closure_instantiation");
 
 --[=[
     Returns whether a closure is cachable.
+    
+    A closure is cachable when it has no upvalues, or only has immutable 
+    module-level upvalues.
 ]=]
 local function is_closure_cachable(chunk: t.Chunk, proto: number | t.Proto): boolean
     local instantiation = get_closure_instantiation(chunk, proto);

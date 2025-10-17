@@ -10,6 +10,9 @@ type Instantiation = {
     type: "DUPCLOSURE" | "NEWCLOSURE",
 };
 
+--[=[
+    Returns where and how a closure is created.
+]=]
 local function get_closure_instantiation(chunk: t.Chunk, proto: number | t.Proto): Instantiation?
     local proto_ref = if type(proto) == "number" then proto else table.find(chunk.protos, proto) or error("orphaned proto") - 1;
 
