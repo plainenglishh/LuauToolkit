@@ -249,4 +249,10 @@ local BUILTIN_NAMES = {
 ]=]
 constants.BUILTIN_NAMES = BUILTIN_NAMES;
 
+constants.CAPTURE_TYPE = {
+    VAL = 0,
+    REF = 1,
+    UPVAL = 2,
+};
+
 return constants;
